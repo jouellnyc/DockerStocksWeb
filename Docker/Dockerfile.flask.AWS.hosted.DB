@@ -1,0 +1,39 @@
+FROM python:3.7
+
+RUN apt-get update  -y && \ 
+    apt-get install -y --no-install-recommends vim \
+    curl \
+    less \
+    net-tools \
+    telnet && pip install --upgrade pip
+
+RUN mkdir /shouldipickitup/ 
+WORKDIR /shouldipickitup/
+
+COPY requirements.txt /shouldipickitup/
+RUN pip install -r requirements.txt
+
+RUN mkdir /shouldipickitup/non-app/  
+RUN mkdir /shouldipickitup/static/     
+RUN mkdir /shouldipickitup/templates/ 
+RUN mkdir /shouldipickitup/lib/
+RUN mkdir -p /shouldipickitup/external/gunicorn/
+
+COPY static/          /shouldipickitup/static/
+COPY non-app/         /shouldipickitup/non-app/
+COPY templates/       /shouldipickitup/templates/
+COPY main.py          /shouldipickitup/
+COPY stock_flask.py   /shouldipickitup/
+COPY external/gunicorn/gunicorn.conf.py /shouldipickitup/external/gunicorn/
+COPY lib/             /shouldipickitup/lib/
+
+RUN chown -R nobody:  /shouldipickitup/
+RUN sed -i s"/MONGOCLIENTLINE/client = MongoClient(host=\"shouldipickitup_db_1\", \
+serverSelectionTimeoutMS=2000)${MONGOUSERNAME}/" lib/mongodb.py
+
+COPY Docker/flask-docker-entrypoint.AWS.hosted.DB.sh /usr/sbin/flask-docker-entrypoint.sh
+RUN chmod 755 /usr/sbin/flask-docker-entrypoint.sh 
+
+USER nobody
+ENTRYPOINT ["/usr/sbin/flask-docker-entrypoint.sh"]
+EXPOSE 8000

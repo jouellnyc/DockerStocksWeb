@@ -1,0 +1,170 @@
+<html>
+
+    <head>
+        <title> Financial data for  {{stock}}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+
+<body>
+
+<table border=1>
+
+  <tr>
+    <td>
+        {{stock}}
+    </td>
+
+    <td>
+        Market Cap: {{mc_val}} {{mc_den}}
+    </td>
+
+    <td>
+        Rev TTM {{rev_ttm_val}} {{rev_ttm_den}}
+    </td>
+
+    <td>
+        ROIC {{roic}}
+    </td>
+
+    <td>
+        Net INC TTM {{net_inc_val}} {{net_inc_den}}
+    </td>
+
+  </tr>
+
+
+
+  <tr>
+
+    <td>
+          Revenue 
+
+        <P>
+        {% for key,val in revenue.items() %}
+
+        {{key}} {{val['Val']}} {{val['Den']}}
+        <P>
+
+        {% endfor %}
+
+    </td>
+
+
+
+     <td>
+
+      Revenue_Growth
+     
+      <P>
+   {% for key,val in revenue.items() %}
+
+     {{key}} {{val['Val']}} {{val['Den']}}
+     <P>
+
+   {% endfor %}
+    </td>
+
+
+
+     <td>
+
+        Net Income
+
+     <P>
+   {% for key,val in net_inc.items() %}
+
+     {{key}} {{val['Val']}} {{val['Den']}}
+     <P>
+
+   {% endfor %}
+    </td>
+
+
+
+     <td>
+
+          Net Income_Growth
+
+     <P>
+   {% for key,val in net_inc_growth.items() %}
+
+     {{key}} {{val['Val']}} {{val['Den']}}
+     <P>
+
+   {% endfor %}
+    </td>
+   
+
+    <td>
+
+        EPS_Growth
+
+     <P>
+   {% for key,val in eps_growth.items() %}
+
+     {{key}} {{val['Val']}} {{val['Den']}}
+     <P>
+
+   {% endfor %}
+    </td>
+
+
+
+     <td>
+
+        FCF
+
+     <P>
+   {% for key,val in fcf.items() %}
+
+     {{key}} {{val['Val']}} {{val['Den']}}
+     <P>
+
+   {% endfor %}
+    </td>
+
+
+
+     <td>
+
+        FCF_Growth
+
+     <P>
+     {% for key,val in stock_data['FCF_Growth'].items() %}
+
+     {{key}} {{val['Val']}} {{val['Den']}}
+     <P>
+
+    {% endfor %}
+    </td>
+
+
+
+
+
+  </tr>
+
+</table>
+
+<P>
+
+<button onclick="goBack()">Back</button>
+
+<script>
+function goBack() {
+  window.history.back();
+}
+</script>
+
+<P>
+
+  <img src="../images/dollar.png" style="height:80%"> 
+
+<small>
+Data provided on this site is for education purposes only.
+No offer or guarantee of any financial outcome is being made of any kind.
+By using this site you agree to using the data as-is with no warranty of any kind.
+</small>
+
+</body>
+</html>

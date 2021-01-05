@@ -1,0 +1,205 @@
+<html>
+
+    <head>
+        <title> Financial data for  {{stock}}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+
+<body>
+
+<table class="comicGreen" style='table-layout:fixed;' border=1>
+
+  <tr>
+    <td>
+        {{stock}}
+    </td>
+
+    <td>
+      Market Cap: 
+    </td>
+
+    <td>
+      {{stock_data['MC']['Val']}} {{stock_data['MC']['Den']}}
+    </td>
+
+    <td>
+        Rev TTM:
+    </td>
+
+    <td>
+        {{stock_data['RevTTM']['Val']}}  {{stock_data['RevTTM']['Den']}}  
+    </td>
+
+
+    <td>
+      Net INC TTM:
+    </td>
+
+    <td>
+     {{stock_data['NetIncTTM']['Val']}} {{stock_data['NetIncTTM']['Den']}}
+    </td>
+
+    <td>
+        ROIC {{stock_data['ROIC']}}
+    </td>
+
+  </tr>
+
+
+
+  <tr>
+
+    <td>
+         Revenue 
+
+        <P>
+        {% for key,val in stock_data['revenue'].items() %}
+
+        {{key}} {{val['Val']}} {{val['Den']}}
+        <P>
+
+        {% endfor %}
+
+    </td>
+
+
+
+     <td>
+
+      Revenue_Growth
+     
+      <P>
+   {% for key,val in stock_data['revenue_Growth'].items() %}
+
+     {{val}} &percnt;
+     <P>
+
+   {% endfor %}
+    </td>
+
+
+
+     <td>
+
+        Net Income
+
+     <P>
+   {% for key,val in stock_data['Net Income'].items() %}
+
+     {{key}} {{val['Val']}} {{val['Den']}}
+     <P>
+
+   {% endfor %}
+    </td>
+
+
+
+     <td>
+
+          Net Income_Growth
+
+     <P>
+
+     {% for key,val in stock_data['Net Income_Growth'].items() %}
+
+     {{val}} &percnt;
+
+     <P>
+
+   {% endfor %}
+    </td>
+   
+
+    <td>
+        EPS
+     <P>
+
+      {% for key,val in stock_data['EPS'].items() %}
+
+      {{val}}
+
+     <P>
+        {% endfor %}
+    </td>
+
+
+    <td>
+        EPS_Growth
+     <P>
+
+      {% for key,val in stock_data['EPS_Growth'].items() %}
+
+      {{val}} &percnt;
+
+     <P>
+        {% endfor %}
+    </td>
+
+
+
+     <td>
+        FCF
+     <P>
+
+      {% for key,val in stock_data['FCF'].items() %}
+
+      {{key}} {{val['Val']}} {{val['Den']}}
+
+     <P>
+        {% endfor %}
+    </td>
+
+
+
+     <td>
+        FCF_Growth
+     <P>
+
+      {% for key,val in stock_data['FCF_Growth'].items() %}
+
+      {{val}} &percnt;
+
+     <P>
+       {% endfor %}
+    </td>
+
+
+  </tr>
+</table>
+
+
+
+<table width="%100">
+
+  <tr>
+
+  <td colspan="100%">
+    <img style="display:block;" width="125%" height="100%" src="../images/dollar.png"> 
+  </td>
+
+  </tr>
+
+</table>
+
+
+<P>
+
+<button onclick="goBack()">Back</button>
+
+<script>
+function goBack() {
+  window.history.back();
+}
+</script>
+
+<P>
+
+
+<small>
+Data provided on this site is for education purposes only.
+No offer or guarantee of any financial outcome is being made of any kind.
+By using this site you agree to using the data as-is with no warranty of any kind.
+</small>
+
+</body>
+</html>

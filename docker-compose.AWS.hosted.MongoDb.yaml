@@ -1,0 +1,35 @@
+version: "3"
+services:
+  app:
+      build:
+        context: .
+        dockerfile: Docker/Dockerfile.flask.AWS.hosted.DB
+      networks:
+        - stocksnetwork
+      logging:
+        driver: awslogs
+        options:
+          awslogs-region: $AWS_REGION
+          awslogs-group: flask
+      cap_drop:
+        - ALL 
+  web:
+      build:
+        context: .
+        dockerfile: Docker/Dockerfile.nginx
+      depends_on:
+        - app
+      ports:
+        - "80:8080"
+      networks:
+        - stocksnetwork 
+      logging:
+        driver: awslogs
+        options:
+          awslogs-region: $AWS_REGION
+          awslogs-group: nginx
+      cap_drop:
+        - ALL 
+networks:
+  stocksnetwork:
+    driver: bridge

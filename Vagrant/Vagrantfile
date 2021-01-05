@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Super Duper quick and dirty vagrant provision script - Dev
+
+#Docker install
+which docker || (curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh)
+
+#Docker Compose install
+[ -f /usr/local/bin/docker-compose ] || sudo curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose
+
+#Pip install
+which pip3 ||  sudo apt install python3-pip -y
+
+
+#Use with a config like this:
+VAGRANT>>>EOF
+Vagrant.configure("2") do |config|
+    config.vm.box = "bento/ubuntu-18.04"
+    config.vm.provider "virtualbox" do |v|
+    config.vm.network "public_network", bridge: "enp3s0", ip: "192.168.0.55"
+        v.memory = 8192
+        v.cpus = 2
+        v.name = "AWS"
+    config.vm.provision :shell, path: "bootstrap.sh"
+    end
+end
+VAGRANT
+
+

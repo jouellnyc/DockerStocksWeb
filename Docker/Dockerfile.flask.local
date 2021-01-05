@@ -1,0 +1,34 @@
+FROM python:3.7
+
+RUN apt-get update  -y && \ 
+    apt-get install -y --no-install-recommends vim \
+    curl \
+    net-tools \
+    less \
+    telnet \
+    net-tools  &&  pip install --upgrade pip
+
+ENV WORKDIR /stocks/
+RUN mkdir /$WORKDIR/ 
+
+COPY requirements.txt /$WORKDIR/
+RUN pip3 install -r /$WORKDIR/requirements.txt
+
+RUN mkdir /$WORKDIR/non-app/ &&  mkdir /$WORKDIR/static/ && mkdir /$WORKDIR/templates/ && mkdir /$WORKDIR/lib/
+RUN mkdir -p /$WORKDIR/external/gunicorn/
+
+COPY static/          /$WORKDIR/static/
+COPY non-app/         /$WORKDIR/non-app/
+COPY templates/       /$WORKDIR/templates/
+COPY stock_flask.py   /$WORKDIR/
+COPY external/gunicorn/gunicorn.conf.py /$WORKDIR/external/gunicorn/
+COPY lib/             /$WORKDIR/lib/
+
+RUN chown -R nobody:  /$WORKDIR/
+COPY Docker/flask-docker-entrypoint.local /usr/sbin/flask-docker-entrypoint.sh
+RUN chmod 755 /usr/sbin/flask-docker-entrypoint.sh 
+RUN rm /usr/bin/python3 && ln -s /usr/local/bin/python3 /usr/bin/python3
+
+USER nobody
+ENTRYPOINT ["/usr/sbin/flask-docker-entrypoint.sh"]
+EXPOSE 8000
