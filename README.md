@@ -30,7 +30,7 @@ and so on.....
 
 ## Installing Locally
 ```
-git clone https://github.com/ShouldIPickItUp/Finance
+git clone https://github.com/jouellnyc/stocks_web
 cd stocks_web 
 docker-compose -f docker-compose.local.yaml  up -d
 ```
