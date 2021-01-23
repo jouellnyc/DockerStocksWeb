@@ -33,7 +33,7 @@ def main(stock):
         df  = income_data[["fiscalDateEnding", "totalRevenue", "netIncome" ]]
 
         """
-        df looks like this:
+        df looks like this now:
                   fiscalDateEnding totalRevenue   netIncome
         index
         0           2019-12-31     57300000       -808500000
@@ -59,7 +59,7 @@ def main(stock):
 
 
         """
-        df looks like this:
+        df looks like this now:
                   fiscalDateEnding  totalRevenue   netIncome  Revenue_Growth  NetInc_Growth
         index
         0           2020-01-31   10918000000  2796000000        0.168587       0.354172
@@ -69,7 +69,7 @@ def main(stock):
         4           2016-01-31    5010000000   614000000        0.000000       0.000000
 
 
-        df.to_dict('records') looks like: 
+        df.to_dict('records') looks like:
 
         [{'fiscalDateEnding': '2020-01-31', 'totalRevenue': 10918000000, 'netIncome': 2796000000, 'Revenue_Growth': 0.1685870595963277, 'NetInc_Growth': 0.35417178008219086}, 
         {'fiscalDateEnding': '2019-01-31', 'totalRevenue': 11716000000, 'netIncome': 4141000000, 'Revenue_Growth': 0.23661756024638625, 'NetInc_Growth': 0.6115144899902718}, 
