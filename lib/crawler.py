@@ -82,7 +82,6 @@ def main(stock):
         {'fiscalDateEnding': '2018-01-31', 'totalRevenue': 9714000000, 'netIncome': 3047000000, 'Revenue_Growth': 0.24696268563501333, 'NetInc_Growth': 0.7056949396757586}, 
         {'fiscalDateEnding': '2017-01-31', 'totalRevenue': 6910000000, 'netIncome': 1666000000, 'Revenue_Growth': 0.17441113625768545, 'NetInc_Growth': 0.6472264716364702}, 
         {'fiscalDateEnding': '2016-01-31', 'totalRevenue': 5010000000, 'netIncome': 614000000, 'Revenue_Growth': 0.0, 'NetInc_Growth': 0.0}]
-        :w
         """
 
         """ Setup our mongo doc as a hash to prepare to send to Mongo """
