@@ -15,32 +15,19 @@
     </td>
 
     <td>
-      Market Cap: 
+      Market Cap: {{ stock_data['Market Cap'] }}
     </td>
 
     <td>
-      {{stock_data['MC']['Val']}} {{stock_data['MC']['Den']}}
+        Rev TTM: {{ stock_data['RevTTM'] }}
     </td>
 
     <td>
-        Rev TTM:
+      Net INC TTM
     </td>
 
     <td>
-        {{stock_data['RevTTM']['Val']}}  {{stock_data['RevTTM']['Den']}}  
-    </td>
-
-
-    <td>
-      Net INC TTM:
-    </td>
-
-    <td>
-     {{stock_data['NetIncTTM']['Val']}} {{stock_data['NetIncTTM']['Den']}}
-    </td>
-
-    <td>
-        ROIC {{stock_data['ROIC']}}
+        ROIC
     </td>
 
   </tr>
@@ -49,122 +36,52 @@
 
   <tr>
 
-    <td>
-         Revenue 
-
-        <P>
-        {% for key,val in stock_data['revenue'].items() %}
-
-        {{key}} {{val['Val']}} {{val['Den']}}
-        <P>
-
-        {% endfor %}
-
-    </td>
-
-
-
-     <td>
-
-      Revenue_Growth
-     
-      <P>
-   {% for key,val in stock_data['revenue_Growth'].items() %}
-
-     {{val}} &percnt;
-     <P>
-
-   {% endfor %}
-    </td>
-
-
-
-     <td>
-
-        Net Income
-
-     <P>
-   {% for key,val in stock_data['Net Income'].items() %}
-
-     {{key}} {{val['Val']}} {{val['Den']}}
-     <P>
-
-   {% endfor %}
-    </td>
-
-
-
-     <td>
-
-          Net Income_Growth
-
-     <P>
-
-     {% for key,val in stock_data['Net Income_Growth'].items() %}
-
-     {{val}} &percnt;
-
-     <P>
-
-   {% endfor %}
-    </td>
-   
 
     <td>
-        EPS
-     <P>
-
-      {% for key,val in stock_data['EPS'].items() %}
-
-      {{val}}
-
-     <P>
-        {% endfor %}
+	     BookValue : {{ stock_data['BookValue'] }} </td>
     </td>
-
 
     <td>
-        EPS_Growth
-     <P>
-
-      {% for key,val in stock_data['EPS_Growth'].items() %}
-
-      {{val}} &percnt;
-
-     <P>
-        {% endfor %}
+             PriceToBookRatio :  {{ stock_data['PriceToBookRatio'] }}
     </td>
 
-
-
-     <td>
-        FCF
-     <P>
-
-      {% for key,val in stock_data['FCF'].items() %}
-
-      {{key}} {{val['Val']}} {{val['Den']}}
-
-     <P>
-        {% endfor %}
+    <td>
+	    PriceToSalesTTM :  {{ stock_data['PriceToSalesTTM'] }}
     </td>
 
-
-
-     <td>
-        FCF_Growth
-     <P>
-
-      {% for key,val in stock_data['FCF_Growth'].items() %}
-
-      {{val}} &percnt;
-
-     <P>
-       {% endfor %}
+    <td>
+	    TrailingPE: {{ stock_data['TrailingPE'] }}
     </td>
 
+    <td>
+      Currency
+    </td>
 
   </tr>
+
+
+
+  <tr>
+        <td>
+        Revenue  and Net Income
+       </td>
+  </tr>
+
+{% for key,val in stock_data['Years'].items() %}
+
+    <tr>
+
+     <td> {{key}} </td>   
+     <td> Revenue:    {{ val['Revenue']       }}   </td>   
+     <td> RevGrowth:  {{ val['RevenueGrowth'] }}   </td>
+     <td> NetIncome:  {{ val['NetIncome']     }}   </td>   
+     <td> NetIGrowth: {{ val['NetIncGrowth'] }} </td>
+
+   </tr>
+
+{% endfor %}
+
+
 </table>
 
 
@@ -174,15 +91,13 @@
   <tr>
 
   <td colspan="100%">
-    <img style="display:block;" width="125%" height="100%" src="../images/dollar.png"> 
+    <img style="display:block;" width="125%" height="100%" src="../images/dollar.png">
   </td>
 
   </tr>
 
 </table>
 
-
-<P>
 
 <button onclick="goBack()">Back</button>
 
@@ -191,8 +106,6 @@ function goBack() {
   window.history.back();
 }
 </script>
-
-<P>
 
 
 <small>
