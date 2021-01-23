@@ -9,6 +9,7 @@ from millify import millify
 from mongodb import MongoCli
 
 import pandas as pd
+""" All Assignment of df Slices """
 pd.options.mode.chained_assignment = None
 
 api_key = "ZZZZZZZZZZZZZZZ"
