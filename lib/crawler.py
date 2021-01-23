@@ -11,7 +11,7 @@ from mongodb import MongoCli
 import pandas as pd
 pd.options.mode.chained_assignment = None
 
-api_key = "XCLK59G68DQR3EFM"
+api_key = "ZZZZZZZZZZZZZZZ"
 format = "json"
 format = "pandas"
 alpha = FundamentalData(key=api_key, output_format=format, indexing_type="integer")
