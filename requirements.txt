@@ -10,3 +10,5 @@ botocore==1.15.17
 numpy==1.19.4
 pandas==1.1.4
 lxml==4.6.1
+alpha_vantage==2.3.1
+millify==0.1.1
