@@ -25,15 +25,13 @@ import logging
 
 
 class MongoCli:
-
-
     def __init__(self):
 
-        self.database_name   = 'db'
-        self.collection_name = 'cname'
-        self.username        = 'user'
-        self.password        = 'pass'
-        self.mongo_host      = 'host'
+        self.database_name = "db"
+        self.collection_name = "cname"
+        self.username = "user"
+        self.password = "pass"
+        self.mongo_host = "host"
         self.dbh = self.ConnectToMongo()
 
     def ConnectToMongo(self):
@@ -53,13 +51,13 @@ class MongoCli:
         """
 
         username = self.username
-        password = self.password 
+        password = self.password
         collection_name = self.collection_name
-        database_name   = self.database_name
+        database_name = self.database_name
         mongo_host = self.mongo_host
 
         try:
-            client = MongoClient('mongodb://db:27017/')
+            client = MongoClient("mongodb://db:27017/")
             client.server_info()
             database_handle = client[database_name]
             collection_handle = database_handle[collection_name]
@@ -68,7 +66,7 @@ class MongoCli:
             raise
 
     def lookup_stock(self, stock):
-        response = self.dbh.find_one( {"Stock": stock}, {"_id" : 0 })
+        response = self.dbh.find_one({"Stock": stock}, {"_id": 0})
         if response is None:
             raise ValueError(f"{stock}  not found")
         else:
@@ -141,7 +139,7 @@ if __name__ == "__main__":
 
     try:
         mg = MongoCli()
-        print(mg.lookup_stock({'Stock': 'AGEN'}))
+        print(mg.lookup_stock({"Stock": "AGEN"}))
     except ConnectionFailure as e:
         print("MongoDB ConnectionFailure: ", e)
         print("Is your IP whitelisted?")

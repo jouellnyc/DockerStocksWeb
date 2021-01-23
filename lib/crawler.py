@@ -9,6 +9,7 @@ from millify import millify
 from mongodb import MongoCli
 
 import pandas as pd
+
 """ All Assignment of df Slices """
 pd.options.mode.chained_assignment = None
 
@@ -17,9 +18,11 @@ format = "json"
 format = "pandas"
 alpha = FundamentalData(key=api_key, output_format=format, indexing_type="integer")
 
+
 def mk_pretty(num):
     """ Pretty print Growth Rate """
     return "%.2f" % (num * 100) + "%"
+
 
 def main(stock):
 
@@ -27,10 +30,10 @@ def main(stock):
         """ Pull Down Income Data from Alpha Vantage """
         income_data, stock_name = alpha.get_income_statement_annual(stock)
         income_data.replace("None", 0, inplace=True)
-        #print(income_data)
+        # print(income_data)
 
         """ Setup our panda dataframe """
-        df  = income_data[["fiscalDateEnding", "totalRevenue", "netIncome" ]]
+        df = income_data[["fiscalDateEnding", "totalRevenue", "netIncome"]]
 
         """
         df looks like this now:
@@ -43,20 +46,23 @@ def main(stock):
         4           2015-12-31     12500000       -42900000
         """
 
-        """  Set data to numbers from strings """ 
-        df[["totalRevenue", "netIncome"]] = df[["totalRevenue", "netIncome"]].apply(pd.to_numeric)
+        """  Set data to numbers from strings """
+        df[["totalRevenue", "netIncome"]] = df[["totalRevenue", "netIncome"]].apply(
+            pd.to_numeric
+        )
 
-
-        """  Years is how many rows """ 
+        """  Years is how many rows """
         years = len(df.index)
 
         last_rev_value = int(df.totalRevenue.iloc[-1])
-        df["Revenue_Growth"] = (last_rev_value / df["totalRevenue"]) ** (1/(df.index - years)) - 1
+        df["Revenue_Growth"] = (last_rev_value / df["totalRevenue"]) ** (
+            1 / (df.index - years)
+        ) - 1
 
         last_ninc_value = int(df.netIncome.iloc[-1])
-        df["NetInc_Growth"]  = (last_ninc_value / df["netIncome"])   ** (1/(df.index - years)) - 1
-
-
+        df["NetInc_Growth"] = (last_ninc_value / df["netIncome"]) ** (
+            1 / (df.index - years)
+        ) - 1
 
         """
         df looks like this now:
@@ -79,21 +85,19 @@ def main(stock):
         :w
         """
 
-
-
         """ Setup our mongo doc as a hash to prepare to send to Mongo """
         mongo_doc = {}
-        mongo_doc['Stock'] = stock
-        mongo_doc['Years'] = {} 
-
+        mongo_doc["Stock"] = stock
+        mongo_doc["Years"] = {}
 
         """ millify() the data and re-arrange df """
-        for year in df.to_dict('records'):
-            mongo_doc['Years'][year['fiscalDateEnding']]  =   { "Revenue" : millify(year['totalRevenue'], precision=2),
-                                                                 "NetIncome" : millify(year['netIncome'], precision=2),
-                                                                 "NetIncGrowth" : mk_pretty(year['NetInc_Growth']),
-                                                                 "RevenueGrowth": mk_pretty(year['Revenue_Growth'])
-                                                              }
+        for year in df.to_dict("records"):
+            mongo_doc["Years"][year["fiscalDateEnding"]] = {
+                "Revenue": millify(year["totalRevenue"], precision=2),
+                "NetIncome": millify(year["netIncome"], precision=2),
+                "NetIncGrowth": mk_pretty(year["NetInc_Growth"]),
+                "RevenueGrowth": mk_pretty(year["Revenue_Growth"]),
+            }
         """
         mongo_doc looks like this now:
         { 'Stock': 'NVDA', 
@@ -107,28 +111,26 @@ def main(stock):
         }
         """
 
-
         """ Pull Down Overview Data from Alpha Vantage """
         overview_data, stock_name = alpha.get_company_overview(stock)
 
         """ Pull out Each value and millify() """
         revenue_ttm = overview_data["RevenueTTM"].values[0]
         market_cap = overview_data["MarketCapitalization"].values[0]
-        PETTM       = int(float(overview_data["TrailingPE"].values[0]))
+        PETTM = int(float(overview_data["TrailingPE"].values[0]))
         price2sales = float(overview_data["PriceToSalesRatioTTM"].values[0])
-        price2book  = float(overview_data["PriceToBookRatio"].values[0])
-        book_value  = overview_data["BookValue"].values[0]
-        if book_value != 'None':
+        price2book = float(overview_data["PriceToBookRatio"].values[0])
+        book_value = overview_data["BookValue"].values[0]
+        if book_value != "None":
             book_value = float(overview_data["BookValue"].values[0])
 
-        """ Add each as a key:value pair ... """ 
-        mongo_doc['RevTTM']           = millify(revenue_ttm, precision=2) 
-        mongo_doc['BookValue']        = book_value 
-        mongo_doc['Market Cap']       = millify(market_cap, precision=2)  
-        mongo_doc['TrailingPE']       = PETTM 
-        mongo_doc['PriceToSalesTTM']  = millify(price2sales, precision=2)
-        mongo_doc['PriceToBookRatio'] = millify(price2book,  precision=2)
-
+        """ Add each as a key:value pair ... """
+        mongo_doc["RevTTM"] = millify(revenue_ttm, precision=2)
+        mongo_doc["BookValue"] = book_value
+        mongo_doc["Market Cap"] = millify(market_cap, precision=2)
+        mongo_doc["TrailingPE"] = PETTM
+        mongo_doc["PriceToSalesTTM"] = millify(price2sales, precision=2)
+        mongo_doc["PriceToBookRatio"] = millify(price2book, precision=2)
 
         """
         mongo_doc now looks like this:
@@ -178,18 +180,18 @@ def main(stock):
 
         """
 
-    except Exception: 
+    except Exception:
         raise
     else:
         """ And now we are ready to send the Data to Mongo """
         print("OK, Sending to Mongo")
-        mg=MongoCli() 
+        mg = MongoCli()
         mg.dbh.insert_one(mongo_doc)
 
 
 if __name__ == "__main__":
 
-    #print('main')
+    # print('main')
     try:
         stock = sys.argv[1]
         main(stock)
@@ -199,9 +201,9 @@ if __name__ == "__main__":
     except KeyError as e:
         print("Likely a Data Issue")
         print("Not Sending to Mongo")
-        #logging.warning
+        # logging.warning
         print(type(e), e)
     except Exception as e:
         print("Uncaught handled Error")
         print(type(e), e)
-        #logging.error
+        # logging.error
