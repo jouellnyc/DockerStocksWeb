@@ -50,38 +50,44 @@ def main(stock):
             pd.to_numeric
         )
 
+        """ Calculate the x-Year Growth Rate for Revenue and Net Income """
+        """ The growth values are relative to the last year of data     """
+
+        #Trim the year value to get just the year
         df["Years"] = df['fiscalDateEnding'].apply(cut).apply(pd.to_numeric)
         last_year_value = df["Years"].iloc[-1]
         last_rev_value  = int(df.totalRevenue.iloc[-1])
         last_ninc_value = int(df.netIncome.iloc[-1])
-        
-        
+
+
         df["Revenue_Growth"] = (last_rev_value / df["totalRevenue"]) ** (
             1 / (last_year_value - df["Years"])
         ) - 1
-        
+
         df["NetInc_Growth"] = (last_ninc_value / df["netIncome"] ) ** (
             1 / (last_year_value - df["Years"])
         ) - 1
 
 
+        print(df)
+
         """
         df looks like this now:
-                  fiscalDateEnding  totalRevenue   netIncome  Revenue_Growth  NetInc_Growth
+                    fiscalDateEnding  totalRevenue    netIncome  Years  Revenue_Growth  NetInc_Growth
         index
-        0           2020-01-31   10918000000  2796000000        0.168587       0.354172
-        1           2019-01-31   11716000000  4141000000        0.236618       0.611514
-        2           2018-01-31    9714000000  3047000000        0.246963       0.705695
-        3           2017-01-31    6910000000  1666000000        0.174411       0.647226
-        4           2016-01-31    5010000000   614000000        0.000000       0.000000
+        0           2019-12-31      161857000000  34343000000     2019     0.212086       0.203908
+        1           2018-12-31      136819000000  30736000000     2018     0.221939       0.234225
+        2           2017-12-31      110855000000  12662000000     2017     0.215847      -0.119927
+        3           2016-12-31      90272000000  19478000000      2016     0.203803       0.191461
+        4           2015-12-31       74989000000  16348000000     2015     0.000000       0.000000
 
 
         df.to_dict('records') looks like:
 
-        [{'fiscalDateEnding': '2020-01-31', 'totalRevenue': 10918000000, 'netIncome': 2796000000, 'Revenue_Growth': 0.1685870595963277, 'NetInc_Growth': 0.35417178008219086}, 
-        {'fiscalDateEnding': '2019-01-31', 'totalRevenue': 11716000000, 'netIncome': 4141000000, 'Revenue_Growth': 0.23661756024638625, 'NetInc_Growth': 0.6115144899902718}, 
-        {'fiscalDateEnding': '2018-01-31', 'totalRevenue': 9714000000, 'netIncome': 3047000000, 'Revenue_Growth': 0.24696268563501333, 'NetInc_Growth': 0.7056949396757586}, 
-        {'fiscalDateEnding': '2017-01-31', 'totalRevenue': 6910000000, 'netIncome': 1666000000, 'Revenue_Growth': 0.17441113625768545, 'NetInc_Growth': 0.6472264716364702}, 
+        [{'fiscalDateEnding': '2020-01-31', 'totalRevenue': 10918000000, 'netIncome': 2796000000, 'Revenue_Growth': 0.1685870595963277, 'NetInc_Growth': 0.35417178008219086},
+        {'fiscalDateEnding': '2019-01-31', 'totalRevenue': 11716000000, 'netIncome': 4141000000, 'Revenue_Growth': 0.23661756024638625, 'NetInc_Growth': 0.6115144899902718},
+        {'fiscalDateEnding': '2018-01-31', 'totalRevenue': 9714000000, 'netIncome': 3047000000, 'Revenue_Growth': 0.24696268563501333, 'NetInc_Growth': 0.7056949396757586},
+        {'fiscalDateEnding': '2017-01-31', 'totalRevenue': 6910000000, 'netIncome': 1666000000, 'Revenue_Growth': 0.17441113625768545, 'NetInc_Growth': 0.6472264716364702},
         {'fiscalDateEnding': '2016-01-31', 'totalRevenue': 5010000000, 'netIncome': 614000000, 'Revenue_Growth': 0.0, 'NetInc_Growth': 0.0}]
         """
 
@@ -90,7 +96,7 @@ def main(stock):
         mongo_doc["Stock"] = stock
         mongo_doc["Years"] = {}
 
-        """ millify() the data and re-arrange df """
+        """ millify() and mk_pretty() the data and re-arrange df """
         for year in df.to_dict("records"):
             mongo_doc["Years"][year["fiscalDateEnding"]] = {
                 "Revenue": millify(year["totalRevenue"], precision=2),
@@ -98,15 +104,16 @@ def main(stock):
                 "NetIncGrowth": mk_pretty(year["NetInc_Growth"]),
                 "RevenueGrowth": mk_pretty(year["Revenue_Growth"]),
             }
+
         """
         mongo_doc looks like this now:
-        { 'Stock': 'NVDA', 
+        { 'Stock': 'NVDA',
 
-        'Years': 
-        {'2020-01-31': {'Revenue': '10.92B', 'NetIncome': '2.8B', 'NetIncGrowth': '35.42%', 'RevenueGrowth': '16.86%'}, 
-         '2019-01-31': {'Revenue': '11.72B', 'NetIncome': '4.14B', 'NetIncGrowth': '61.15%', 'RevenueGrowth': '23.66%'}, 
-         '2018-01-31': {'Revenue': '9.71B', 'NetIncome': '3.05B', 'NetIncGrowth': '70.57%', 'RevenueGrowth': '24.70%'}, 
-         '2017-01-31': {'Revenue': '6.91B', 'NetIncome': '1.67B', 'NetIncGrowth': '64.72%', 'RevenueGrowth': '17.44%'}, 
+        'Years':
+        {'2020-01-31': {'Revenue': '10.92B', 'NetIncome': '2.8B', 'NetIncGrowth': '35.42%', 'RevenueGrowth': '16.86%'},
+         '2019-01-31': {'Revenue': '11.72B', 'NetIncome': '4.14B', 'NetIncGrowth': '61.15%', 'RevenueGrowth': '23.66%'},
+         '2018-01-31': {'Revenue': '9.71B', 'NetIncome': '3.05B', 'NetIncGrowth': '70.57%', 'RevenueGrowth': '24.70%'},
+         '2017-01-31': {'Revenue': '6.91B', 'NetIncome': '1.67B', 'NetIncGrowth': '64.72%', 'RevenueGrowth': '17.44%'},
          '2016-01-31': {'Revenue': '5.01B', 'NetIncome': '614M', 'NetIncGrowth': '0.00%', 'RevenueGrowth': '0.00%'}}
         }
         """
@@ -135,19 +142,19 @@ def main(stock):
 
         """
         mongo_doc now looks like this:
-        {'Stock': 'NVDA', 
-        'Years': 
-        {'2020-01-31': {'Revenue': '10.92B', 'NetIncome': '2.8B', 'NetIncGrowth': '35.42%', 'RevenueGrowth': '16.86%'}, 
-         '2019-01-31': {'Revenue': '11.72B', 'NetIncome': '4.14B', 'NetIncGrowth': '61.15%', 'RevenueGrowth': '23.66%'}, 
-         '2018-01-31': {'Revenue': '9.71B',  'NetIncome': '3.05B', 'NetIncGrowth': '70.57%', 'RevenueGrowth': '24.70%'}, 
-         '2017-01-31': {'Revenue': '6.91B', 'NetIncome': '1.67B', 'NetIncGrowth': '64.72%', 'RevenueGrowth': '17.44%'}, 
-         '2016-01-31': {'Revenue': '5.01B', 'NetIncome': '614M', 'NetIncGrowth': '0.00%', 'RevenueGrowth': '0.00%'}}, 
-        'RevTTM': '14.78B', 
-        'BookValue': 24.772, 
-        'Market Cap': '339.52B', 
-        'Currency': 'USD', 
-        'TrailingPE': 89, 
-        'PriceToSalesTTM': '21.75', 
+        {'Stock': 'NVDA',
+        'Years':
+        {'2020-01-31': {'Revenue': '10.92B', 'NetIncome': '2.8B', 'NetIncGrowth': '35.42%', 'RevenueGrowth': '16.86%'},
+         '2019-01-31': {'Revenue': '11.72B', 'NetIncome': '4.14B', 'NetIncGrowth': '61.15%', 'RevenueGrowth': '23.66%'},
+         '2018-01-31': {'Revenue': '9.71B',  'NetIncome': '3.05B', 'NetIncGrowth': '70.57%', 'RevenueGrowth': '24.70%'},
+         '2017-01-31': {'Revenue': '6.91B', 'NetIncome': '1.67B', 'NetIncGrowth': '64.72%', 'RevenueGrowth': '17.44%'},
+         '2016-01-31': {'Revenue': '5.01B', 'NetIncome': '614M', 'NetIncGrowth': '0.00%', 'RevenueGrowth': '0.00%'}},
+        'RevTTM': '14.78B',
+        'BookValue': 24.772,
+        'Market Cap': '339.52B',
+        'Currency': 'USD',
+        'TrailingPE': 89,
+        'PriceToSalesTTM': '21.75',
         'PriceToBookRatio': '20.76'}
 
 
@@ -183,7 +190,7 @@ def main(stock):
         """
 
     except Exception:
-        raise        
+        raise
     else:
         """ And now we are ready to send the Data to Mongo """
         print("OK, Sending to Mongo")
@@ -210,3 +217,4 @@ if __name__ == "__main__":
         print("Uncaught handled Error")
         print(type(e), e)
         # logging.error
+
