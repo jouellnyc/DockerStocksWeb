@@ -116,6 +116,7 @@ def main(stock):
         """ Pull out Each value and millify() """
         revenue_ttm = overview_data["RevenueTTM"].values[0]
         market_cap = overview_data["MarketCapitalization"].values[0]
+        currency = overview_data["Currency"].values[0]
         PETTM = int(float(overview_data["TrailingPE"].values[0]))
         price2sales = float(overview_data["PriceToSalesRatioTTM"].values[0])
         price2book = float(overview_data["PriceToBookRatio"].values[0])
@@ -127,6 +128,7 @@ def main(stock):
         mongo_doc["RevTTM"] = millify(revenue_ttm, precision=2)
         mongo_doc["BookValue"] = book_value
         mongo_doc["Market Cap"] = millify(market_cap, precision=2)
+        mongo_doc["Currency"] = currency
         mongo_doc["TrailingPE"] = PETTM
         mongo_doc["PriceToSalesTTM"] = millify(price2sales, precision=2)
         mongo_doc["PriceToBookRatio"] = millify(price2book, precision=2)
@@ -143,6 +145,7 @@ def main(stock):
         'RevTTM': '14.78B', 
         'BookValue': 24.772, 
         'Market Cap': '339.52B', 
+        'Currency': 'USD', 
         'TrailingPE': 89, 
         'PriceToSalesTTM': '21.75', 
         'PriceToBookRatio': '20.76'}
