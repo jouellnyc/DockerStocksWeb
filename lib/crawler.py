@@ -5,24 +5,23 @@ import sys
 from alpha_vantage.fundamentaldata import FundamentalData
 from pymongo.errors import ServerSelectionTimeoutError
 from millify import millify
-
-from mongodb import MongoCli
-
 import pandas as pd
-
 """ All Assignment of df Slices """
 pd.options.mode.chained_assignment = None
 
-api_key = "ZZZZZZZZZZZZZZZ"
+from mongodb import MongoCli
+
+api_key = "ZZZZZZZZZZZ"
 format = "json"
 format = "pandas"
 alpha = FundamentalData(key=api_key, output_format=format, indexing_type="integer")
-
 
 def mk_pretty(num):
     """ Pretty print Growth Rate """
     return "%.2f" % (num * 100) + "%"
 
+def cut(x):
+    return x.rpartition('-')[0].rpartition('-')[0]
 
 def main(stock):
 
@@ -51,18 +50,20 @@ def main(stock):
             pd.to_numeric
         )
 
-        """  Years is how many rows """
-        years = len(df.index)
-
-        last_rev_value = int(df.totalRevenue.iloc[-1])
-        df["Revenue_Growth"] = (last_rev_value / df["totalRevenue"]) ** (
-            1 / (df.index - years)
-        ) - 1
-
+        df["Years"] = df['fiscalDateEnding'].apply(cut).apply(pd.to_numeric)
+        last_year_value = df["Years"].iloc[-1]
+        last_rev_value  = int(df.totalRevenue.iloc[-1])
         last_ninc_value = int(df.netIncome.iloc[-1])
-        df["NetInc_Growth"] = (last_ninc_value / df["netIncome"]) ** (
-            1 / (df.index - years)
+        
+        
+        df["Revenue_Growth"] = (last_rev_value / df["totalRevenue"]) ** (
+            1 / (last_year_value - df["Years"])
         ) - 1
+        
+        df["NetInc_Growth"] = (last_ninc_value / df["netIncome"] ) ** (
+            1 / (last_year_value - df["Years"])
+        ) - 1
+
 
         """
         df looks like this now:
@@ -182,19 +183,20 @@ def main(stock):
         """
 
     except Exception:
-        raise
+        raise        
     else:
         """ And now we are ready to send the Data to Mongo """
         print("OK, Sending to Mongo")
+        #print(mongo_doc)
         mg = MongoCli()
         mg.dbh.insert_one(mongo_doc)
-
 
 if __name__ == "__main__":
 
     # print('main')
     try:
         stock = sys.argv[1]
+        #stock = 'amzn'
         main(stock)
     except ServerSelectionTimeoutError as e:
         print("Can't connect to Mongodb - Quitting Crawl", e)
