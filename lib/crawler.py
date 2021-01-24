@@ -30,7 +30,7 @@ def main(stock):
         """ Pull Down Income Data from Alpha Vantage """
         income_data, stock_name = alpha.get_income_statement_annual(stock)
         income_data.replace("None", 0, inplace=True)
-        # print(income_data)
+        currency = income_data["reportedCurrency"].values[0]
 
         """ Setup our panda dataframe """
         df = income_data[["fiscalDateEnding", "totalRevenue", "netIncome"]]
@@ -116,7 +116,6 @@ def main(stock):
         """ Pull out Each value and millify() """
         revenue_ttm = overview_data["RevenueTTM"].values[0]
         market_cap = overview_data["MarketCapitalization"].values[0]
-        currency = overview_data["Currency"].values[0]
         PETTM = int(float(overview_data["TrailingPE"].values[0]))
         price2sales = float(overview_data["PriceToSalesRatioTTM"].values[0])
         price2book = float(overview_data["PriceToBookRatio"].values[0])
