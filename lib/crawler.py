@@ -6,6 +6,7 @@ from alpha_vantage.fundamentaldata import FundamentalData
 from pymongo.errors import ServerSelectionTimeoutError
 from millify import millify
 import pandas as pd
+
 """ All Assignment of df Slices """
 pd.options.mode.chained_assignment = None
 
@@ -16,12 +17,16 @@ format = "json"
 format = "pandas"
 alpha = FundamentalData(key=api_key, output_format=format, indexing_type="integer")
 
+
 def mk_pretty(num):
     """ Pretty print Growth Rate """
-    return "%.2f" % (num * 100) + "%"
+    # return "%.2f" % (num * 100) + "%"
+    return "%.2f" % (num * 100)
+
 
 def cut(x):
-    return x.rpartition('-')[0].rpartition('-')[0]
+    return x.rpartition("-")[0].rpartition("-")[0]
+
 
 def main(stock):
 
@@ -53,23 +58,21 @@ def main(stock):
         """ Calculate the x-Year Growth Rate for Revenue and Net Income """
         """ The growth values are relative to the last year of data     """
 
-        #Trim the year value to get just the year
-        df["Years"] = df['fiscalDateEnding'].apply(cut).apply(pd.to_numeric)
+        # Trim the year value to get just the year
+        df["Years"] = df["fiscalDateEnding"].apply(cut).apply(pd.to_numeric)
         last_year_value = df["Years"].iloc[-1]
-        last_rev_value  = int(df.totalRevenue.iloc[-1])
+        last_rev_value = int(df.totalRevenue.iloc[-1])
         last_ninc_value = int(df.netIncome.iloc[-1])
-
 
         df["Revenue_Growth"] = (last_rev_value / df["totalRevenue"]) ** (
             1 / (last_year_value - df["Years"])
         ) - 1
 
-        df["NetInc_Growth"] = (last_ninc_value / df["netIncome"] ) ** (
+        df["NetInc_Growth"] = (last_ninc_value / df["netIncome"]) ** (
             1 / (last_year_value - df["Years"])
         ) - 1
 
-
-        print(df)
+        # print(df)
 
         """
         df looks like this now:
@@ -99,10 +102,12 @@ def main(stock):
         """ millify() and mk_pretty() the data and re-arrange df """
         for year in df.to_dict("records"):
             mongo_doc["Years"][year["fiscalDateEnding"]] = {
-                "Revenue": millify(year["totalRevenue"], precision=2),
-                "NetIncome": millify(year["netIncome"], precision=2),
-                "NetIncGrowth": mk_pretty(year["NetInc_Growth"]),
-                "RevenueGrowth": mk_pretty(year["Revenue_Growth"]),
+                "Revenue"       : float(millify(year["totalRevenue"], precision=2)[:-1]),
+                "RevDenom"      : millify(year["totalRevenue"], precision=2)[-1], 
+                "NetIncome"     : float(millify(year["netIncome"], precision=2)[:-1]),
+                "NetIncDenom"   : millify(year["netIncome"], precision=2)[-1],
+                "NetIncGrowth"  : float(mk_pretty(year["NetInc_Growth"])),
+                "RevenueGrowth" : float(mk_pretty(year["Revenue_Growth"])),
             }
 
         """
@@ -133,12 +138,18 @@ def main(stock):
 
         """ Add each as a key:value pair ... """
         mongo_doc["RevTTM"] = millify(revenue_ttm, precision=2)
-        mongo_doc["BookValue"] = book_value
-        mongo_doc["Market Cap"] = millify(market_cap, precision=2)
+        mongo_doc["RevTTM_Denom"] = mongo_doc["RevTTM"][-1]
+        mongo_doc["RevTTM"] = float(mongo_doc["RevTTM"][:-1])
+
+        mongo_doc["BookValue"] = float(book_value)
+        mongo_doc["Market_Cap"] = millify(market_cap, precision=2)
+        mongo_doc["Market_Cap_Denom"] = mongo_doc["Market_Cap"][-1]        
+        mongo_doc["Market_Cap"] = float(mongo_doc["Market_Cap"][:-1])
+           
         mongo_doc["Currency"] = currency
-        mongo_doc["TrailingPE"] = PETTM
-        mongo_doc["PriceToSalesTTM"] = millify(price2sales, precision=2)
-        mongo_doc["PriceToBookRatio"] = millify(price2book, precision=2)
+        mongo_doc["TrailingPE"] = float(PETTM)
+        mongo_doc["PriceToSalesTTM"] = float(millify(price2sales, precision=2))
+        mongo_doc["PriceToBookRatio"] = float(millify(price2book, precision=2))
 
         """
         mongo_doc now looks like this:
@@ -198,6 +209,7 @@ def main(stock):
         mg = MongoCli()
         mg.dbh.insert_one(mongo_doc)
 
+
 if __name__ == "__main__":
 
     # print('main')
@@ -217,4 +229,3 @@ if __name__ == "__main__":
         print("Uncaught handled Error")
         print(type(e), e)
         # logging.error
-

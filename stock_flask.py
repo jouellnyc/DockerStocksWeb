@@ -37,10 +37,11 @@ app = Flask(__name__)
 # https://trstringer.com/logging-flask-gunicorn-the-manageable-way/
 # https://stackoverflow.com/questions/27687867/is-there-a-way-to-log-python-print-statements-in-gunicorn
 
-if __name__ != '__main__':
-    gunicorn_logger = logging.getLogger('gunicorn.error')
+if __name__ != "__main__":
+    gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
+
 
 @app.route("/search/", methods=["POST", "GET"])
 def get_data():
@@ -58,18 +59,18 @@ def get_data():
         stock = querystring.get("stock")
         if len(str(stock)) < 1:
             raise ValueError
-    except (TypeError, ValueError): 
-            app.logger.error(f"Invalid data: querystring: {querystring} : invalid")
-            return render_template("notastock.html", stock=stock)
+    except (TypeError, ValueError):
+        app.logger.error(f"Invalid data: querystring: {querystring} : invalid")
+        return render_template("notastock.html", stock=stock)
     except Exception as e:
-            msg = f"Bug: querystring:{querystring}, Error: {str(e)}"
-            app.logger.exception(msg)
-            flask.abort(500)
+        msg = f"Bug: querystring:{querystring}, Error: {str(e)}"
+        app.logger.exception(msg)
+        flask.abort(500)
     else:
         stock = str(stock).upper()
         try:
-            #Master Dictionary with all the Data
-            mongocli   = mongodb.MongoCli()
+            # Master Dictionary with all the Data
+            mongocli = mongodb.MongoCli()
             stock_data = mongocli.lookup_stock(stock)
         except ValueError as e:
             app.logger.error(str(e))
@@ -90,10 +91,11 @@ def get_data():
             app.logger.error(msg)
             return render_template("dne_stock.html", stock=stock)
         else:
-            #Each Financial Group will be broken down by the template
+            # Each Financial Group will be broken down by the template
             return render_template(
-                "stock_data.html", stock_data = stock_data,stock=stock, 
-           )
+                "stock_data.html", stock_data=stock_data, stock=stock,
+            )
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
