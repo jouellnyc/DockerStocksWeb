@@ -99,9 +99,9 @@ def main(stock):
         """ millify() and mk_pretty() the data and re-arrange df """
         for year in df.to_dict("records"):
             mongo_doc["Years"][year["fiscalDateEnding"]] = {
-                "Revenue"       : float(millify(year["totalRevenue"], precision=2)[:-1]),
+                "Revenue"       : millify(float(year["totalRevenue"]), precision=2)[:-1],
                 "RevDenom"      : millify(year["totalRevenue"], precision=2)[-1],
-                "NetIncome"     : float(millify(year["netIncome"], precision=2)[:-1]),
+                "NetIncome"     : millify(float(year["netIncome"]), precision=2)[:-1],
                 "NetIncDenom"   : millify(year["netIncome"], precision=2)[-1],
                 "NetIncGrowth"  : float(mk_pretty(year["NetInc_Growth"])),
                 "RevenueGrowth" : float(mk_pretty(year["Revenue_Growth"])),
@@ -124,24 +124,27 @@ def main(stock):
         overview_data, stock_name = alpha.get_company_overview(stock)
 
         """ Pull out Each value and millify() """
-        revenue_ttm = overview_data["RevenueTTM"].values[0]
+        revenue_ttm = float(overview_data["RevenueTTM"].values[0])
         market_cap = overview_data["MarketCapitalization"].values[0]
         PETTM = int(float(overview_data["TrailingPE"].values[0]))
         price2sales = float(overview_data["PriceToSalesRatioTTM"].values[0])
         price2book = float(overview_data["PriceToBookRatio"].values[0])
         book_value = overview_data["BookValue"].values[0]
-        if book_value != "None":
-            book_value = float(overview_data["BookValue"].values[0])
+        if book_value.startswith('None'):
+            mongo_doc["BookValue"] = 0.0
+        else:
+            mongo_doc["BookValue"] = float(book_value)
 
         """ Add each as a key:value pair ... """
-        mongo_doc["RevTTM"] = float(millify(revenue_ttm, precision=2))
-        if  mongo_doc["RevTTM"] > 0:
+        if revenue_ttm > 0:
+            mongo_doc["RevTTM"] = millify(revenue_ttm, precision=2)
             mongo_doc["RevTTM_Denom"] = mongo_doc["RevTTM"][-1]
             mongo_doc["RevTTM"] = float(mongo_doc["RevTTM"][:-1])
         else:
             mongo_doc["RevTTM_Denom"] = "NA"
+            mongo_doc["RevTTM"] = revenue_ttm
 
-        mongo_doc["BookValue"] = float(book_value)
+
         mongo_doc["Market_Cap"] = millify(market_cap, precision=2)
         mongo_doc["Market_Cap_Denom"] = mongo_doc["Market_Cap"][-1]
         mongo_doc["Market_Cap"] = float(mongo_doc["Market_Cap"][:-1])
