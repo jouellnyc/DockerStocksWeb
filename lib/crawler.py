@@ -1,32 +1,29 @@
 #!/usr/bin/python3
 
 import sys
+import traceback
 
 from alpha_vantage.fundamentaldata import FundamentalData
 from pymongo.errors import ServerSelectionTimeoutError
 from millify import millify
 import pandas as pd
-
 """ All Assignment of df Slices """
 pd.options.mode.chained_assignment = None
 
 from mongodb import MongoCli
 
 api_key = "ZZZZZZZZZZZ"
-format = "json"
 format = "pandas"
-alpha = FundamentalData(key=api_key, output_format=format, indexing_type="integer")
 
+alpha = FundamentalData(key=api_key, output_format=format, indexing_type="integer")
 
 def mk_pretty(num):
     """ Pretty print Growth Rate """
     # return "%.2f" % (num * 100) + "%"
     return "%.2f" % (num * 100)
 
-
 def cut(x):
     return x.rpartition("-")[0].rpartition("-")[0]
-
 
 def main(stock):
 
@@ -103,7 +100,7 @@ def main(stock):
         for year in df.to_dict("records"):
             mongo_doc["Years"][year["fiscalDateEnding"]] = {
                 "Revenue"       : float(millify(year["totalRevenue"], precision=2)[:-1]),
-                "RevDenom"      : millify(year["totalRevenue"], precision=2)[-1], 
+                "RevDenom"      : millify(year["totalRevenue"], precision=2)[-1],
                 "NetIncome"     : float(millify(year["netIncome"], precision=2)[:-1]),
                 "NetIncDenom"   : millify(year["netIncome"], precision=2)[-1],
                 "NetIncGrowth"  : float(mk_pretty(year["NetInc_Growth"])),
@@ -137,15 +134,18 @@ def main(stock):
             book_value = float(overview_data["BookValue"].values[0])
 
         """ Add each as a key:value pair ... """
-        mongo_doc["RevTTM"] = millify(revenue_ttm, precision=2)
-        mongo_doc["RevTTM_Denom"] = mongo_doc["RevTTM"][-1]
-        mongo_doc["RevTTM"] = float(mongo_doc["RevTTM"][:-1])
+        mongo_doc["RevTTM"] = float(millify(revenue_ttm, precision=2))
+        if  mongo_doc["RevTTM"] > 0:
+            mongo_doc["RevTTM_Denom"] = mongo_doc["RevTTM"][-1]
+            mongo_doc["RevTTM"] = float(mongo_doc["RevTTM"][:-1])
+        else:
+            mongo_doc["RevTTM_Denom"] = "NA"
 
         mongo_doc["BookValue"] = float(book_value)
         mongo_doc["Market_Cap"] = millify(market_cap, precision=2)
-        mongo_doc["Market_Cap_Denom"] = mongo_doc["Market_Cap"][-1]        
+        mongo_doc["Market_Cap_Denom"] = mongo_doc["Market_Cap"][-1]
         mongo_doc["Market_Cap"] = float(mongo_doc["Market_Cap"][:-1])
-           
+
         mongo_doc["Currency"] = currency
         mongo_doc["TrailingPE"] = float(PETTM)
         mongo_doc["PriceToSalesTTM"] = float(millify(price2sales, precision=2))
@@ -227,5 +227,6 @@ if __name__ == "__main__":
         print(type(e), e)
     except Exception as e:
         print("Uncaught handled Error")
-        print(type(e), e)
+        #print(type(e), e)
+        print(traceback.format_exc())
         # logging.error
