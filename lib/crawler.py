@@ -25,6 +25,9 @@ def mk_pretty(num):
 def cut(x):
     return x.rpartition("-")[0].rpartition("-")[0]
 
+def add_str(string):
+    return string + "Years"
+
 def main(stock):
 
     try:
@@ -69,7 +72,10 @@ def main(stock):
             1 / (last_year_value - df["Years"])
         ) - 1
 
-        # print(df)
+        #df["Years_From"] = str(df['Years'] - last_year_value) + 'year'
+        df["Years_From"] = df['Years']  - last_year_value
+        df["Years_From"] = df["Years_From"].apply(str)
+        df["Years_From"] = df["Years_From"].apply(add_str)
 
         """
         df looks like this now:
@@ -91,6 +97,10 @@ def main(stock):
         {'fiscalDateEnding': '2016-01-31', 'totalRevenue': 5010000000, 'netIncome': 614000000, 'Revenue_Growth': 0.0, 'NetInc_Growth': 0.0}]
         """
 
+        print(df)
+
+        print(df.to_dict('records'))
+
         """ Setup our mongo doc as a hash to prepare to send to Mongo """
         mongo_doc = {}
         mongo_doc["Stock"] = stock
@@ -98,7 +108,10 @@ def main(stock):
 
         """ millify() and mk_pretty() the data and re-arrange df """
         for year in df.to_dict("records"):
-            mongo_doc["Years"][year["fiscalDateEnding"]] = {
+            #mongo_doc["Years"][year["fiscalDateEnding"]] = {
+            mongo_doc["Years"][ year["Years_From"] ] =  {
+
+                "Date"          : year["fiscalDateEnding"],
                 "Revenue"       : millify(float(year["totalRevenue"]), precision=2)[:-1],
                 "RevDenom"      : millify(year["totalRevenue"], precision=2)[-1],
                 "NetIncome"     : millify(float(year["netIncome"]), precision=2)[:-1],
@@ -118,10 +131,14 @@ def main(stock):
          '2017-01-31': {'Revenue': '6.91B', 'NetIncome': '1.67B', 'NetIncGrowth': '64.72%', 'RevenueGrowth': '17.44%'},
          '2016-01-31': {'Revenue': '5.01B', 'NetIncome': '614M', 'NetIncGrowth': '0.00%', 'RevenueGrowth': '0.00%'}}
         }
+
         """
+
+        print(mongo_doc)
 
         """ Pull Down Overview Data from Alpha Vantage """
         overview_data, stock_name = alpha.get_company_overview(stock)
+        ##print(overview_data)
 
         """ Pull out Each value and millify() """
         revenue_ttm = float(overview_data["RevenueTTM"].values[0])
