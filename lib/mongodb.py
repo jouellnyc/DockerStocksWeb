@@ -27,8 +27,8 @@ import logging
 class MongoCli:
     def __init__(self):
 
-        self.database_name = "db"
-        self.collection_name = "cname"
+        self.database_name = "stocks"
+        self.collection_name = "data"
         self.username = "user"
         self.password = "pass"
         self.mongo_host = "host"
