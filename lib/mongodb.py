@@ -57,7 +57,7 @@ class MongoCli:
         mongo_host = self.mongo_host
 
         try:
-            client = MongoClient("mongodb://db:27017/")
+            MONGOCLIENTLINE
             client.server_info()
             database_handle = client[database_name]
             collection_handle = database_handle[collection_name]
