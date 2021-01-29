@@ -21,7 +21,6 @@ alpha = FundamentalData(key=api_key, output_format=format, indexing_type="intege
 
 def mk_pretty(num):
     """ Pretty print Growth Rate """
-    # return "%.2f" % (num * 100) + "%"
     return "%.2f" % (num * 100)
 
 def cut(x):
