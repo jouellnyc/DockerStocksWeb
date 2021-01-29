@@ -9,7 +9,7 @@ from pymongo.errors import ServerSelectionTimeoutError
 from millify import millify
 import pandas as pd
 
-""" All Assignment of df Slices """
+""" Allow Assignment of df Slices """
 pd.options.mode.chained_assignment = None
 
 from mongodb import MongoCli
