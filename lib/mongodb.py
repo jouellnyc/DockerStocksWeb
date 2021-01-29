@@ -29,9 +29,6 @@ class MongoCli:
 
         self.database_name = "stocks"
         self.collection_name = "data"
-        self.username = "user"
-        self.password = "pass"
-        self.mongo_host = "host"
         self.dbh = self.ConnectToMongo()
 
     def ConnectToMongo(self):
@@ -50,11 +47,8 @@ class MongoCli:
             collection_handle :  pymongo connect object
         """
 
-        username = self.username
-        password = self.password
         collection_name = self.collection_name
         database_name = self.database_name
-        mongo_host = self.mongo_host
 
         try:
             MONGOCLIENTLINE
