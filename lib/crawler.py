@@ -9,7 +9,7 @@ from pymongo.errors import ServerSelectionTimeoutError
 from millify import millify
 import pandas as pd
 
-""" Allow Assignment of df Slices """
+""" All Assignment of df Slices """
 pd.options.mode.chained_assignment = None
 
 from mongodb import MongoCli
@@ -21,6 +21,7 @@ alpha = FundamentalData(key=api_key, output_format=format, indexing_type="intege
 
 def mk_pretty(num):
     """ Pretty print Growth Rate """
+    # return "%.2f" % (num * 100) + "%"
     return "%.2f" % (num * 100)
 
 def cut(x):
@@ -30,23 +31,26 @@ def add_str(string):
     return string + "Years"
 
 def stock_exists(stock, mg):
-    if mg.lookup_stock(stock):
-        return 1
+    try:
+        mg.lookup_stock(stock)
+    except ValueError:
+        return False
     else:
-        return 0
+        return True
 
 
 def main(stock, mg, force):
 
-    debug = True
+    debug = False
 
     if force is False:
-        mg.lookup_stock(stock)
         if stock_exists(stock, mg):
-             return(f"{stock} already in Mongo -- passing")
+            print(f"{stock} already in Mongo -- passing")
+            return True
 
     try:
 
+        print(f"Connecting to Alpha Vantage for {stock}")
         """ Pull Down Income Data from Alpha Vantage """
         income_data, stock_name = alpha.get_income_statement_annual(stock)
         income_data.replace("None", 0, inplace=True)
@@ -310,7 +314,7 @@ def main(stock, mg, force):
         raise
     else:
         """ And now we are ready to send the Data to Mongo """
-        print(f"OK, Sending to Mongo for {stock}\n")
+        print(f"OK, Sending data to Mongo for {stock}\n")
         print(mg.dbh.update_one(  {'Stock': stock}, {'$set' : mongo_doc }, upsert=True))
 
 
@@ -333,4 +337,4 @@ if __name__ == "__main__" :
         print(traceback.format_exc())
         # logging.error
     else:
-        main(stock, mg, force=True)
+        main(stock, mg, force=False
