@@ -2,7 +2,7 @@
 
 import sys
 import traceback
-import pprint
+from pprint import pprint
 
 from alpha_vantage.fundamentaldata import FundamentalData
 from pymongo.errors import ServerSelectionTimeoutError
@@ -150,8 +150,8 @@ def main(stock, mg, force):
 
         if debug:
             print("df.to_dict\('records'\):\n")
-            #pprint(df.to_dict('records'),"\n")
-            print(df.to_dict('records'),"\n")
+            pprint(df.to_dict('records'))
+            print("\n")
 
 
         """ Setup our mongo doc as a hash to prepare to send to Mongo """
@@ -212,7 +212,9 @@ def main(stock, mg, force):
 
         """
         if debug:
-            print("mongo_doc: \n", mongo_doc, "\n")
+            print("mongo_doc: \n")
+            pprint(mongo_doc)
+            print("\n")
 
 
 
@@ -301,7 +303,9 @@ def main(stock, mg, force):
                               'RevenueGrowth': 21.21}}}
         """
         if debug:
-            print("mongo_doc: ", mongo_doc)
+            print("mongo_doc:\n")
+            pprint(mongo_doc)
+            print("\n")
 
     except Exception:
         raise

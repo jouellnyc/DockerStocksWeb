@@ -12,3 +12,4 @@ pandas==1.1.4
 lxml==4.6.1
 alpha_vantage==2.3.1
 millify==0.1.1
+pprintpp==0.4.0
