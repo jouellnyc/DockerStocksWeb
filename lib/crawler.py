@@ -41,7 +41,7 @@ def stock_exists(stock, mg):
 
 def main(stock, mg, force):
 
-    debug = False
+    debug = True
 
     if force is False:
         if stock_exists(stock, mg):
@@ -337,6 +337,8 @@ if __name__ == "__main__" :
     except ValueError as e:
         if "Thank you" in str(e.args):
             print("Error: Hit Api limit")
+        elif "no return was given" in str(e.args):
+            print("No Data Returned from Api")
         else:
             print("Unhandled Value Error")
             print(traceback.format_exc())
