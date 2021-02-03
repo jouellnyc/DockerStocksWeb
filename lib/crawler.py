@@ -15,6 +15,7 @@ pd.options.mode.chained_assignment = None
 from mongodb import MongoCli
 
 api_key = "ZZZZZZZZZZZ"
+
 format = "pandas"
 
 alpha = FundamentalData(key=api_key, output_format=format, indexing_type="integer")
@@ -41,7 +42,7 @@ def stock_exists(stock, mg):
 
 def main(stock, mg, force):
 
-    debug = True
+    debug = True 
 
     if force is False:
         if stock_exists(stock, mg):
@@ -112,7 +113,7 @@ def main(stock, mg, force):
         3           2016-12-31   90272000000  19478000000   2016        0.203803       0.191461     1Years
         4           2015-12-31   74989000000  16348000000   2015        0.000000       0.000000     0Years
 
-       df.to_dict\('records'\) looks like this now:
+        df.to_dict\('records'\) looks like this now:
 
         [{'NetInc_Growth': 0.20390827677878742,
           'Revenue_Growth': 0.21208612858558862,
@@ -254,7 +255,8 @@ def main(stock, mg, force):
 
         mongo_doc["Currency"] = currency
         mongo_doc["TrailingPE"] = float(PETTM)
-        mongo_doc["PriceToSalesTTM"] = float(millify(price2sales, precision=2))
+        #mongo_doc["PriceToSalesTTM"] = float(millify(price2sales, precision=2))
+        mongo_doc["PriceToSalesTTM"] = millify(float(price2sales), precision=2)
         mongo_doc["PriceToBookRatio"] = float(millify(price2book, precision=2))
 
         """
@@ -320,6 +322,7 @@ def main(stock, mg, force):
 
 if __name__ == "__main__" :
 
+    force=True
 
     try:
         stock = sys.argv[1]
@@ -329,7 +332,7 @@ if __name__ == "__main__" :
         sys.exit(1)
 
     try:
-        main(stock, mg, force=False)
+        main(stock, mg, force=force)
     except KeyError as e:
         print("Likely a Data Issue")
         print("Not Sending to Mongo")
