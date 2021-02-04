@@ -1,6 +1,7 @@
 #!/bin/bash
 
 COUNTER=0
+SLEEP=62
 
 while read stk; do echo == $stk ==;
 
@@ -16,6 +17,12 @@ else
 	if echo $OUT | grep already; then
 	    touch /tmp/$stk
 	elif echo $OUT | grep -i 'no data'; then
+	    echo sleep $SLEEP
+	    sleep $SLEEP
+	    touch /tmp/$stk
+	    echo $stk >> remove.txt
+	elif echo $OUT | grep -i 'likely a data issue'; then
+	    touch /tmp/$stk
 	    echo $stk >> remove.txt
 	elif echo $OUT | grep -i 'limit'; then
 	    echo 'hit api limit'
@@ -29,11 +36,12 @@ else
 		exit
 	    fi
 
-	    echo sleep 65
-	    sleep 65
+	    echo sleep $SLEEP
+	    sleep $SLEEP
 	fi
 
 
 fi
 
-done < stocks.txt
+
+done < sto.txt
