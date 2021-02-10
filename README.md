@@ -218,9 +218,9 @@ http://$YOUR_IP/search/?stock=GOOG
 ```
 
 ## Architechure
-Nginx will listen on the local hosts port 80
+Nginx will listen on the local hosts port 80.
 
-Flask and Mongodb will be on the same bridged docker network reachable by docker names
+Flask and Mongodb will be on the same bridged docker network reachable by docker names.
 
 ## Requirements
 Git/Docker/Docker-compose/Optionally a MongoDB hosted at Mongo
