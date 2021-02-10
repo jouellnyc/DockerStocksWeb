@@ -224,6 +224,13 @@ Flask and Mongodb will be on the same bridged docker network reachable by docker
 
 ## Requirements
 git/docker/docker-compose/optionally a MongoDB hosted at Mongo
+This project default to a local MongoDB
+To use AWS/Hosted you'd need a custom MongoDB entry -- (See https://www.mongodb.com/python) 
 
-
-
+```
+$diff mongodb.py mongodb.py.AWS
+54c54
+<             client = MongoClient("mongodb://db:27017/")
+---
+>             MONGOCLIENTLINE      <===Change This for AWS
+```
