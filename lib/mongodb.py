@@ -51,7 +51,7 @@ class MongoCli:
         database_name = self.database_name
 
         try:
-            MONGOCLIENTLINE
+            client = MongoClient("mongodb://db:27017/")
             client.server_info()
             database_handle = client[database_name]
             collection_handle = database_handle[collection_name]
