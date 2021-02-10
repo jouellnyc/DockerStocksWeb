@@ -30,12 +30,17 @@ docker-compose -f docker-compose.local.yaml  up -d
 ```
 
 ### Setup 
+
+Enter the flask container:
 ```
-Enter the flask container and start crawling:
 
  ./non-app/master.enter.sh flask
 
-(Example with debug=True)
+```
+
+
+Start crawling -- (Example with debug=True):
+```
 
 nobody@85e2ddd5a534:/stocks/lib$ ./crawler.py OKTA
 Connecting to Alpha Vantage for OKTA
@@ -136,8 +141,11 @@ mongo_doc:
 
 
 overview_data:
-     Symbol     AssetType       Name                                        Description  ... DividendDate ExDividendDate LastSplitFactor LastSplitDate
-NaN   OKTA  Common Stock  Okta, Inc  Okta, Inc. provides identity management platfo...  ...         None           None            None          None
+     Symbol     AssetType       Name   Description  ... DividendDate 
+     ExDividendDate LastSplitFactor LastSplitDate
+     NaN   OKTA  Common Stock  Okta, Inc  
+     Okta, Inc. provides identity management platfo...  ...         
+     None           None            None          None
 
 [1 rows x 59 columns]
 
@@ -191,10 +199,11 @@ mongo_doc:
 
 OK, Sending data to Mongo for OKTA
 
+```
 
 
 The DB 'Stocks' will be auto created in the local Mongo Container
-
+```
 ./non-app/master.enter.sh mongodb 
 
 > show dbs
