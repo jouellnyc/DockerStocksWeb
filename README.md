@@ -3,25 +3,17 @@
 ![Stocks](stock_peek.gif)
 
 ## Why Do this?
-Once you Crawl and Index all the stocks you like, you can issue a  query like "Tell me all the Companies with a Market Cap of more than 200 Million, 4 year CAGR for Revenue of 15%, and at least 20 Million dollar of Revenue TTM/etc/etc. Most Stock Screeners don't include Growth Rates 
+Once you Crawl and Index all the stocks you like, you can issue a  query like "Tell me all the Companies with a Market Cap of more than 2 Billion, 4 year CAGR for Revenue of 20% and at least 20 Million dollar of Revenue TTM or whatever metric you've crawled and indexed.\
 
 ```
-In [39]: for x in collh.find( {"MC.Val" : {"$gt" : 200 }, "MC.Den" : 'Mil',  "revenue_Growth.4" : {"$gte" : 15}, "revenue_Growth.3" : {"$gte" : 15
-    ...: },"revenue_Growth.2" : {"$gte" : 15}, "revenue_Growth.1" : {"$gte" : 15},  "RevTTM.Val" : {"$gte" : 20}, 'revenue.2015.Val' : {"$gte" : 2
-    ...: 0},'revenue.2016.Val' : {"$gte" : 20}, 'revenue.2017.Val' : {"$gte" : 20}, 'revenue.2018.Val' : {"$gte" : 20}}, {"Stock" : 1, "MC.Val" :
-    ...: 1, "revenue_Growth.4" : 1 ,   "_id" : 0 } ):
-    ...:     print(x)
-    ...:
-    ...:
-{'Stock': 'AKU', 'MC': {'Val': 251.24}, 'revenue_Growth': {'4': 66.18}}
-{'Stock': 'ATRS', 'MC': {'Val': 465.06}, 'revenue_Growth': {'4': 28.34}}
-{'Stock': 'AXGN', 'MC': {'Val': 510.28}, 'revenue_Growth': {'4': 40.57}}
-{'Stock': 'BCOR', 'MC': {'Val': 493.84}, 'revenue_Growth': {'4': 57.15}}
-{'Stock': 'BOOM', 'MC': {'Val': 516.64}, 'revenue_Growth': {'4': 24.23}}
-{'Stock': 'CDXC', 'MC': {'Val': 277.91}, 'revenue_Growth': {'4': 20.43}}
-{'Stock': 'CERS', 'MC': {'Val': 871.62}, 'revenue_Growth': {'4': 28.66}}
-{'Stock': 'EBIX', 'MC': {'Val': 558.3}, 'revenue_Growth': {'4': 21.61}}
-{'Stock': 'GNMK', 'MC': {'Val': 876.43}, 'revenue_Growth': {'4': 22.25}}
+In [39]:
+for x in mg.dbh.find( {'Market_Cap' : {"$gte" : 2}, "Market_Cap_Denom" : 'B', 'Years.4Years.RevenueGrowth' : {"$gte" : 20} }):
+    print(x['Stock'])
+KNSL
+CDXC
+CERS
+EBIX
+GNMK
 
 and so on.....
 
