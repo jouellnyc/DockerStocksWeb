@@ -34,17 +34,16 @@ docker-compose -f docker-compose.local.yaml  up -d
 Enter the flask container:
 
 ```
-
 ./non-app/master.enter.sh flask
-cd /stocks/lib
-vi ./crawler.py
-#set your  api_key from Alpha Vantage
-
 ```
 
+Set your  api_key from Alpha Vantage
+```
+cd /stocks/lib
+vi ./crawler.py
+```
 
 Start crawling -- (Example with debug=True):
-
 ```
 
 nobody@85e2ddd5a534:/stocks/lib$ ./crawler.py OKTA
