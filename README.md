@@ -32,14 +32,19 @@ docker-compose -f docker-compose.local.yaml  up -d
 ### Setup 
 
 Enter the flask container:
+
 ```
 
- ./non-app/master.enter.sh flask
+./non-app/master.enter.sh flask
+cd /stocks/lib
+vi ./crawler.py
+#set your  api_key from Alpha Vantage
 
 ```
 
 
 Start crawling -- (Example with debug=True):
+
 ```
 
 nobody@85e2ddd5a534:/stocks/lib$ ./crawler.py OKTA
@@ -224,6 +229,8 @@ Flask and Mongodb will be on the same bridged docker network reachable by docker
 
 ## Requirements
 Git/Docker/Docker-compose/Optionally a MongoDB hosted at Mongo
+https://www.alphavantage.co/ -- Free Api key
+
 
 This project defaults to a local MongoDB -- up and running after 'git clone'.
 
