@@ -15,7 +15,7 @@ if [ -e /tmp/$stk ]; then
 
 else
 
-	OUT=$(../non-app/crawler.py $stk)
+	OUT=$(../lib/crawler.py $stk)
 	if echo $OUT | grep already; then
 	    touch /tmp/$stk
 	elif echo $OUT | grep -i 'no data'; then
