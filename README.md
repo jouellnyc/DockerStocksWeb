@@ -225,15 +225,9 @@ Flask and Mongodb will be on the same bridged docker network reachable by docker
 ## Requirements
 Git/Docker/Docker-compose/Optionally a MongoDB hosted at Mongo
 
-This project defaults to a local MongoDB
+This project defaults to a local MongoDB if you were to git clone it.
 
-To use AWS/Hosted you'd need a custom MongoDB entry -- (See https://www.mongodb.com/python) 
-
-```
-$diff mongodb.py mongodb.py.AWS
-54c54
-<             client = MongoClient("mongodb://db:27017/")
----
->             MONGOCLIENTLINE      <===Change This for AWS
-```
+To use AWS:
+- You'd need a custom MongoDB entry specific to your account  -- (See https://www.mongodb.com/python) 
+- If using https://github.com/jouellnyc/AWS/tree/master/boto3/blue_green_deploy, you would simply modify the variable user_data_file in prod_vpc_lb_builder.py to point to  user_data.http.AWS.sh. user_data.http.AWS.sh will act on lib/mongodb.py.AWS and 'do the right thing' to put it in the right place.
 
