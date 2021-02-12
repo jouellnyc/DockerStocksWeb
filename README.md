@@ -3,7 +3,7 @@
 ![Stocks](stock_peek.gif)
 
 ## Why Do this?
-Once you Crawl and Index all the stocks you like, you can issue a  query like "Tell me all the Companies with a Market Cap of more than 2 Billion, 4 year CAGR for Revenue of 20% and at least 200 Million dollar of Revenue TTM or whatever metric you've crawled and indexed.
+Once you Crawl and Index all the stocks you like, you can issue a  query like "Tell me all the Companies with a Market Cap of more than 2 Billion, 4 year CAGR for Revenue of 20% and at least 200 Million dollar of Revenue TTM or whatever metric you've crawled and indexed. Or simply query to see the details of the stock you are researching.
 
 ```
 >>> for x in mg.dbh.find( {'Market_Cap' : {"$gte" : 2}, "Market_Cap_Denom" : 'B', 'Years.4Years.RevenueGrowth' : {"$gte" : 20 }, 'RevTTM': {"$gte" : 200 } , 'RevTTM_Denom': 'M' }):
