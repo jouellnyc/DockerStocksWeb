@@ -31,6 +31,7 @@ else
 	    exit
 	else
 
+	    touch /tmp/$stk
 	    let COUNTER=COUNTER+1
 	    echo = $COUNTER =
 
