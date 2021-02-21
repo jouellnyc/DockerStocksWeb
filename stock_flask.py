@@ -48,9 +48,9 @@ def get_data():
     """
     Return a view to Flask with relevant details
 
-    zip comes in as a 'str' from the Flash HTML form  and most easily is tested
-    by casting to 'int'. zip is then queried @mongodb and returns HTML
-    Done this way it catches zip='' and if zip is None with explictly checking.
+    'stock' comes in as a 'str' from the Flash HTML form  and most easily is tested
+    by casting to 'int'. It is  then queried @mongodb and returns HTML
+    Done this way it catches stock='' and if stock is None without explictly checking.
     """
 
     try:

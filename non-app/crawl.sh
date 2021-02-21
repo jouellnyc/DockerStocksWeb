@@ -19,19 +19,19 @@ else
 	if echo $OUT | grep already; then
 	    touch /tmp/$stk
 	elif echo $OUT | grep -i 'no data'; then
-	    echo sleep $SLEEP
 	    sleep $SLEEP
 	    touch /tmp/$stk
-	    echo $stk >> remove.txt
 	elif echo $OUT | grep -i 'likely a data issue'; then
+	    sleep $SLEEP
 	    touch /tmp/$stk
-	    echo $stk >> remove.txt
 	elif echo $OUT | grep -i 'limit'; then
 	    echo 'hit api limit'
-	    exit
+	    sleep $SLEEP
+	    touch /tmp/$stk
 	else
 
 	    touch /tmp/$stk
+
 	    let COUNTER=COUNTER+1
 	    echo = $COUNTER =
 
@@ -39,12 +39,12 @@ else
 		exit
 	    fi
 
-	    echo sleep $SLEEP
 	    sleep $SLEEP
+
 	fi
 
 
 fi
 
 
-done < $STOCKS 
+done < $STOCKS
