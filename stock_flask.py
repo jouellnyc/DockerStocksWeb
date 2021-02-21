@@ -9,7 +9,7 @@ app.py - Main Flask application file
 - This script requires Flask to be installed.
 
 - It expects to be passed:
-    - zip # from nginx html form
+    - stock # from nginx html form
 
 - It sends all returnables to return flask's render_template
 
