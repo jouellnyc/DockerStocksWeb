@@ -221,7 +221,7 @@ http://$YOUR_IP/search/?stock=GOOG
 
 ```
 
-## Architechure
+## Architecture
 Nginx will listen on the local hosts port 80.
 
 Flask and Mongodb will be on the same bridged docker network reachable by docker names.
