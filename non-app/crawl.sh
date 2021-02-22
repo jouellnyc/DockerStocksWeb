@@ -1,7 +1,8 @@
 #!/bin/bash
 
-COUNTER=0
 SLEEP=62
+COUNTER=0
+MAX=400
 
 STOCKS=nasdaq.txt
 
@@ -15,6 +16,7 @@ if [ -e /tmp/$stk ]; then
 
 else
 
+	date
 	OUT=$(../lib/crawler.py $stk)
 	if echo $OUT | grep already; then
 	    touch /tmp/$stk
@@ -35,8 +37,9 @@ else
 	    let COUNTER=COUNTER+1
 	    echo = $COUNTER =
 
-	    if [ $COUNTER -eq 400 ]; then
-		exit
+	    if [ $COUNTER -eq $MAX ]; then
+       		echo "hit $MAX"
+		      exit
 	    fi
 
 	    sleep $SLEEP
@@ -45,6 +48,5 @@ else
 
 
 fi
-
 
 done < $STOCKS
