@@ -303,7 +303,6 @@ def main(stock, mg, force, force_new):
 
         mongo_doc["Currency"] = currency
         mongo_doc["TrailingPE"] = float(PETTM)
-        # mongo_doc["PriceToSalesTTM"] = float(millify(price2sales, precision=2))
         mongo_doc["PriceToSalesTTM"] = millify(float(price2sales), precision=2)
         mongo_doc["PriceToBookRatio"] = float(millify(price2book, precision=2))
         mongo_doc["DateCrawled"] = datetime.datetime.utcnow()
