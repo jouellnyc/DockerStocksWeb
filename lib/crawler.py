@@ -15,7 +15,7 @@ pd.options.mode.chained_assignment = None
 
 from mongodb import MongoCli
 
-api_key = "XXXXXXXXXXXXXXXX"
+api_key = "ZZZZZZZZZZZ"
 
 format = "pandas"
 
