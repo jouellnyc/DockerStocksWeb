@@ -93,11 +93,13 @@ def main(stock, mg, force, force_new):
 
     try:
 
-        print(f"Connecting to Alpha Vantage for {stock}")
         """ Pull Down Income Data from Alpha Vantage """
+        print(f"Connecting to Alpha Vantage for {stock}")
+
         income_data, stock_name = alpha.get_income_statement_annual(stock)
         income_data.replace("None", 0, inplace=True)
         currency = income_data["reportedCurrency"].values[0]
+
 
         """ Setup our panda dataframe """
         df = income_data[["fiscalDateEnding", "totalRevenue", "netIncome"]]
