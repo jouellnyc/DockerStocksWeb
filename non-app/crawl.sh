@@ -17,20 +17,19 @@ if [ -e /tmp/$stk ]; then
 else
 
 	date
-	OUT=$(../lib/crawler.py $stk)
-	if echo $OUT | grep already; then
-	    touch /tmp/$stk
-	elif echo $OUT | grep -i 'no data'; then
-	    sleep $SLEEP
-	    touch /tmp/$stk
-	elif echo $OUT | grep -i 'likely a data issue'; then
-	    sleep $SLEEP
-	    touch /tmp/$stk
-	elif echo $OUT | grep -i 'limit'; then
+	OUT=$(../lib/crawler.py $stk | tee -a "${0}"_main_crawl.log)
+	if echo $OUT | grep -i 'limit'; then
 	    echo 'hit api limit'
 	    sleep $SLEEP
+	elif echo $OUT | grep -i 'already in Mongo'; then
 	    touch /tmp/$stk
-	else
+	elif echo $OUT | grep -i 'no data'; then
+	    touch /tmp/$stk
+	    sleep $SLEEP
+	elif echo $OUT | grep -i 'likely a data issue'; then
+	    touch /tmp/$stk
+	    sleep $SLEEP
+	elif echo $OUT | grep -i 'sending'; then
 
 	    touch /tmp/$stk
 
