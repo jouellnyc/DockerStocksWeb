@@ -21,7 +21,7 @@ else
 	if echo $OUT | grep -i 'limit'; then
 	    echo 'hit api limit'
 	    sleep $SLEEP
-	elif echo $OUT | grep -i 'already in Mongo'; then
+	elif echo $OUT | grep -i 'is already in Mongo'; then
 	    touch /tmp/$stk
 	elif echo $OUT | grep -i 'no data'; then
 	    touch /tmp/$stk
