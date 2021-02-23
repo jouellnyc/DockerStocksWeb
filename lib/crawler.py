@@ -15,7 +15,7 @@ pd.options.mode.chained_assignment = None
 
 from mongodb import MongoCli
 
-api_key = "ZZZZZZZZZZZ"
+api_key = "ZZZZZZZZZZZZZZZZ"
 
 format = "pandas"
 
@@ -95,7 +95,7 @@ def main(stock, mg, force, force_new):
         df = income_data[["fiscalDateEnding", "totalRevenue", "netIncome"]]
 
         try:
-            if ((df["totalRevenue"].iloc[0] == "0") or (df["totalRevenue"].iloc[0] == 0) or (df["totalRevenue"].iloc[4] == "0") or (df["totalRevenue"].iloc[4] == 0)):
+            if ((df["totalRevenue"].iloc[0] == "0") or (df["totalRevenue"].iloc[0] == 0) or (df["totalRevenue"].iloc[-1] == "0") or (df["totalRevenue"].iloc[-1] == 0)):
                 print("0 Revenue -- Sending blank to Mongo")
                 mg.dbh.insert_one({'Stock': stock})
                 sys.exit(0)
