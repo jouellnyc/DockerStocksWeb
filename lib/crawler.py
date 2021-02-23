@@ -53,7 +53,7 @@ def main(stock, mg, force, force_new):
 
     if data:
 
-        print(f"{stock} already in Mongo")
+        print(f"{stock} is already in Mongo")
         if force is False:
             print("...Passing due to force option")
             return True
