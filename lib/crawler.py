@@ -15,32 +15,28 @@ pd.options.mode.chained_assignment = None
 
 from mongodb import MongoCli
 
-api_key = "ZZZZZZZZZZZZZZZZZ"
+api_key = "XXXXXXXXXXXXXXXX"
 
 format = "pandas"
 
 alpha = FundamentalData(key=api_key, output_format=format, indexing_type="integer")
-
 
 def mk_pretty(num):
     """ Pretty print Growth Rate """
     # return "%.2f" % (num * 100) + "%"
     return "%.2f" % (num * 100)
 
-
 def cut(x):
     return x.rpartition("-")[0].rpartition("-")[0]
 
-
 def add_str(string):
     return string + "Years"
-
 
 def stock_exists(stock, mg):
     try:
         data = mg.lookup_stock(stock)
     except ValueError:
-        return False, "NA"
+        return False, False
     else:
         return True, data
 
@@ -65,17 +61,13 @@ def main(stock, mg, force, force_new):
             print("...Trying due to force option")
             try:
 
-                if data["DateCrawled"]:
+                if data['DateCrawled']:
 
                     if force_new is False:
-                        print(
-                            "...crawled with date data but passing due to force_new option"
-                        )
+                        print("...crawled with date data but passing due to force_new option")
                         return True
                     else:
-                        print(
-                            "...crawled with date data -- continuing due to force_new option"
-                        )
+                        print("...crawled with date data -- continuing due to force_new option")
                         pass
 
             except KeyError:
@@ -93,23 +85,30 @@ def main(stock, mg, force, force_new):
 
     try:
 
-        """ Pull Down Income Data from Alpha Vantage """
         print(f"Connecting to Alpha Vantage for {stock}")
-
+        """ Pull Down Income Data from Alpha Vantage """
         income_data, stock_name = alpha.get_income_statement_annual(stock)
         income_data.replace("None", 0, inplace=True)
         currency = income_data["reportedCurrency"].values[0]
 
-
         """ Setup our panda dataframe """
         df = income_data[["fiscalDateEnding", "totalRevenue", "netIncome"]]
 
-        if df["totalRevenue"].iloc[0] == "0":
-            print("0 Revenue -- Sending blank to Mongo")
-            mg.dbh.insert_one({"Stock": stock})
-            sys.exit(0)
+        try:
+            if ((df["totalRevenue"].iloc[0] == "0") or (df["totalRevenue"].iloc[0] == 0) or (df["totalRevenue"].iloc[4] == "0") or (df["totalRevenue"].iloc[4] == 0)):
+                print("0 Revenue -- Sending blank to Mongo")
+                mg.dbh.insert_one({'Stock': stock})
+                sys.exit(0)
+        except IndexError as e:
+            print(e)
+            pass
+
+        """
         else:
             print(df["totalRevenue"].iloc[0])
+            print(type(df["totalRevenue"].iloc[0]))
+            print(len(df["totalRevenue"].iloc[0]))
+        """
 
         """
         df looks like this now:
@@ -147,7 +146,7 @@ def main(stock, mg, force, force_new):
             1 / (last_year_value - df["Years"])
         ) - 1
 
-        df["Years_From"] = df["Years"] - last_year_value
+        df["Years_From"] = df['Years']  - last_year_value
         df["Years_From"] = df["Years_From"].apply(str)
         df["Years_From"] = df["Years_From"].apply(add_str)
         df = df.fillna(0)
@@ -206,8 +205,9 @@ def main(stock, mg, force, force_new):
 
         if debug:
             print("df.to_dict\('records'\):\n")
-            pprint(df.to_dict("records"))
+            pprint(df.to_dict('records'))
             print("\n")
+
 
         """ Setup our mongo doc as a hash to prepare to send to Mongo """
         mongo_doc = {}
@@ -216,14 +216,15 @@ def main(stock, mg, force, force_new):
         """ millify() and mk_pretty() the data and re-arrange df """
         for year in df.to_dict("records"):
 
-            mongo_doc["Years"][year["Years_From"]] = {
-                "Date": year["fiscalDateEnding"],
-                "Revenue": float(millify(year["totalRevenue"], precision=2)[:-1]),
-                "RevDenom": millify(year["totalRevenue"], precision=2)[-1],
-                "NetIncome": float(millify(year["netIncome"], precision=2)[:-1]),
-                "NetIncDenom": millify(year["netIncome"], precision=2)[-1],
-                "NetIncGrowth": float(mk_pretty(year["NetInc_Growth"])),
-                "RevenueGrowth": float(mk_pretty(year["Revenue_Growth"])),
+            mongo_doc["Years"][ year["Years_From"] ] =  {
+
+                "Date"          : year["fiscalDateEnding"],
+                "Revenue"       : float(millify(year["totalRevenue"], precision=2)[:-1]),
+                "RevDenom"      : millify(year["totalRevenue"], precision=2)[-1],
+                "NetIncome"     : float(millify(year["netIncome"], precision=2)[:-1]),
+                "NetIncDenom"   : millify(year["netIncome"], precision=2)[-1],
+                "NetIncGrowth"  : float(mk_pretty(year["NetInc_Growth"])),
+                "RevenueGrowth" : float(mk_pretty(year["Revenue_Growth"])),
             }
 
         """
@@ -271,6 +272,8 @@ def main(stock, mg, force, force_new):
             pprint(mongo_doc)
             print("\n")
 
+
+
         """ Pull Down Overview Data from Alpha Vantage """
         overview_data, stock_name = alpha.get_company_overview(stock)
         if debug:
@@ -283,7 +286,7 @@ def main(stock, mg, force, force_new):
         price2sales = float(overview_data["PriceToSalesRatioTTM"].values[0])
         price2book = float(overview_data["PriceToBookRatio"].values[0])
         book_value = overview_data["BookValue"].values[0]
-        if book_value.startswith("None"):
+        if book_value.startswith('None'):
             mongo_doc["BookValue"] = 0.0
         else:
             mongo_doc["BookValue"] = float(book_value)
@@ -297,13 +300,14 @@ def main(stock, mg, force, force_new):
             mongo_doc["RevTTM_Denom"] = "NA"
             mongo_doc["RevTTM"] = revenue_ttm
 
+
         mongo_doc["Market_Cap"] = millify(market_cap, precision=2)
         mongo_doc["Market_Cap_Denom"] = mongo_doc["Market_Cap"][-1]
         mongo_doc["Market_Cap"] = float(mongo_doc["Market_Cap"][:-1])
 
         mongo_doc["Currency"] = currency
         mongo_doc["TrailingPE"] = float(PETTM)
-        mongo_doc["PriceToSalesTTM"] = millify(float(price2sales), precision=2)
+        mongo_doc["PriceToSalesTTM"] = float(millify(price2sales, precision=2))
         mongo_doc["PriceToBookRatio"] = float(millify(price2book, precision=2))
         mongo_doc["DateCrawled"] = datetime.datetime.utcnow()
 
@@ -366,13 +370,14 @@ def main(stock, mg, force, force_new):
     else:
         """ And now we are ready to send the Data to Mongo """
         print(f"OK, Sending data to Mongo for {stock}\n")
-        print(mg.dbh.update_one({"Stock": stock}, {"$set": mongo_doc}, upsert=True))
+        print(mg.dbh.update_one(  {'Stock': stock}, {'$set' : mongo_doc }, upsert=True))
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" :
 
-    force = True
-    force_new = True
+
+    force = False
+    force_new = False
 
     try:
         stock = sys.argv[1]
@@ -386,7 +391,7 @@ if __name__ == "__main__":
     except KeyError as e:
         print("Likely a Data Issue")
         print("Sending blank to Mongo")
-        mg.dbh.insert_one({"Stock": stock})
+        mg.dbh.insert_one({'Stock': stock})
         print(type(e), e)
     except ValueError as e:
         if "Thank you" in str(e.args):
@@ -394,7 +399,7 @@ if __name__ == "__main__":
         elif "no return was given" in str(e.args):
             print("No Data Returned from Api")
             print("Sending blank to Mongo")
-            mg.dbh.insert_one({"Stock": stock})
+            mg.dbh.insert_one({'Stock': stock})
         else:
             print("Unhandled Value Error")
             print(traceback.format_exc())
