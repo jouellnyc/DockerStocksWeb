@@ -3,6 +3,7 @@
 import sys
 import traceback
 from pprint import pprint
+import datetime
 
 from alpha_vantage.fundamentaldata import FundamentalData
 from pymongo.errors import ServerSelectionTimeoutError
@@ -14,7 +15,7 @@ pd.options.mode.chained_assignment = None
 
 from mongodb import MongoCli
 
-api_key = "ZZZZZZZZZZZ"
+api_key = "ZZZZZZZZZZZZZZZZZ"
 
 format = "pandas"
 
@@ -33,21 +34,54 @@ def add_str(string):
 
 def stock_exists(stock, mg):
     try:
-        mg.lookup_stock(stock)
+        data = mg.lookup_stock(stock)
     except ValueError:
-        return False
+        return False, 'NA'
     else:
-        return True
+        return True, data
 
 
-def main(stock, mg, force):
+def main(stock, mg, force, force_new):
 
-    debug = True 
+    debug = True
 
-    if force is False:
-        if stock_exists(stock, mg):
-            print(f"{stock} already in Mongo -- passing")
+    _, data = stock_exists(stock, mg)
+
+    if debug:
+        print("data", data)
+        print("force force_new", force, force_new)
+
+    if data:
+
+        print(f"{stock} already in Mongo")
+        if force is False:
+            print("...Passing due to force option")
             return True
+        else:
+            print("...Trying due to force option")
+            try:
+
+                if data['DateCrawled']:
+
+                    if force_new is False:
+                        print("...crawled with date data but passing due to force_new option")
+                        return True
+                    else:
+                        print("...crawled with date data -- continuing due to force_new option")
+                        pass
+
+            except KeyError:
+
+                print(f"{stock} does not have crawl date -- continuing to crawl")
+                pass
+
+            except TypeError:
+                print(f"{stock} does not have data or has incorrect data -- continuing")
+                pass
+
+    else:
+        print(f"{stock} was not already in Mongo -- continuing")
+        pass
 
     try:
 
@@ -59,6 +93,13 @@ def main(stock, mg, force):
 
         """ Setup our panda dataframe """
         df = income_data[["fiscalDateEnding", "totalRevenue", "netIncome"]]
+
+        if df["totalRevenue"].iloc[0] == "0":
+            print("0 Revenue -- Sending blank to Mongo")
+            mg.dbh.insert_one({'Stock': stock})
+            sys.exit(0)
+        else:
+            print(df["totalRevenue"].iloc[0])
 
         """
         df looks like this now:
@@ -99,6 +140,7 @@ def main(stock, mg, force):
         df["Years_From"] = df['Years']  - last_year_value
         df["Years_From"] = df["Years_From"].apply(str)
         df["Years_From"] = df["Years_From"].apply(add_str)
+        df = df.fillna(0)
 
         if debug:
             print("df:\n", df, "\n")
@@ -164,12 +206,13 @@ def main(stock, mg, force):
 
         """ millify() and mk_pretty() the data and re-arrange df """
         for year in df.to_dict("records"):
+
             mongo_doc["Years"][ year["Years_From"] ] =  {
 
                 "Date"          : year["fiscalDateEnding"],
-                "Revenue"       : millify(float(year["totalRevenue"]), precision=2)[:-1],
+                "Revenue"       : float(millify(year["totalRevenue"], precision=2)[:-1]),
                 "RevDenom"      : millify(year["totalRevenue"], precision=2)[-1],
-                "NetIncome"     : millify(float(year["netIncome"]), precision=2)[:-1],
+                "NetIncome"     : float(millify(year["netIncome"], precision=2)[:-1]),
                 "NetIncDenom"   : millify(year["netIncome"], precision=2)[-1],
                 "NetIncGrowth"  : float(mk_pretty(year["NetInc_Growth"])),
                 "RevenueGrowth" : float(mk_pretty(year["Revenue_Growth"])),
@@ -258,6 +301,7 @@ def main(stock, mg, force):
         #mongo_doc["PriceToSalesTTM"] = float(millify(price2sales, precision=2))
         mongo_doc["PriceToSalesTTM"] = millify(float(price2sales), precision=2)
         mongo_doc["PriceToBookRatio"] = float(millify(price2book, precision=2))
+        mongo_doc["DateCrawled"] = datetime.datetime.utcnow()
 
         """
         mongo_doc now looks like this:
@@ -307,6 +351,7 @@ def main(stock, mg, force):
                               'Revenue': '161.86',
                               'RevenueGrowth': 21.21}}}
         """
+
         if debug:
             print("mongo_doc:\n")
             pprint(mongo_doc)
@@ -322,7 +367,9 @@ def main(stock, mg, force):
 
 if __name__ == "__main__" :
 
-    force=True
+
+    force = True
+    force_new = True
 
     try:
         stock = sys.argv[1]
@@ -332,16 +379,19 @@ if __name__ == "__main__" :
         sys.exit(1)
 
     try:
-        main(stock, mg, force=force)
+        main(stock, mg, force=force, force_new=force_new)
     except KeyError as e:
         print("Likely a Data Issue")
-        print("Not Sending to Mongo")
+        print("Sending blank to Mongo")
+        mg.dbh.insert_one({'Stock': stock})
         print(type(e), e)
     except ValueError as e:
         if "Thank you" in str(e.args):
             print("Error: Hit Api limit")
         elif "no return was given" in str(e.args):
             print("No Data Returned from Api")
+            print("Sending blank to Mongo")
+            mg.dbh.insert_one({'Stock': stock})
         else:
             print("Unhandled Value Error")
             print(traceback.format_exc())
