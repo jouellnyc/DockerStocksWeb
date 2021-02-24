@@ -402,6 +402,8 @@ if __name__ == "__main__" :
             mg.dbh.insert_one({'Stock': stock})
         else:
             print("Unhandled Value Error")
+            print("Sending blank to Mongo")
+            mg.dbh.insert_one({'Stock': stock})
             print(traceback.format_exc())
     except Exception as e:
         print("Unhandled Error")
