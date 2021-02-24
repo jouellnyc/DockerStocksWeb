@@ -23,6 +23,9 @@ else
 	    sleep $SLEEP
 	elif echo $OUT | grep -i 'is already in Mongo'; then
 	    touch /tmp/$stk
+	elif echo $OUT | grep -i 'unhandled Value Error'; then
+	    touch /tmp/$stk
+	    sleep $SLEEP
 	elif echo $OUT | grep -i 'no data'; then
 	    touch /tmp/$stk
 	    sleep $SLEEP
@@ -48,4 +51,4 @@ else
 
 fi
 
-done < $STOCKS
+done < <(tac $STOCKS
