@@ -51,4 +51,4 @@ else
 
 fi
 
-done < <(tac $STOCKS
+done < <(tac $STOCKS)
