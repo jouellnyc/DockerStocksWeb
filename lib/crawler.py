@@ -15,7 +15,7 @@ pd.options.mode.chained_assignment = None
 
 from mongodb import MongoCli
 
-api_key = "ZZZZZZZZZZZZZZZZ"
+api_key = "QE6BV4N8MW6WA486"
 
 format = "pandas"
 
@@ -44,6 +44,7 @@ def stock_exists(stock, mg):
 def main(stock, mg, force, force_new):
 
     debug = True
+    old_enough = 3
 
     _, data = stock_exists(stock, mg)
 
@@ -59,25 +60,35 @@ def main(stock, mg, force, force_new):
             return True
         else:
             print("...Trying due to force option")
+
             try:
 
-                if data['DateCrawled']:
+                date_crawled = data['DateCrawled']
+                difference = datetime.datetime.utcnow() - date_crawled
 
-                    if force_new is False:
-                        print("...crawled with date data but passing due to force_new option")
-                        return True
-                    else:
-                        print("...crawled with date data -- continuing due to force_new option")
+                if force_new is False:
+                    print("...Checking Crawl Date")
+                    if difference.days >  old_enough:
+                        print(f"Crawling and Indexing {stock} - Crawl date less than {old_enough} days")
                         pass
+                    else:
+                        print(f"Passing on {stock} - crawled within {old_enough} days")
+                        return True
+                else:
+                    print(f"Crawling and Indexing {stock} - due to force_new")
+                    pass
+
 
             except KeyError:
 
-                print(f"{stock} does not have crawl date -- continuing to crawl")
-                pass
+                print(f"{stock} does not have crawl date")
+                print(f"passing")
+                return True
 
             except TypeError:
-                print(f"{stock} does not have data or has incorrect data -- continuing")
-                pass
+                print(f"{stock} does not have data or has incorrect data")
+                print(f"passing")
+                return True
 
     else:
         print(f"{stock} was not already in Mongo -- continuing")
@@ -376,7 +387,7 @@ def main(stock, mg, force, force_new):
 if __name__ == "__main__" :
 
 
-    force = False
+    force = True
     force_new = False
 
     try:
