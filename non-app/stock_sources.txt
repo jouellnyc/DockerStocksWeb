@@ -1,2 +1,4 @@
 
 https://stackoverflow.com/questions/25338608/download-all-stock-symbol-list-of-a-market
+
+https://github.com/prediqtiv/alpha-vantage-cookbook/blob/master/symbol-lists.md
