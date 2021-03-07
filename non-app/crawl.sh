@@ -2,9 +2,9 @@
 
 SLEEP=62
 COUNTER=0
-MAX=400
+MAX=4000
 
-STOCKS=nasdaq.txt
+STOCKS=all.txt
 
 while read stk; do echo == $stk ==;
 
@@ -12,6 +12,7 @@ while read stk; do echo == $stk ==;
 if [ -e /tmp/$stk ]; then
 
         ls -l /tmp/$stk
+
 	echo "Already crawled $stk"
 
 else
@@ -21,7 +22,7 @@ else
 	if echo $OUT | grep -i 'limit'; then
 	    echo 'hit api limit'
 	    sleep $SLEEP
-	elif echo $OUT | grep -i 'is already in Mongo'; then
+	elif echo $OUT | grep -i 'Passing due to'; then
 	    touch /tmp/$stk
 	elif echo $OUT | grep -i 'unhandled Value Error'; then
 	    touch /tmp/$stk
@@ -32,7 +33,7 @@ else
 	elif echo $OUT | grep -i 'likely a data issue'; then
 	    touch /tmp/$stk
 	    sleep $SLEEP
-	elif echo $OUT | grep -i 'sending'; then
+	elif echo $OUT | grep -i 'crawling and indexing'; then
 
 	    touch /tmp/$stk
 
@@ -51,4 +52,4 @@ else
 
 fi
 
-done < <(tac $STOCKS)
+done < $STOCKS
