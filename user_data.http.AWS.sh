@@ -1,7 +1,7 @@
 #!/bin/bash -x
 
 GIT_AWS="https://github.com/jouellnyc/AWS.git"
-GIT_STOCKS="https://github.com/jouellnyc/stocks_web.git"
+GIT_STOCKS="https://github.com/jouellnyc/DockerStocksWeb.git"
 
 yum update -y
 yum -y install git 
