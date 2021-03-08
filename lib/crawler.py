@@ -41,16 +41,16 @@ def stock_exists(stock, mg):
         return True, data
 
 
-def main(stock, mg, force, force_new):
+def main(stock, force, force_new):
 
     debug = True
-    old_enough = 3
 
     _, data = stock_exists(stock, mg)
 
+
     if debug:
-        print("data", data)
-        print("force force_new", force, force_new)
+        print("data:\n", data)
+        print("force force_new:", force, force_new)
 
     if data:
 
@@ -63,13 +63,14 @@ def main(stock, mg, force, force_new):
 
             try:
 
+                old_enough = 3
                 date_crawled = data['DateCrawled']
                 difference = datetime.datetime.utcnow() - date_crawled
 
                 if force_new is False:
                     print("...Checking Crawl Date")
                     if difference.days >  old_enough:
-                        print(f"Crawling and Indexing {stock} - Crawl date less than {old_enough} days")
+                        print(f"Crawling and Indexing {stock} - Crawl date more than {old_enough} days")
                         pass
                     else:
                         print(f"Passing on {stock} - crawled within {old_enough} days")
@@ -398,7 +399,7 @@ if __name__ == "__main__" :
         sys.exit(1)
 
     try:
-        main(stock, mg, force=force, force_new=force_new)
+        main(stock,force=force, force_new=force_new)
     except KeyError as e:
         print("Likely a Data Issue")
         print("Sending blank to Mongo")
