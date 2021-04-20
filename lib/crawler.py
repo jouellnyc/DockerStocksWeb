@@ -4,6 +4,7 @@ import sys
 import traceback
 from pprint import pprint
 import datetime
+import time
 
 from alpha_vantage.fundamentaldata import FundamentalData
 from pymongo.errors import ServerSelectionTimeoutError
@@ -15,7 +16,7 @@ pd.options.mode.chained_assignment = None
 
 from mongodb import MongoCli
 
-api_key = "ZZZZZZZZZZZZZZZZ"
+api_key = "E2W484948FV3YIWS"
 
 format = "pandas"
 
@@ -43,7 +44,19 @@ def stock_exists(stock, mg):
 
 def main(stock, force, force_new):
 
-    debug = True
+    """
+
+        force = False will not crawl if stock is in the DB at all
+        force = True  will try the date:
+
+            force_new  = True  will crawl no matter how old the data is
+            force_new  = False check's if it's X days old
+
+        We pass on stock w/o crawl dates
+
+    """
+
+    debug = False
 
     _, data = stock_exists(stock, mg)
 
@@ -83,12 +96,12 @@ def main(stock, force, force_new):
             except KeyError:
 
                 print(f"{stock} does not have crawl date")
-                print(f"passing")
+                print("passing")
                 return True
 
             except TypeError:
                 print(f"{stock} does not have data or has incorrect data")
-                print(f"passing")
+                print("passing")
                 return True
 
     else:
@@ -110,7 +123,7 @@ def main(stock, force, force_new):
             if ((df["totalRevenue"].iloc[0] == "0") or (df["totalRevenue"].iloc[0] == 0) or (df["totalRevenue"].iloc[-1] == "0") or (df["totalRevenue"].iloc[-1] == 0)):
                 print("0 Revenue -- Sending blank to Mongo")
                 mg.dbh.insert_one({'Stock': stock})
-                sys.exit(0)
+                return False
         except IndexError as e:
             print(e)
             pass
@@ -382,42 +395,66 @@ def main(stock, force, force_new):
     else:
         """ And now we are ready to send the Data to Mongo """
         print(f"OK, Sending data to Mongo for {stock}\n")
-        print(mg.dbh.update_one(  {'Stock': stock}, {'$set' : mongo_doc }, upsert=True))
-
+        print(mg.dbh.update_one({'Stock': stock}, {'$set' : mongo_doc }, upsert=True))
+        print(f"OK, Updating {stock} as the lastest stock\n")
+        print(mg.update_latest_stock(stock))
+        print(f"OK, sleeping for {pause} seconds")
+        time.sleep(pause)
 
 if __name__ == "__main__" :
 
+    def pause_update_last(pause, msg):
+        print(msg)
+        print(f"Pausing for {pause} seconds")
+        time.sleep(pause)
+        mg.update_latest_stock(stock)
 
     force = True
     force_new = False
+    pause = 35
 
     try:
-        stock = sys.argv[1]
+
         mg = MongoCli()
+        all_stocks_raw  = mg.dump_all_stocks()
+        all_stocks_dict  = {}
+        for i,stock in enumerate(all_stocks_raw):
+            all_stocks_dict[stock]=int(i)
+        latest_stock = mg.get_latest_stock()
+        latest_stock_index = all_stocks_dict[latest_stock]
+        print(f"Latest Stock {latest_stock}")
+        all_stocks_left = all_stocks_raw[latest_stock_index:]
+
     except ServerSelectionTimeoutError as e:
         print("Can't connect to Mongodb - Quitting Crawl", e)
         sys.exit(1)
 
-    try:
-        main(stock,force=force, force_new=force_new)
-    except KeyError as e:
-        print("Likely a Data Issue")
-        print("Sending blank to Mongo")
-        mg.dbh.insert_one({'Stock': stock})
-        print(type(e), e)
-    except ValueError as e:
-        if "Thank you" in str(e.args):
-            print("Error: Hit Api limit")
-        elif "no return was given" in str(e.args):
-            print("No Data Returned from Api")
-            print("Sending blank to Mongo")
+    for stock in  all_stocks_left:
+        try:
+            print(f"==== Trying {stock}")
+            main(stock,force=force, force_new=force_new)
+        except KeyError:
+            msg="Likely a Data Issue\nSending blank to Mongo"
             mg.dbh.insert_one({'Stock': stock})
-        else:
-            print("Unhandled Value Error")
-            print("Sending blank to Mongo")
-            mg.dbh.insert_one({'Stock': stock})
+            pause_update_last(pause, msg)
+            pass
+        except ValueError as e:
+            if "Thank you" in str(e.args):
+                msg=print("Error: Hit Api limit -- ", end='')
+                pause_update_last(pause * 3, msg)
+                pass
+            elif "no return was given" in str(e.args):
+                msg="No Data Returned from Api\nSending blank to Mongo"
+                mg.dbh.insert_one({'Stock': stock})
+                pause_update_last(pause, msg)
+                pass
+            else:
+                msg="Unhandled Value Error\nSending blank to Mongo"
+                mg.dbh.insert_one({'Stock': stock})
+                pause_update_last(pause, msg)
+                print(traceback.format_exc())
+                pass
+        except Exception as e:
+            print("Unhandled Error")
+            print(type(e), e)
             print(traceback.format_exc())
-    except Exception as e:
-        print("Unhandled Error")
-        print(type(e), e)
-        print(traceback.format_exc())
