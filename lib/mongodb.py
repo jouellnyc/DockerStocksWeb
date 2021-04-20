@@ -51,7 +51,7 @@ class MongoCli:
         database_name = self.database_name
 
         try:
-            client = MongoClient("mongodb://db:27017/")
+            client = MONGOCLIENTLINE
             client.server_info()
             database_handle = client[database_name]
             collection_handle = database_handle[collection_name]
@@ -65,7 +65,16 @@ class MongoCli:
             raise ValueError(f"{stock}  not found")
         else:
             return response
-
+        
+    def dump_all_stocks(self):
+        return sorted([ x['Stock'] for x in self.dbh.find({})])
+        
+    def get_latest_stock(self):
+        return self.dbh.find_one({'Stock':'last_good'},{'Name':1,'_id' : 0})['Name']
+    
+    def update_latest_stock(self, stock):
+        return self.dbh.update_one({'Stock':'last_good'}, {'$set' : {'Name' : stock}} , upsert=True)
+    
     def update_one_document(self, mongo_filter, mongo_doc, verbose=False):
         """
         Update only one document in MongoDB, create it if it does not exist.
