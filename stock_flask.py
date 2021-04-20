@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 app.py - Main Flask application file
@@ -16,14 +15,13 @@ app.py - Main Flask application file
 """
 
 
-import sys
 import logging
 
 import flask
 from flask import Flask
 from flask import request
 from flask import render_template
-import pymongo
+
 from pymongo.errors import ConnectionFailure
 from pymongo.errors import ServerSelectionTimeoutError
 from pymongo.errors import OperationFailure
@@ -72,6 +70,8 @@ def get_data():
             # Master Dictionary with all the Data
             mongocli = mongodb.MongoCli()
             stock_data = mongocli.lookup_stock(stock)
+            if len(stock_data) < 2:
+                return render_template("dne_stock.html", stock=stock)
         except ValueError as e:
             app.logger.error(str(e))
             return render_template("dne_stock.html", stock=stock)
