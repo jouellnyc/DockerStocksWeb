@@ -105,6 +105,7 @@ def main(stock, force, force_new):
                 return True
 
     else:
+        
         print(f"{stock} was not already in Mongo -- continuing")
         pass
 
@@ -122,7 +123,10 @@ def main(stock, force, force_new):
         try:
             if ((df["totalRevenue"].iloc[0] == "0") or (df["totalRevenue"].iloc[0] == 0) or (df["totalRevenue"].iloc[-1] == "0") or (df["totalRevenue"].iloc[-1] == 0)):
                 print("0 Revenue -- Sending blank to Mongo")
+                mg.dbh.dbh.delete_one({'Stock': stock})
                 mg.dbh.insert_one({'Stock': stock})
+                #This will fail:
+                #mg.dbh.update_one({'Stock': stock}, {'$set' : "" }, upsert=True)
                 return False
         except IndexError as e:
             print(e)
@@ -416,23 +420,27 @@ if __name__ == "__main__" :
     try:
 
         mg = MongoCli()
-        all_stocks_raw  = mg.dump_all_stocks()
-        all_stocks_dict  = {}
-        for i,stock in enumerate(all_stocks_raw):
-            all_stocks_dict[stock]=int(i)
-        latest_stock = mg.get_latest_stock()
-        latest_stock_index = all_stocks_dict[latest_stock]
-        print(f"Latest Stock {latest_stock}")
-        all_stocks_left = all_stocks_raw[latest_stock_index:]
+        all_stocks_left = mg.dump_all_stocks_sorted_by_date()
+        #all_stocks_raw  = mg.dump_all_stocks_sorted_by_date()
+        #all_stocks_dict  = {}
+        #for i,stock in enumerate(all_stocks_raw):
+        #    all_stocks_dict[stock]=int(i)
+        #latest_stock = mg.get_latest_stock()
+        #latest_stock_index = all_stocks_dict[latest_stock]
+        #print(f"Latest Stock {latest_stock}")
+        #all_stocks_left = all_stocks_raw[latest_stock_index:]
 
     except ServerSelectionTimeoutError as e:
         print("Can't connect to Mongodb - Quitting Crawl", e)
         sys.exit(1)
 
+    print(all_stocks_left)
     for stock in  all_stocks_left:
         try:
             print(f"==== Trying {stock}")
-            main(stock,force=force, force_new=force_new)
+            if not main(stock,force=force, force_new=force_new):
+                msg="Likely a Data Issue\nSending blank to Mongo"
+                pause_update_last(pause, msg)
         except KeyError:
             msg="Likely a Data Issue\nSending blank to Mongo"
             mg.dbh.insert_one({'Stock': stock})
@@ -442,7 +450,7 @@ if __name__ == "__main__" :
             if "Thank you" in str(e.args):
                 msg=print("Error: Hit Api limit -- ", end='')
                 pause_update_last(pause * 3, msg)
-                pass
+                sys.exit(1)
             elif "no return was given" in str(e.args):
                 msg="No Data Returned from Api\nSending blank to Mongo"
                 mg.dbh.insert_one({'Stock': stock})
