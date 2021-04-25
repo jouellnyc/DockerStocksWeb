@@ -1,5 +1,6 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
+import argparse
 import sys
 import traceback
 from pprint import pprint
@@ -52,8 +53,6 @@ def main(stock, force, force_new):
             force_new  = True  will crawl no matter how old the data is
             force_new  = False check's if it's X days old
 
-        We pass on stock w/o crawl dates
-
     """
 
     debug = True
@@ -96,13 +95,17 @@ def main(stock, force, force_new):
             except KeyError:
 
                 print(f"{stock} does not have crawl date")
-                print("passing")
-                return True
+                if force_retry_blank:
+                    print(f"Crawling and Indexing {stock} - force_retry_blank is set")
+                    pass
+                else:
+                    print("...passing")
+                    return True
 
             except TypeError:
                 print(f"{stock} does not have data or has incorrect data")
                 print("passing")
-                return True
+                return False 
 
     else:
 
@@ -123,10 +126,6 @@ def main(stock, force, force_new):
         try:
             if ((df["totalRevenue"].iloc[0] == "0") or (df["totalRevenue"].iloc[0] == 0) or (df["totalRevenue"].iloc[-1] == "0") or (df["totalRevenue"].iloc[-1] == 0)):
                 print("0 Revenue -- Sending blank to Mongo")
-                mg.dbh.delete_one({'Stock': stock})
-                mg.dbh.insert_one({'Stock': stock})
-                #This will fail:
-                #mg.dbh.update_one({'Stock': stock}, {'$set' : "" }, upsert=True)
                 return False
         except IndexError as e:
             print(e)
@@ -399,77 +398,94 @@ def main(stock, force, force_new):
     else:
         """ And now we are ready to send the Data to Mongo """
         print(f"OK, Sending data to Mongo for {stock}\n")
-        print(mg.dbh.update_one({'Stock': stock}, {'$set' : mongo_doc }, upsert=True))
+        #print(mg.dbh.update_one({'Stock': stock}, {'$set' : mongo_doc }, upsert=True))
+        print(mg.update_one_document({'Stock': stock}, {'$set' : mongo_doc }))
         print(f"OK, Updating {stock} as the lastest stock\n")
         print(mg.update_latest_stock(stock))
-        print(f"OK, sleeping for {pause} seconds")
-        time.sleep(pause)
+        return True
 
 if __name__ == "__main__" :
 
-    def pause_update_last(pause, msg):
-        print(msg)
-        print(f"Pausing for {pause} seconds")
-        time.sleep(pause)
-        mg.update_latest_stock(stock)
-
-    def send_blank():
-        print(mg)
-        mg.dbh.remove({'Stock': stock})
-        mg.dbh.insert_one({'Stock': stock})
-
     force = True
-    force_new = False
+    force_new = True 
+    force_retry_blank = True
     pause = 35
+    debug = True
+
+    parser = argparse.ArgumentParser()
+    parser.description = "Get Stock Data and Return Growth Rates"
+    parser.epilog = "Example: " + sys.argv[0] + " -m all"
+    parser.add_argument("-s", "--stock")
+    parser.add_argument("-m", "--mode", choices=['date', 'all'])
+    namespace = parser.parse_args(sys.argv[1:])
+
+
 
     try:
 
         mg = MongoCli()
-        all_stocks_left = mg.dump_all_stocks_sorted_by_date()
-        #all_stocks_raw  = mg.dump_all_stocks_sorted_by_date()
-        #all_stocks_dict  = {}
-        #for i,stock in enumerate(all_stocks_raw):
-        #    all_stocks_dict[stock]=int(i)
-        #latest_stock = mg.get_latest_stock()
-        #latest_stock_index = all_stocks_dict[latest_stock]
-        #print(f"Latest Stock {latest_stock}")
-        #all_stocks_left = all_stocks_raw[latest_stock_index:]
+
+        """ mode == all  -- Crawl from the first alphabetically """
+        """ mode == date -- Crawl the oldest stocks first       """
+        """ no mode -- Crawl from Last Known, then Alphabetically from there """
+
+        if namespace.mode:
+
+            if namespace.mode == "date":
+                all_stocks = mg.dump_all_stocks_sorted_by_date()
+            elif namespace.mode == "all":
+                all_stocks = mg.dump_all_stocks()
+
+        elif namespace.stock:
+
+            all_stocks = []
+            all_stocks.append(namespace.stock)
+
+        else:
+            all_stocks  = mg.dump_all_stocks()
+            all_stocks_dict  = {}
+            for i,stock in enumerate(all_stocks, 1):
+                all_stocks_dict[stock]=int(i)
+            latest_stock = mg.get_latest_stock()
+            latest_stock_index = all_stocks_dict[latest_stock]
+            print(latest_stock_index)
+            for x, y in all_stocks_dict.items():
+                print(x,y)
+            all_stocks = all_stocks[latest_stock_index:]
 
     except ServerSelectionTimeoutError as e:
         print("Can't connect to Mongodb - Quitting Crawl", e)
         sys.exit(1)
 
-    print(all_stocks_left)
-    for stock in  all_stocks_left:
+    print(f"{all_stocks} Mode: {namespace.mode}")
+    for stock in all_stocks:
         try:
             print(f"==== Trying {stock}")
             if not main(stock, force=force, force_new=force_new):
-                msg="Likely a Data Issue\nSending blank to Mongo"
-                send_blank()
-                print(msg)
+                print("Likely a Data Issue\nSending blank to Mongo")
+                mg.update_as_blank(stock)
         except KeyError:
-            msg="Likely a Data Issue\nSending blank to Mongo"
-            send_blank()
-            print(msg)
+            print("Likely a Data Issue\nSending blank to Mongo")
+            mg.update_as_blank(stock)
             pass
         except ValueError as e:
             if "Thank you" in str(e.args):
                 msg=print("Error: Hit Api limit -- ", end='')
-                pause_update_last(pause, msg)
+                print(msg)
                 sys.exit(1)
             elif "no return was given" in str(e.args):
-                msg="No Data Returned from Api\nSending blank to Mongo"
-                print(msg)
-                send_blank()
+                print("No Data Returned from Api\nSending blank to Mongo")
+                mg.update_as_blank(stock)
                 pass
             else:
-                msg="Unhandled Value Error\nSending blank to Mongo"
-                print(msg)
-                send_blank()
+                print("Unhandled Value Error\nSending blank to Mongo")
+                mg.update_as_blank(stock)
                 print(traceback.format_exc())
                 pass
         except Exception as e:
             print("Unhandled Error")
             print(type(e), e)
             print(traceback.format_exc())
-
+        finally:
+            print(f"Sleeping for {pause} seconds")
+            time.sleep(pause)
