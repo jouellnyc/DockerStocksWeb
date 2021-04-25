@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 
 
+
+import sys
+sys.path.append('../lib/')
+
 from mongodb import MongoCli
+mg = MongoCli()
 
 
 def stock_exists(stock):
