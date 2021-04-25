@@ -407,8 +407,8 @@ def main(stock, force, force_new):
 if __name__ == "__main__" :
 
     force = True
-    force_new = True 
-    force_retry_blank = True
+    force_new = False 
+    force_retry_blank = False
     pause = 35
     debug = True
 
