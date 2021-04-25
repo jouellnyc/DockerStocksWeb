@@ -33,7 +33,7 @@ def cut(x):
 def add_str(string):
     return string + "Years"
 
-def stock_exists(stock, mg):
+def stock_exists(stock):
     try:
         data = mg.lookup_stock(stock)
     except ValueError:
@@ -56,9 +56,9 @@ def main(stock, force, force_new):
 
     """
 
-    debug = False
+    debug = True
 
-    _, data = stock_exists(stock, mg)
+    _, data = stock_exists(stock)
 
 
     if debug:
@@ -105,7 +105,7 @@ def main(stock, force, force_new):
                 return True
 
     else:
-        
+
         print(f"{stock} was not already in Mongo -- continuing")
         pass
 
@@ -123,7 +123,7 @@ def main(stock, force, force_new):
         try:
             if ((df["totalRevenue"].iloc[0] == "0") or (df["totalRevenue"].iloc[0] == 0) or (df["totalRevenue"].iloc[-1] == "0") or (df["totalRevenue"].iloc[-1] == 0)):
                 print("0 Revenue -- Sending blank to Mongo")
-                mg.dbh.dbh.delete_one({'Stock': stock})
+                mg.dbh.delete_one({'Stock': stock})
                 mg.dbh.insert_one({'Stock': stock})
                 #This will fail:
                 #mg.dbh.update_one({'Stock': stock}, {'$set' : "" }, upsert=True)
@@ -413,6 +413,11 @@ if __name__ == "__main__" :
         time.sleep(pause)
         mg.update_latest_stock(stock)
 
+    def send_blank():
+        print(mg)
+        mg.dbh.remove({'Stock': stock})
+        mg.dbh.insert_one({'Stock': stock})
+
     force = True
     force_new = False
     pause = 35
@@ -438,31 +443,33 @@ if __name__ == "__main__" :
     for stock in  all_stocks_left:
         try:
             print(f"==== Trying {stock}")
-            if not main(stock,force=force, force_new=force_new):
+            if not main(stock, force=force, force_new=force_new):
                 msg="Likely a Data Issue\nSending blank to Mongo"
-                pause_update_last(pause, msg)
+                send_blank()
+                print(msg)
         except KeyError:
             msg="Likely a Data Issue\nSending blank to Mongo"
-            mg.dbh.insert_one({'Stock': stock})
-            pause_update_last(pause, msg)
+            send_blank()
+            print(msg)
             pass
         except ValueError as e:
             if "Thank you" in str(e.args):
                 msg=print("Error: Hit Api limit -- ", end='')
-                pause_update_last(pause * 3, msg)
+                pause_update_last(pause, msg)
                 sys.exit(1)
             elif "no return was given" in str(e.args):
                 msg="No Data Returned from Api\nSending blank to Mongo"
-                mg.dbh.insert_one({'Stock': stock})
-                pause_update_last(pause, msg)
+                print(msg)
+                send_blank()
                 pass
             else:
                 msg="Unhandled Value Error\nSending blank to Mongo"
-                mg.dbh.insert_one({'Stock': stock})
-                pause_update_last(pause, msg)
+                print(msg)
+                send_blank()
                 print(traceback.format_exc())
                 pass
         except Exception as e:
             print("Unhandled Error")
             print(type(e), e)
             print(traceback.format_exc())
+
