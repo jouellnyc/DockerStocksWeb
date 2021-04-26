@@ -5,6 +5,7 @@
 MG=mongodb.py 
 MGD=mongodb.py.dummy
 PROD=mongodb.py.prod
+MSG="$1"
 
 if [ x"$1" == x"done" ]; then
     mv $PROD $MG 
@@ -22,6 +23,6 @@ mv $MGD $MG
 
 if grep MONGO $MG; then
     echo git add $MG
-    echo git commit -m \"\"  $MG
+    echo git commit -m $MSG $MG
     echo git push 
 fi
