@@ -408,7 +408,7 @@ if __name__ == "__main__" :
 
     force = True
     force_new = False 
-    force_retry_blank = False
+    force_retry_blank = True
     pause = 35
     debug = True
 
@@ -418,6 +418,10 @@ if __name__ == "__main__" :
     parser.add_argument("-s", "--stock")
     parser.add_argument("-m", "--mode", choices=['date', 'all'])
     namespace = parser.parse_args(sys.argv[1:])
+
+    def sleepit(pause):
+        print(f"Sleeping for {pause} seconds")
+        time.sleep(pause)
 
 
 
@@ -464,9 +468,11 @@ if __name__ == "__main__" :
             if not main(stock, force=force, force_new=force_new):
                 print("Likely a Data Issue\nSending blank to Mongo")
                 mg.update_as_blank(stock)
+                sleepit(pause)
         except KeyError:
             print("Likely a Data Issue\nSending blank to Mongo")
             mg.update_as_blank(stock)
+            sleepit(pause)
             pass
         except ValueError as e:
             if "Thank you" in str(e.args):
@@ -476,16 +482,18 @@ if __name__ == "__main__" :
             elif "no return was given" in str(e.args):
                 print("No Data Returned from Api\nSending blank to Mongo")
                 mg.update_as_blank(stock)
+                sleepit(pause)
                 pass
             else:
                 print("Unhandled Value Error\nSending blank to Mongo")
                 mg.update_as_blank(stock)
                 print(traceback.format_exc())
+                sleepit(pause)
                 pass
         except Exception as e:
             print("Unhandled Error")
             print(type(e), e)
+            mg.update_as_blank(stock)
+            sleepit(pause)
             print(traceback.format_exc())
-        finally:
-            print(f"Sleeping for {pause} seconds")
-            time.sleep(pause)
+            pass
