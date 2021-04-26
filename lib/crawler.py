@@ -27,6 +27,9 @@ alpha = FundamentalData(key=api_key, output_format=format, indexing_type="intege
 class NotOldEnough(Exception):
     pass
 
+class PassOnErrorStock(Exception):
+    pass
+
 class GoodCrawl(Exception):
     pass
 
@@ -78,7 +81,7 @@ def DecidetoCrawl(stock, force_new_all):
     """ if force_new_all is True, crawl the doc """
     """ otherwise check it's crawl date         """
 
-    debug = True
+    debug = False
     stock_data = get_stock_data(stock)
 
     if debug:
@@ -87,13 +90,25 @@ def DecidetoCrawl(stock, force_new_all):
     if force_new_all:
         print(f"Crawling and Indexing {stock} - due to force_new_all ")
         CrawlStock(stock)
+    else:
+        if stock_is_crawled_recently:
+            print(f"Passing on {stock} - crawled recently")
+            raise NotOldEnough
+        else:
+            if force_retry_errors:
+                print(f"Crawling and Indexing {stock} due to force_retry_errors")
+                CrawlStock(stock)
+            else:
+                try:
+                    if stock_data['Errors']:
+                        print(f"Passing on {stock} due to force_retry_errors")
+                        raise PassOnErrorStock
+                except KeyError:
+                    print(f"Crawling and Indexing {stock} due to force_retry_errors")
+                    CrawlStock(stock)
 
     print("...Checking Crawl Date")
-    if stock_is_crawled_recently:
-        print(f"Passing on {stock} - crawled recently")
-        raise NotOldEnough
-    print(f"Crawling and Indexing {stock} due to out of date Crawl date")
-    CrawlStock(stock)
+                    
 
 
 def CrawlStock(stock):
@@ -116,7 +131,6 @@ def CrawlStock(stock):
         or (df["totalRevenue"].iloc[-1] == 0)
     ):
         raise ZeroRevenue
-
 
     """  Set data to numbers from strings """
     df[["totalRevenue", "netIncome"]] = df[["totalRevenue", "netIncome"]].apply(
@@ -227,8 +241,9 @@ def CrawlStock(stock):
 if __name__ == "__main__":
 
     force_new_all = True
+    force_retry_errors = True
     pause = 35
-    debug = True
+    debug = False
 
     parser = argparse.ArgumentParser()
     parser.description = "Get Stock Data and Return Growth Rates"
@@ -237,12 +252,11 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--mode", choices=["date", "all"])
     namespace = parser.parse_args(sys.argv[1:])
 
-
     try:
 
         """ Connect to Mongo... or not """
         mg = MongoCli()
-    
+
         """ mode == all  -- Crawl from the first alphabetically """
         """ mode == date -- Crawl the oldest stocks first       """
         """ no mode -- Crawl from Last Known, then Alphabetically from there """
@@ -266,47 +280,52 @@ if __name__ == "__main__":
         print("Mongodb issue: ", e)
         sys.exit(1)
 
-
-    print(f"{all_stocks} Mode: {namespace.mode}")
+    print(f"{all_stocks} Mode: {namespace.mode}") if debug else None
     for stock in all_stocks:
         try:
 
             print(f"==== Trying {stock}")
             DecidetoCrawl(stock, force_new_all=force_new_all)
 
-        except GoodCrawl:
-            sleepit(pause)
-            continue
-
-        except ZeroRevenue:
-            print("Zero Revenue")
-            sleepit(pause)
+        except PassOnErrorStock:
             continue
 
         except NotOldEnough:
             continue
 
-        except KeyError:
-           print("Likely a Data Issue\nSending blank to Mongo")
-           mg.update_as_blank(stock)
-           sleepit(pause)
-           continue
+        except GoodCrawl:
+            sleepit(pause)
+            continue
+
+        except ZeroRevenue:
+            msg = "Zero Revenue"
+            mg.update_as_error(stock, msg)
+            print(msg) if debug else None
+            sleepit(pause)
+            continue
+
+        except KeyError as e:
+            msg = "Likely a Data Issue"
+            mg.update_as_error(stock,f"{msg} -- {e}")
+            print(msg) 
+            sleepit(pause)
+            continue
 
         except ValueError as e:
 
             if "Thank you" in str(e.args):
-                msg = print("Error: Hit Api limit -- ", end="")
-                print(msg)
+                print("Error: Hit Api limit -- ", end="")
                 sys.exit(1)
             elif "no return was given" in str(e.args):
-                print("No Data Returned from Api\nSending blank to Mongo")
-                mg.update_as_blank(stock)
+                msg = "No Data Returned from Api"
+                mg.update_as_error(stock, msg)
+                print(msg) 
                 sleepit(pause)
                 continue
             else:
-                print("Unhandled Value Error\nSending blank to Mongo")
-                mg.update_as_blank(stock)
-                print(traceback.format_exc())
+                msg = "Unhandled Value Error"
+                mg.update_as_error(stock,f"{msg} -- {e}")
+                print("Full TB: ", traceback.format_exc())
                 sleepit(pause)
                 continue
 
