@@ -33,13 +33,11 @@ git clone $GIT_STOCKS
 cd stocks_web
 sleep 2
 
-MONGOFILE="lib/mongodb.py.AWS"
-MONGOFILE_FINAL="lib/mongodb.py"
+MONGOFILE="lib/mongodb.py"
 sed -i -r  's#MONGOCLIENTLINE#client = MongoClient("mongodb+srv://MONGOUSERNAME:MONGOPASSWORD@MONGOHOST/test?retryWrites=true\&w=majority", serverSelectionTimeoutMS=2000)#' $MONGOFILE
 sed -i s"/MONGOUSERNAME/${MONGOUSERNAME}/" $MONGOFILE
 sed -i s"/MONGOPASSWORD/${MONGOPASSWORD}/" $MONGOFILE 
 sed -i         s"/MONGOHOST/${MONGOHOST}/" $MONGOFILE 
-mv $MONGOFILE $MONGOFILE_FINAL
 
 DOCKER_COMPOSE_FILE="docker-compose.AWS.hosted.MongoDb.yaml"
 source $GIT_DIR/AWS/aws-cli/shared_vars.txt
