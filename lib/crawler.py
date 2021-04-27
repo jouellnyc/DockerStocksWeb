@@ -67,11 +67,11 @@ def sleepit(pause):
 
 def stock_is_crawled_recently(stock_data, old_enough=None):
 
-    old_enough = 3
+    old_enough = 12
     date_crawled = stock_data["DateCrawled"]
     difference = datetime.datetime.utcnow() - date_crawled
 
-    if difference.days > old_enough:
+    if difference.hours > old_enough:
         return False
     return True
 
