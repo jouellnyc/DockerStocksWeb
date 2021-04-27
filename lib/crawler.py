@@ -67,11 +67,17 @@ def sleepit(pause):
 
 def stock_is_crawled_recently(stock_data, old_enough=None):
 
-    old_enough = 12
+    old_enough = 4 
     date_crawled = stock_data["DateCrawled"]
     difference = datetime.datetime.utcnow() - date_crawled
+    duration_in_s = difference.total_seconds()  
+    hours = divmod(duration_in_s, 3600)[0]
 
-    if difference.hours > old_enough:
+    #print(datetime.datetime.utcnow())
+    #print(dir(difference))
+    #print(difference)
+    #if difference.hours > old_enough:
+    if hours > old_enough:
         return False
     return True
 
@@ -82,32 +88,35 @@ def DecidetoCrawl(stock, force_new_all):
     """ otherwise check it's crawl date         """
 
     debug = False
-    stock_data = get_stock_data(stock)
+    _, stock_data = get_stock_data(stock)
 
     if debug:
         print("data:\n", stock_data)
 
+    print("Deciding to Crawl or Not...")
+
     if force_new_all:
         print(f"Crawling and Indexing {stock} - due to force_new_all ")
         CrawlStock(stock)
-    else:
-        print("...Checking Crawl Date")
-        if stock_is_crawled_recently:
-            print(f"Passing on {stock} - crawled recently")
-            raise NotOldEnough
-        else:
-            if force_retry_errors:
-                print(f"Crawling and Indexing {stock} due to force_retry_errors")
-                CrawlStock(stock)
-            else:
-                try:
-                    if stock_data['Errors']:
-                        print(f"Passing on {stock} due to force_retry_errors")
-                        raise PassOnErrorStock
-                except KeyError:
-                    print(f"Crawling and Indexing {stock} due to force_retry_errors")
-                    CrawlStock(stock)
 
+    if force_retry_errors:
+        print(f"Crawling and Indexing {stock} due to force_retry_errors")
+        CrawlStock(stock)
+    else:
+        try:
+            print("Force_retry_errors is False...")
+            print("Checking for Errors...")
+            if stock_data['Error']:
+                print("Passing: force_retry_errors is False and stock has errors")
+                raise PassOnErrorStock
+        except KeyError:
+            print("No Errors, now checking Crawl Date...")
+            if stock_is_crawled_recently(stock_data):
+                print("...Passing: Not old enough and force_retry_errors is False")
+                raise NotOldEnough
+            else:
+                print("...Crawling: Old Enough and has no error")
+                CrawlStock(stock)
 
 
 def CrawlStock(stock):
@@ -237,8 +246,9 @@ def CrawlStock(stock):
 
 if __name__ == "__main__":
 
-    force_new_all = True
-    force_retry_errors = True
+    #Multiple crawlers will step on each other if set
+    force_new_all = False 
+    force_retry_errors = False 
     pause = 35
     debug = False
 
@@ -322,6 +332,7 @@ if __name__ == "__main__":
             elif "no return was given" in str(e.args):
                 msg = "No Data Returned from Api"
                 mg.update_as_error(stock, msg)
+                print(f"OK, Updating {stock} as the lastest stock\n")
                 mg.update_latest_stock(stock)
                 print(msg) 
                 sleepit(pause)
@@ -329,6 +340,7 @@ if __name__ == "__main__":
             else:
                 msg = "Unhandled Value Error"
                 mg.update_as_error(stock,f"{msg} -- {e}")
+                print(f"OK, Updating {stock} as the lastest stock\n")
                 mg.update_latest_stock(stock)
                 print("Full TB: ", traceback.format_exc())
                 sleepit(pause)
@@ -344,3 +356,5 @@ if __name__ == "__main__":
             print(traceback.format_exc())
             sleepit(pause)
             continue
+        
+        
