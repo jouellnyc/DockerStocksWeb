@@ -3,7 +3,7 @@
 ### Switch out Credentials with Dummy line
 
 MG=mongodb.py 
-MGD=mongodb.py.dummy
+MGB=mongodb.py.bak
 PROD=mongodb.py.prod
 
 if [ x"$1" == x"" ]; then
@@ -13,20 +13,16 @@ fi
 
 if [ x"$1" == x"done" ]; then
     mv $PROD $MG 
-    grep MongoClient $MG
+    grep -q MongoClient $MG && echo 'Back to Working Config' 
     exit
 fi
 
 MSG="$1"
-[ -f $MGD ] && rm $MGD
-cp $MG $MGD
+cp $MG $PROD
+cp $MG $MGB
 
-sed -i s#"$(grep -iEo  "client.*=.*MongoClient.*"  $MG)"#"client = MONGOCLIENTLINE"#g $MGD
-grep -l MongoClient $PROD
-grep -l MONGOCLIENT $MG
-
-mv $MG $PROD 
-mv $MGD $MG
+sed -i s#"$(grep -iEo  "client.*=.*MongoClient.*"  $MG)"#"client = MONGOCLIENTLINE"#g $MGB
+mv $MGB $MG
 
 if grep MONGO $MG; then
     echo git add $MG
