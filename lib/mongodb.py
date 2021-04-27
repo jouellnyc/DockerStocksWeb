@@ -9,8 +9,6 @@
 
 """
 
-from pymongo import MongoClient
-
 
 class MongoCli:
     def __init__(self):

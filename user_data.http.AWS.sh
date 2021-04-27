@@ -30,7 +30,7 @@ read -r  MONGOUSERNAME MONGOPASSWORD MONGOHOST <  <(/usr/bin/python3 ./getSecret
 
 cd $GIT_DIR
 git clone $GIT_STOCKS 
-cd stocks_web
+cd DockerStocksWeb
 sleep 2
 
 MONGOFILE="lib/mongodb.py"
