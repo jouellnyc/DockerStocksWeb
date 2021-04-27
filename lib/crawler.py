@@ -73,10 +73,7 @@ def stock_is_crawled_recently(stock_data, old_enough=None):
     duration_in_s = difference.total_seconds()  
     hours = divmod(duration_in_s, 3600)[0]
 
-    #print(datetime.datetime.utcnow())
-    #print(dir(difference))
-    #print(difference)
-    #if difference.hours > old_enough:
+    #if difference.days > old_enough:
     if hours > old_enough:
         return False
     return True
