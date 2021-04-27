@@ -232,8 +232,6 @@ def CrawlStock(stock):
     """ And now we are ready to send the Data to Mongo """
     print(f"OK, Sending data to Mongo for {stock}\n")
     print(mg.update_one_document({"Stock": stock}, {"$set": mongo_doc}))
-    print(f"OK, Updating {stock} as the lastest stock\n")
-    print(mg.update_latest_stock(stock))
     raise GoodCrawl
 
 
@@ -293,6 +291,8 @@ if __name__ == "__main__":
             continue
 
         except GoodCrawl:
+            print(f"OK, Updating {stock} as the lastest stock\n")
+            print(mg.update_latest_stock(stock))
             sleepit(pause)
             continue
 
@@ -300,6 +300,8 @@ if __name__ == "__main__":
             msg = "Zero Revenue"
             mg.update_as_error(stock, msg)
             print(msg) if debug else None
+            print(f"OK, Updating {stock} as the lastest stock\n")
+            print(mg.update_latest_stock(stock))
             sleepit(pause)
             continue
 
@@ -307,6 +309,8 @@ if __name__ == "__main__":
             msg = "Likely a Data Issue"
             mg.update_as_error(stock,f"{msg} -- {e}")
             print(msg) 
+            print(f"OK, Updating {stock} as the lastest stock\n")
+            print(mg.update_latest_stock(stock))
             sleepit(pause)
             continue
 
@@ -318,12 +322,14 @@ if __name__ == "__main__":
             elif "no return was given" in str(e.args):
                 msg = "No Data Returned from Api"
                 mg.update_as_error(stock, msg)
+                mg.update_latest_stock(stock)
                 print(msg) 
                 sleepit(pause)
                 continue
             else:
                 msg = "Unhandled Value Error"
                 mg.update_as_error(stock,f"{msg} -- {e}")
+                mg.update_latest_stock(stock)
                 print("Full TB: ", traceback.format_exc())
                 sleepit(pause)
                 continue
