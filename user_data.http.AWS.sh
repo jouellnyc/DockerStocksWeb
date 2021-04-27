@@ -38,8 +38,12 @@ sed -i -r  's#MONGOCLIENTLINE#client = MongoClient("mongodb+srv://MONGOUSERNAME:
 sed -i s"/MONGOUSERNAME/${MONGOUSERNAME}/" $MONGOFILE
 sed -i s"/MONGOPASSWORD/${MONGOPASSWORD}/" $MONGOFILE 
 sed -i         s"/MONGOHOST/${MONGOHOST}/" $MONGOFILE 
+unset MONGOPASSWORD 
+unset MONGOHOST
+unset MONGOUSERNAME
 
 DOCKER_COMPOSE_FILE="docker-compose.AWS.hosted.MongoDb.yaml"
 source $GIT_DIR/AWS/aws-cli/shared_vars.txt
 docker-compose -f $DOCKER_COMPOSE_FILE up -d
+rm $MONGOFILE
 
