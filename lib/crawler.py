@@ -91,6 +91,7 @@ def DecidetoCrawl(stock, force_new_all):
         print(f"Crawling and Indexing {stock} - due to force_new_all ")
         CrawlStock(stock)
     else:
+        print("...Checking Crawl Date")
         if stock_is_crawled_recently:
             print(f"Passing on {stock} - crawled recently")
             raise NotOldEnough
@@ -107,8 +108,6 @@ def DecidetoCrawl(stock, force_new_all):
                     print(f"Crawling and Indexing {stock} due to force_retry_errors")
                     CrawlStock(stock)
 
-    print("...Checking Crawl Date")
-                    
 
 
 def CrawlStock(stock):
