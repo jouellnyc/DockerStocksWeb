@@ -1,5 +1,0 @@
-#!/bin/bash
-WORKDIR="stocks"
-cd /$WORKDIR
-cd lib
-./crawler.py
