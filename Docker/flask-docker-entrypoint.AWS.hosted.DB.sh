@@ -1,4 +1,4 @@
 #!/bin/bash
 WORKDIR="stocks"
-cd /$WORKDIR/lib
-./crawler.py -m flywheel
+cd /$WORKDIR
+/usr/local/bin/gunicorn stock_flask:app  -c /$WORKDIR/external/gunicorn/gunicorn.conf.py
