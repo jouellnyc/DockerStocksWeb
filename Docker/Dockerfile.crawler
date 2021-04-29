@@ -14,8 +14,7 @@ RUN mkdir /$WORKDIR/
 COPY requirements.txt /$WORKDIR/
 RUN pip3 install -r /$WORKDIR/requirements.txt
 
-RUN mkdir /$WORKDIR/non-app/ &&  mkdir /$WORKDIR/static/ && mkdir /$WORKDIR/templates/ && mkdir
-/$WORKDIR/lib/ &&  RUN mkdir -p /$WORKDIR/external/gunicorn/
+RUN mkdir /$WORKDIR/non-app/ &&  mkdir /$WORKDIR/static/ && mkdir /$WORKDIR/templates/ && mkdir /$WORKDIR/lib/ &&  RUN mkdir -p /$WORKDIR/external/gunicorn/
 
 COPY non-app/  /$WORKDIR/non-app/
 COPY lib/      /$WORKDIR/lib/
