@@ -1,32 +1,31 @@
 #!/usr/bin/env python3
 
+""" This script's function is to provide the data quickly to crawlers in a flywheel fashion. """
+""" in order to make getting the stock list as efficient as possible.                        """
+""" Pulling the list locally and fiddling was ok but a temp measure and not efficient.       """
+
+""" Without this script the Crawlers would have to take a differnet mode                     """
+""" - Take a bunch of stocks off the stocklist  in batches                                   """
+""" - Set some sort of flag in the database and try to work with  that                       """
+""" So far it's 100% efficient and no blocking                                               """
 
 import sys
-
 import logging
 
 import flask
 from flask import Flask
 from flask import request
 from flask import render_template
-
 from pymongo.errors import ConnectionFailure
 from pymongo.errors import ServerSelectionTimeoutError
 from pymongo.errors import OperationFailure
 
 from lib import mongodb
-
-
-import mongodb
-
 sys.path.insert(0, 'lib')
 
-
 app = Flask(__name__)
-
 mg = mongodb.MongoCli()    
 all_stocks = mg.dump_all_stocks_sorted_by_date()
-    
     
 # Logging A la:
 # https://trstringer.com/logging-flask-gunicorn-the-manageable-way/
