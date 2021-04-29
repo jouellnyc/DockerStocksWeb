@@ -14,6 +14,8 @@ from millify import millify
 import pandas as pd
 
 from mongodb import MongoCli
+from requestwrap err_web
+
 
 """ All Assignment of df Slices """
 pd.options.mode.chained_assignment = None
@@ -46,10 +48,8 @@ def mk_pretty(num):
 def cut(x):
     return x.rpartition("-")[0].rpartition("-")[0]
 
-
 def add_str(string):
     return string + "Years"
-
 
 def get_stock_data(stock):
     try:
@@ -59,18 +59,16 @@ def get_stock_data(stock):
     else:
         return True, data
 
-
 def sleepit(pause):
     print(f"Sleeping for {pause} seconds")
     time.sleep(pause)
 
-
 def stock_is_crawled_recently(stock_data, old_enough=None):
 
-    old_enough = 4 
+    old_enough = 4
     date_crawled = stock_data["DateCrawled"]
     difference = datetime.datetime.utcnow() - date_crawled
-    duration_in_s = difference.total_seconds()  
+    duration_in_s = difference.total_seconds()
     hours = divmod(duration_in_s, 3600)[0]
 
     #if difference.days > old_enough:
@@ -78,6 +76,9 @@ def stock_is_crawled_recently(stock_data, old_enough=None):
         return False
     return True
 
+def GetNextStock():
+    stock = err_web('http://54.224.79.12:9001/stocks/')
+    return stock.text
 
 def DecidetoCrawl(stock, force_new_all):
 
@@ -244,8 +245,8 @@ def CrawlStock(stock):
 if __name__ == "__main__":
 
     #Multiple crawlers will step on each other if set
-    force_new_all = False 
-    force_retry_errors = False 
+    force_new_all = False
+    force_retry_errors = False
     pause = 35
     debug = False
 
@@ -253,7 +254,7 @@ if __name__ == "__main__":
     parser.description = "Get Stock Data and Return Growth Rates"
     parser.epilog = "Example: " + sys.argv[0] + " -m all"
     parser.add_argument("-s", "--stock")
-    parser.add_argument("-m", "--mode", choices=["date", "all"])
+    parser.add_argument("-m", "--mode", choices=["date", "all","flywheel"])
     namespace = parser.parse_args(sys.argv[1:])
 
     try:
@@ -271,6 +272,8 @@ if __name__ == "__main__":
                 all_stocks = mg.dump_all_stocks_sorted_by_date()
             elif namespace.mode == "all":
                 all_stocks = mg.dump_all_stocks()
+            elif namespace.mode == "flywheel":
+                all_stocks = list(range(1,10_000)
 
         elif namespace.stock:
 
@@ -289,6 +292,8 @@ if __name__ == "__main__":
         try:
 
             print(f"==== Trying {stock}")
+            if namespace.mode == "flywheel":
+                stock = GetNextStock()
             DecidetoCrawl(stock, force_new_all=force_new_all)
 
         except PassOnErrorStock:
@@ -315,7 +320,7 @@ if __name__ == "__main__":
         except KeyError as e:
             msg = "Likely a Data Issue"
             mg.update_as_error(stock,f"{msg} -- {e}")
-            print(msg) 
+            print(msg)
             print(f"OK, Updating {stock} as the lastest stock\n")
             print(mg.update_latest_stock(stock))
             sleepit(pause)
@@ -331,7 +336,7 @@ if __name__ == "__main__":
                 mg.update_as_error(stock, msg)
                 print(f"OK, Updating {stock} as the lastest stock\n")
                 mg.update_latest_stock(stock)
-                print(msg) 
+                print(msg)
                 sleepit(pause)
                 continue
             else:
@@ -353,5 +358,3 @@ if __name__ == "__main__":
             print(traceback.format_exc())
             sleepit(pause)
             continue
-        
-        
