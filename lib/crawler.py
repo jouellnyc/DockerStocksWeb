@@ -14,7 +14,7 @@ from millify import millify
 import pandas as pd
 
 from mongodb import MongoCli
-from requestwrap err_web
+from requestwrap import err_web
 
 
 """ All Assignment of df Slices """
@@ -273,7 +273,7 @@ if __name__ == "__main__":
             elif namespace.mode == "all":
                 all_stocks = mg.dump_all_stocks()
             elif namespace.mode == "flywheel":
-                all_stocks = list(range(1,10_000)
+                all_stocks = list(range(1,10_000))
 
         elif namespace.stock:
 
