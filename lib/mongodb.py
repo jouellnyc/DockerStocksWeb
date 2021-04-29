@@ -66,7 +66,7 @@ class MongoCli:
         return [one_stock[0] for one_stock in stocks]
 
     def dump_all_stocks(self):
-        """ Dump All Stocks, sorted Alphabetically """
+        """ Dump All Stocks (All should have a CD), sorted Alphabetically """
         stocks = sorted(
             [x["Stock"] for x in self.dbh.find({"Stock": {"$exists": True}})]
         )
