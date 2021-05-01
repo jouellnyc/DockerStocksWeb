@@ -34,4 +34,3 @@ RUN chown -R nobody:  /$WORKDIR/  &&     \
 
 USER nobody
 ENTRYPOINT /usr/sbin/crawler.entry.sh
-EXPOSE 8000
