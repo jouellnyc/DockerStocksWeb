@@ -11,6 +11,10 @@
 
 from pymongo import MongoClient
 
+
+class StockDoesNotExist(Exception):
+    pass
+
 class MongoCli:
     def __init__(self):
 
@@ -38,7 +42,7 @@ class MongoCli:
         database_name = self.database_name
 
         try:
-            client = MongoClient("mongodb+srv://stocku:pO1UvmV0wEsuUwm0@stockcluster.poxqf.mongodb.net/test?retryWrites=true&w=majority", serverSelectionTimeoutMS=2000)
+            client = MONGOCLIENTLINE
             client.server_info()
             database_handle = client[database_name]
             collection_handle = database_handle[collection_name]
@@ -47,9 +51,10 @@ class MongoCli:
             raise
 
     def lookup_stock(self, stock):
+        """ Simple Stock Query """
         response = self.dbh.find_one({"Stock": stock}, {"_id": 0})
         if response is None:
-            raise ValueError(f"{stock}  not found")
+            raise StockDoesNotExist(f"{stock}  not found")
         else:
             return response
 
@@ -99,40 +104,33 @@ class MongoCli:
     def update_one_document(self, mongo_filter, mongo_doc):
         """
         Update only one document in MongoDB, create it if it does not exist.
+        
         Parameters
         ----------
         mongo_filter
             - hash to specify mongo restriction
         mongo_doc
             - key : value pairs making up the document
-
-        Returns
-        -------
-        Items
-            {MongoCli object}  of all the local posts in the free section
         """
         new_result = self.dbh.update_one(mongo_filter, mongo_doc, upsert=True)
         return new_result
 
-    def insert_one_document(self, mongo_doc):
-        """
-        Insert  only one document in MongoDB; do not create it if it does not exist.
+    def insert_one_document(self, mongo_filter, mongo_doc):
+        """ Insert one document - do not create it if it does not exist.
 
         Parameters
         ----------
+        mongo_filter
+            - hash to specify mongo restriction
         mongo_doc
             - key : value pairs making up the document
-
-        Returns
-        -------
-        Mongo Doc Id
+        
         """
-        new_result = self.dbh.insert_one(mongo_doc)
+        new_result = self.dbh.insert_one(mongo_filter, mongo_doc)
         return new_result.inserted_id
 
     def drop_db(self):
-        """
-        Drop all documents (testing/etc.)
+        """  Drop all documents (testing/etc.)
 
         Parameters
         ----------
@@ -149,3 +147,4 @@ class MongoCli:
 
         new_result = self.dbh.drop()
         return new_result
+    
