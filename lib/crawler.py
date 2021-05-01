@@ -13,7 +13,7 @@ from pymongo.errors import PyMongoError
 from millify import millify
 import pandas as pd
 
-from mongodb import MongoCli
+from mongodb import MongoCli, StockDoesNotExist
 from requestwrap import err_web
 
 
@@ -38,12 +38,10 @@ class GoodCrawl(Exception):
 class ZeroRevenue(Exception):
     pass
 
-
 def mk_pretty(num):
     """ Pretty print Growth Rate """
     # return "%.2f" % (num * 100) + "%"
     return "%.2f" % (num * 100)
-
 
 def cut(x):
     return x.rpartition("-")[0].rpartition("-")[0]
@@ -86,7 +84,13 @@ def DecidetoCrawl(stock, force_new_all):
     """ otherwise check it's crawl date         """
 
     debug = False
-    _, stock_data = get_stock_data(stock)
+    
+    try:
+        _, stock_data = get_stock_data(stock)
+
+    except StockDoesNotExist:
+        print("Stock DNE - crawling")
+        CrawlStock(stock)
 
     if debug:
         print("data:\n", stock_data)
@@ -238,7 +242,9 @@ def CrawlStock(stock):
 
     """ And now we are ready to send the Data to Mongo """
     print(f"OK, Sending data to Mongo for {stock}\n")
+    #print(mg.insert_one_document({"Stock": stock}, mongo_doc))
     print(mg.update_one_document({"Stock": stock}, {"$set": mongo_doc}))
+    #Remember: ValueError: update only works with $ operators
     raise GoodCrawl
 
 
@@ -301,7 +307,7 @@ if __name__ == "__main__":
 
         except NotOldEnough:
             continue
-
+                
         except GoodCrawl:
             print(f"OK, Updating {stock} as the lastest stock\n")
             print(mg.update_latest_stock(stock))
