@@ -6,10 +6,12 @@ sys.path.append('../lib/')
 import mongodb
 mg = mongodb.MongoCli()
 
-"""
-
-for x in mg.dbh.find({'DateCrawled' : {"$exists": True } }): 
+for x in mg.dbh.find({'Success' : {"$exists": True } }): 
     print(x['Stock'], x['DateCrawled'])
+
+"""
+for x in mg.dbh.find({'Error' : {"$exists": True } }): 
+    print(x)
 
 
 for x in mg.dbh.find({'Stock' : {"$exists": True} }): 
@@ -36,7 +38,7 @@ for x in mg.dbh.find():
     except KeyError:
         print ('oh',x)
 
-"""
+############
 
 def sa(how_to_sort):
     return sorted([ (x['Stock'],x['DateCrawled'])  
@@ -49,3 +51,4 @@ def by_date(stock):
 for x in sa(how_to_sort=by_date):
     print(x)
 
+"""
