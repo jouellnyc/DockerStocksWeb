@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+import random, string
 import traceback
 from pprint import pprint
 import datetime
@@ -29,25 +30,39 @@ alpha = FundamentalData(key=api_key, output_format=format, indexing_type="intege
 class NotOldEnough(Exception):
     pass
 
+
 class PassOnErrorStock(Exception):
     pass
+
 
 class GoodCrawl(Exception):
     pass
 
+
 class ZeroRevenue(Exception):
     pass
+
 
 def mk_pretty(num):
     """ Pretty print Growth Rate """
     # return "%.2f" % (num * 100) + "%"
     return "%.2f" % (num * 100)
 
+
+def gen_crawlid():
+    return "".join(
+        random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
+        for _ in range(7)
+    )
+
+
 def cut(x):
     return x.rpartition("-")[0].rpartition("-")[0]
 
+
 def add_str(string):
     return string + "Years"
+
 
 def get_stock_data(stock):
     try:
@@ -57,34 +72,38 @@ def get_stock_data(stock):
     else:
         return True, data
 
+
 def sleepit(pause):
     print(f"Sleeping for {pause} seconds")
     time.sleep(pause)
+
 
 def stock_is_crawled_recently(stock_data, old_enough=None):
 
     old_enough = 2
     date_crawled = stock_data["DateCrawled"]
     difference = datetime.datetime.utcnow() - date_crawled
-    #duration_in_s = difference.total_seconds()
-    #hours = divmod(duration_in_s, 3600)[0]
+    # duration_in_s = difference.total_seconds()
+    # hours = divmod(duration_in_s, 3600)[0]
 
     if difference.days > old_enough:
-    #if hours > old_enough:
+        # if hours > old_enough:
         return False
     return True
 
+
 def GetNextStock():
-    stock = err_web('http://52.23.193.1:9001/stocks/')
+    stock = err_web("http://3.84.240.48:9001/stocks/")
     return stock.text
 
-def DecidetoCrawl(stock, force_new_all):
+
+def DecidetoCrawl(stock, force_new_all=None, force_retry_errors=None):
 
     """ if force_new_all is True, crawl the doc """
     """ otherwise check it's crawl date         """
 
     debug = False
-    
+
     try:
         _, stock_data = get_stock_data(stock)
 
@@ -108,7 +127,7 @@ def DecidetoCrawl(stock, force_new_all):
         try:
             print("Force_retry_errors is False...")
             print("Checking for Errors...")
-            if stock_data['Error']:
+            if stock_data["Error"]:
                 print("Passing: force_retry_errors is False and stock has errors")
                 raise PassOnErrorStock
         except KeyError:
@@ -123,6 +142,7 @@ def DecidetoCrawl(stock, force_new_all):
 
 def CrawlStock(stock):
 
+    my_crawlid = gen_crawlid()
     print(f"Connecting to Alpha Vantage for {stock}")
     """ Pull Down Income Data from Alpha Vantage """
     income_data, stock_name = alpha.get_income_statement_annual(stock)
@@ -235,7 +255,8 @@ def CrawlStock(stock):
     mongo_doc["PriceToBookRatio"] = float(millify(price2book, precision=2))
     mongo_doc["DateCrawled"] = datetime.datetime.utcnow()
     mongo_doc["Success"] = "Yes"
-    
+    mongo_doc["Crawled_By"] = my_crawlid
+
     if debug:
         print("mongo_doc:\n")
         pprint(mongo_doc)
@@ -243,25 +264,25 @@ def CrawlStock(stock):
 
     """ And now we are ready to send the Data to Mongo """
     print(f"OK, Sending data to Mongo for {stock}\n")
-    #print(mg.insert_one_document({"Stock": stock}, mongo_doc))
+    # print(mg.insert_one_document({"Stock": stock}, mongo_doc))
     print(mg.update_one_document({"Stock": stock}, {"$set": mongo_doc}))
-    #Remember: ValueError: update only works with $ operators
+    # Remember: ValueError: update only works with $ operators
     raise GoodCrawl
 
 
 if __name__ == "__main__":
 
-    #Multiple crawlers will step on each other if set
-    force_new_all = False
-    force_retry_errors = False
+    # Multiple crawlers will step on each other if set
     pause = 35
     debug = False
+    force_new_all = False
+    force_retry_errors = False
 
     parser = argparse.ArgumentParser()
     parser.description = "Get Stock Data and Return Growth Rates"
     parser.epilog = "Example: " + sys.argv[0] + " -m all"
     parser.add_argument("-s", "--stock")
-    parser.add_argument("-m", "--mode", choices=["date", "all","flywheel"])
+    parser.add_argument("-m", "--mode", choices=["date", "all", "flywheel"])
     namespace = parser.parse_args(sys.argv[1:])
 
     try:
@@ -280,7 +301,7 @@ if __name__ == "__main__":
             elif namespace.mode == "all":
                 all_stocks = mg.dump_all_stocks()
             elif namespace.mode == "flywheel":
-                all_stocks = list(range(1,10_000))
+                all_stocks = range(10_000)
 
         elif namespace.stock:
 
@@ -295,20 +316,26 @@ if __name__ == "__main__":
         sys.exit(1)
 
     print(f"{all_stocks} Mode: {namespace.mode}") if debug else None
+
     for stock in all_stocks:
         try:
 
-            print(f"==== Trying {stock}")
             if namespace.mode == "flywheel":
                 stock = GetNextStock()
-            DecidetoCrawl(stock, force_new_all=force_new_all)
+
+            print(f"==== Trying {stock}")
+            DecidetoCrawl(
+                stock,
+                force_new_all=force_new_all,
+                force_retry_errors=force_retry_errors,
+            )
 
         except PassOnErrorStock:
             continue
 
         except NotOldEnough:
             continue
-                
+
         except GoodCrawl:
             print(f"OK, Updating {stock} as the lastest stock\n")
             print(mg.update_latest_stock(stock))
@@ -326,7 +353,7 @@ if __name__ == "__main__":
 
         except KeyError as e:
             msg = "Likely a Data Issue"
-            mg.update_as_error(stock,f"{msg} -- {e}")
+            mg.update_as_error(stock, f"{msg} -- {e}")
             print(msg)
             print(f"OK, Updating {stock} as the lastest stock\n")
             print(mg.update_latest_stock(stock))
@@ -348,7 +375,7 @@ if __name__ == "__main__":
                 continue
             else:
                 msg = "Unhandled Value Error"
-                mg.update_as_error(stock,f"{msg} -- {e}")
+                mg.update_as_error(stock, f"{msg} -- {e}")
                 print(f"OK, Updating {stock} as the lastest stock\n")
                 mg.update_latest_stock(stock)
                 print("Full TB: ", traceback.format_exc())
