@@ -43,5 +43,5 @@ RUN chmod 755 /usr/sbin/$MY_ENTRY
 RUN rm /usr/bin/python3 && ln -s /usr/local/bin/python3 /usr/bin/python3
 
 USER nobody
-ENTRYPOINT /usr/sbin/flywheel-entry.sh
 EXPOSE 9001 
+ENTRYPOINT /usr/sbin/flywheel-entry.sh

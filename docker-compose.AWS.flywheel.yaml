@@ -6,6 +6,8 @@ services:
         dockerfile: Docker/Dockerfile.flywheel
       networks:
         - stocksnetwork
+      ports:
+        - "9001:9001"
       logging:
         driver: awslogs
         options:
