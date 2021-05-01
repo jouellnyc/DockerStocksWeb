@@ -142,7 +142,6 @@ def DecidetoCrawl(stock, force_new_all=None, force_retry_errors=None):
 
 def CrawlStock(stock):
 
-    my_crawlid = gen_crawlid()
     print(f"Connecting to Alpha Vantage for {stock}")
     """ Pull Down Income Data from Alpha Vantage """
     income_data, stock_name = alpha.get_income_statement_annual(stock)
@@ -277,7 +276,8 @@ if __name__ == "__main__":
     debug = False
     force_new_all = False
     force_retry_errors = False
-
+    my_crawlid = gen_crawlid()
+    
     parser = argparse.ArgumentParser()
     parser.description = "Get Stock Data and Return Growth Rates"
     parser.epilog = "Example: " + sys.argv[0] + " -m all"
