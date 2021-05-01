@@ -77,7 +77,7 @@ def stock_is_crawled_recently(stock_data, old_enough=None):
     return True
 
 def GetNextStock():
-    stock = err_web('http://54.224.79.12:9001/stocks/')
+    stock = err_web('http://52.23.193.1:9001/stocks/')
     return stock.text
 
 def DecidetoCrawl(stock, force_new_all):
