@@ -52,7 +52,7 @@ def mk_pretty(num):
 def gen_crawlid():
     return "".join(
         random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
-        for _ in range(7)
+        for _ in range(8)
     )
 
 
@@ -93,7 +93,7 @@ def stock_is_crawled_recently(stock_data, old_enough=None):
 
 
 def GetNextStock():
-    stock = err_web("http://3.84.240.48:9001/stocks/")
+    stock = err_web("http://54.91.93.106:9001/stocks/")
     return stock.text
 
 
