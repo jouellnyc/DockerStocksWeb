@@ -16,7 +16,7 @@ import pandas as pd
 
 from mongodb import MongoCli, StockDoesNotExist
 from requestwrap import err_web
-
+from requests.exceptions import HTTPError
 
 """ All Assignment of df Slices """
 pd.options.mode.chained_assignment = None
@@ -30,16 +30,16 @@ alpha = FundamentalData(key=api_key, output_format=format, indexing_type="intege
 class NotOldEnough(Exception):
     pass
 
-
 class PassOnErrorStock(Exception):
     pass
-
 
 class GoodCrawl(Exception):
     pass
 
-
 class ZeroRevenue(Exception):
+    pass
+
+class FlywheelError(Exception):
     pass
 
 
@@ -54,7 +54,6 @@ def gen_crawlid():
         random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
         for _ in range(8)
     )
-
 
 def cut(x):
     return x.rpartition("-")[0].rpartition("-")[0]
@@ -92,8 +91,16 @@ def stock_is_crawled_recently(stock_data, old_enough=None):
     return True
 
 
-def GetNextStock():
-    stock = err_web("http://54.91.93.106:9001/stocks/")
+def GetNextStock(count=0, max=5, pause = 60):
+    try:
+        stock = err_web("http://54.91.93.106:9001/stocks/")
+    except HTTPError:
+        if count == max:
+            raise FlywheelError
+        print(f"Retrying Flywheel in {pause} s")
+        time.sleep(pause)
+        count += 1
+        GetNextStock(count)
     return stock.text
 
 
@@ -293,6 +300,8 @@ if __name__ == "__main__":
         """ mode == all  -- Crawl from the first alphabetically """
         """ mode == date -- Crawl the oldest stocks first       """
         """ no mode -- Crawl from Last Known, then Alphabetically from there """
+        """ flywheel -- use a micro service                     """
+        """ -s stock - crawl one stock                          """
 
         if namespace.mode:
 
@@ -334,6 +343,9 @@ if __name__ == "__main__":
             continue
 
         except NotOldEnough:
+            continue
+
+        except FlywheelError:
             continue
 
         except GoodCrawl:
