@@ -30,14 +30,18 @@ alpha = FundamentalData(key=api_key, output_format=format, indexing_type="intege
 class NotOldEnough(Exception):
     pass
 
+
 class PassOnErrorStock(Exception):
     pass
+
 
 class GoodCrawl(Exception):
     pass
 
+
 class ZeroRevenue(Exception):
     pass
+
 
 class FlywheelError(Exception):
     pass
@@ -54,6 +58,7 @@ def gen_crawlid():
         random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
         for _ in range(8)
     )
+
 
 def cut(x):
     return x.rpartition("-")[0].rpartition("-")[0]
@@ -91,16 +96,20 @@ def stock_is_crawled_recently(stock_data, old_enough=None):
     return True
 
 
-def GetNextStock(count=0, max=5, pause = 60):
+def GetNextStockBatch(count=0, max=5, pause=60):
+    """ Pull down a batch of Stock to Crawl         """
+    """ Try 'max' times to get it w/a 'pause' delay """
+    """ before raising a FlywheelError              """
+    
     try:
-        stock = err_web("http://54.91.93.106:9001/stocks/")
+        stock = err_web("http://0:9001/stocks/")
     except HTTPError:
         if count == max:
             raise FlywheelError
         print(f"Retrying Flywheel in {pause} s")
         time.sleep(pause)
         count += 1
-        GetNextStock(count)
+        GetNextStockBatch(count)
     return stock.text
 
 
@@ -284,7 +293,7 @@ if __name__ == "__main__":
     force_new_all = False
     force_retry_errors = False
     my_crawlid = gen_crawlid()
-    
+
     parser = argparse.ArgumentParser()
     parser.description = "Get Stock Data and Return Growth Rates"
     parser.epilog = "Example: " + sys.argv[0] + " -m all"
@@ -297,11 +306,11 @@ if __name__ == "__main__":
         """ Connect to Mongo... or not """
         mg = MongoCli()
 
-        """ mode == all  -- Crawl from the first alphabetically """
-        """ mode == date -- Crawl the oldest stocks first       """
-        """ no mode -- Crawl from Last Known, then Alphabetically from there """
-        """ flywheel -- use a micro service                     """
-        """ -s stock - crawl one stock                          """
+        """ mode == all  -- Crawl from the first alphabetically    """
+        """ mode == date -- Crawl the oldest stocks first          """
+        """ mode == last -- Crawl from Last Known, Alphabetically  """
+        """ flywheel -- use a micro service                        """
+        """ -s stock - crawl one stock                             """
 
         if namespace.mode:
 
@@ -310,15 +319,22 @@ if __name__ == "__main__":
             elif namespace.mode == "all":
                 all_stocks = mg.dump_all_stocks()
             elif namespace.mode == "flywheel":
-                all_stocks = range(10_000)
+                all_stocks = (
+                    GetNextStockBatch()
+                    .replace("'", "")
+                    .replace(" ", "")
+                    .replace("[", "")
+                    .replace("]", "")
+                    .split(",")
+                )
+
+            elif namespace.mode == "last":
+                all_stocks = mg.dump_recent_stocks()
 
         elif namespace.stock:
 
             all_stocks = []
             all_stocks.append(namespace.stock)
-
-        else:
-            all_stocks = mg.dump_recent_stocks()
 
     except PyMongoError as e:
         print("Mongodb issue: ", e)
@@ -326,13 +342,11 @@ if __name__ == "__main__":
 
     print(f"{all_stocks} Mode: {namespace.mode}") if debug else None
 
+    count = 1
     for stock in all_stocks:
         try:
 
-            if namespace.mode == "flywheel":
-                stock = GetNextStock()
-
-            print(f"==== Trying {stock}")
+            print(f"==== Trying {stock} - {count}")
             DecidetoCrawl(
                 stock,
                 force_new_all=force_new_all,
@@ -404,3 +418,5 @@ if __name__ == "__main__":
             print(traceback.format_exc())
             sleepit(pause)
             continue
+        finally:
+            count += 1
