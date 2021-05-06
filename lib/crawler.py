@@ -54,6 +54,7 @@ def mk_pretty(num):
 
 
 def gen_crawlid():
+    """ Generate a short id string for each crawler """
     return "".join(
         random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
         for _ in range(8)
@@ -61,14 +62,17 @@ def gen_crawlid():
 
 
 def cut(x):
+    """ Cut off part of the string """
     return x.rpartition("-")[0].rpartition("-")[0]
 
 
 def add_str(string):
+    """ Add Years """
     return string + "Years"
 
 
 def get_stock_data(stock):
+    """ Simple query for stock data """
     try:
         data = mg.lookup_stock(stock)
     except ValueError:
@@ -78,12 +82,13 @@ def get_stock_data(stock):
 
 
 def sleepit(pause):
+    """ sleep for x seconds """
     print(f"Sleeping for {pause} seconds")
     time.sleep(pause)
 
 
 def stock_is_crawled_recently(stock_data, old_enough=None):
-
+    """ See if we crawled stock recently """
     old_enough = 2
     date_crawled = stock_data["DateCrawled"]
     difference = datetime.datetime.utcnow() - date_crawled
@@ -100,12 +105,12 @@ def GetNextStockBatch(count=0, max=5, pause=60):
     """ Pull down a batch of Stock to Crawl         """
     """ Try 'max' times to get it w/a 'pause' delay """
     """ before raising a FlywheelError              """
-    
+
     try:
-        
+
         stock_json = err_web("http://0:9001/stocks/").json()
-        stocks = stock_json['NextBatch']
-        
+        stocks = stock_json["NextBatch"]
+
     except HTTPError:
         if count == max:
             raise FlywheelError
