@@ -8,7 +8,6 @@ import mongodb
 
 mg = mongodb.MongoCli()
 
-
 def sa(how_to_sort):
     return sorted(
         [
@@ -21,24 +20,32 @@ def sa(how_to_sort):
 def by_date(stock):
     return stock[1]
 
-
 try:
     for x in sa(how_to_sort=by_date):
         print(x)
 except KeyError:
     pass
 
+
 """
+for x in mg.dbh.find({"Crawled_By": {"$exists": False}}):
+    print(x)
+
+for x in mg.dbh.find({"Crawled_By": {"$exists": True}}):
+    print(x)
+
+"""
+
+"""
+for x in mg.dbh.find({'Stock' : {"$exists": True} }): 
+    print(x['Stock'])
+
 for x in mg.dbh.find({'Success' : {"$exists": True } }): 
     print(x['Stock'], x['DateCrawled'])
 
 
-for x in mg.dbh.find({'Error' : {"$exists": True } }): 
-    print(x)
-
-
-for x in mg.dbh.find({'Stock' : {"$exists": True} }): 
-    print(x['Stock'])
+#for x in mg.dbh.find({'Error' : {"$exists": True } }): 
+#    print(x)
 
 
 for x in mg.dbh.find({'DateCrawled' : {"$exists": False } }): 

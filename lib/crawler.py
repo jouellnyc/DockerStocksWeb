@@ -102,15 +102,18 @@ def GetNextStockBatch(count=0, max=5, pause=60):
     """ before raising a FlywheelError              """
     
     try:
-        stock = err_web("http://0:9001/stocks/")
+        
+        stock_json = err_web("http://0:9001/stocks/").json()
+        stocks = stock_json['NextBatch']
+        
     except HTTPError:
         if count == max:
             raise FlywheelError
         print(f"Retrying Flywheel in {pause} s")
         time.sleep(pause)
         count += 1
-        GetNextStockBatch(count)
-    return stock.text
+        GetNextStockBatch(count, max=max, pause=pause)
+    return stocks
 
 
 def DecidetoCrawl(stock, force_new_all=None, force_retry_errors=None):
@@ -319,16 +322,8 @@ if __name__ == "__main__":
             elif namespace.mode == "all":
                 all_stocks = mg.dump_all_stocks()
             elif namespace.mode == "flywheel":
-                all_stocks = (
-                    GetNextStockBatch()
-                    .replace("'", "")
-                    .replace(" ", "")
-                    .replace("[", "")
-                    .replace("]", "")
-                    .split(",")
-                )
-
-            elif namespace.mode == "last":
+                all_stocks = GetNextStockBatch()
+            elif namespace.mode == "last" or namespace.mode is None:
                 all_stocks = mg.dump_recent_stocks()
 
         elif namespace.stock:

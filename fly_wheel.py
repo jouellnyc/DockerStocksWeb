@@ -12,7 +12,7 @@
 import sys
 import logging
 
-from flask import Flask
+from flask import Flask, jsonify
 
 from lib import mongodb
 sys.path.insert(0, 'lib')
@@ -38,9 +38,8 @@ def get_data():
     global all_stocks
     
     while all_stocks:
-        #stock = all_stocks.pop()
         stock = [ all_stocks.pop() for x in range(batch_size ) ]
-        return str(stock)
+        return jsonify(NextBatch=stock)
         
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=9001)
