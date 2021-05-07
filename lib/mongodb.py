@@ -59,7 +59,7 @@ class MongoCli:
             return response
 
     def dump_all_stocks_sorted_by_date(self):
-        """ Dump All Stocks with a Crawl Date, sort by that Date """
+        """ Dump All Stocks with a Crawl Date, return oldest first by date """
 
         stocks = sorted(
             [
