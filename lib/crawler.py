@@ -325,10 +325,10 @@ if __name__ == "__main__":
 
         if namespace.mode:
 
-            if namespace.mode == "date":
-                all_stocks = mg.dump_all_stocks_sorted_by_date()
-            elif namespace.mode == "all":
+            if namespace.mode == "all":
                 all_stocks = mg.dump_all_stocks()
+            elif namespace.mode == "date":
+                all_stocks = mg.dump_all_stocks_sorted_by_date()
             elif namespace.mode == "flywheel":
                 all_stocks = GetNextStockBatch()
             elif namespace.mode == "last":
