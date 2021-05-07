@@ -89,7 +89,7 @@ def sleepit(pause):
 
 def stock_is_crawled_recently(stock_data, old_enough=None):
     """ See if we crawled stock recently """
-    old_enough = 2
+    old_enough = 7
     date_crawled = stock_data["DateCrawled"]
     difference = datetime.datetime.utcnow() - date_crawled
     # duration_in_s = difference.total_seconds()
@@ -306,8 +306,11 @@ if __name__ == "__main__":
     parser.description = "Get Stock Data and Return Growth Rates"
     parser.epilog = "Example: " + sys.argv[0] + " -m all"
     parser.add_argument("-s", "--stock")
-    parser.add_argument("-m", "--mode", choices=["date", "all", "flywheel"])
+    parser.add_argument("-m", "--mode", choices=["date", "all", "flywheel", "last"])
     namespace = parser.parse_args(sys.argv[1:])
+    if len(sys.argv) < 2:
+        parser.print_usage()
+        sys.exit(1)
 
     try:
 
@@ -328,7 +331,7 @@ if __name__ == "__main__":
                 all_stocks = mg.dump_all_stocks()
             elif namespace.mode == "flywheel":
                 all_stocks = GetNextStockBatch()
-            elif namespace.mode == "last" or namespace.mode is None:
+            elif namespace.mode == "last":
                 all_stocks = mg.dump_recent_stocks()
 
         elif namespace.stock:
@@ -343,9 +346,10 @@ if __name__ == "__main__":
     print(f"{all_stocks} Mode: {namespace.mode}") if debug else None
 
     count = 1
+    print(all_stocks)
     for stock in all_stocks:
         try:
-
+            
             print(f"==== Trying {stock} - {count}")
             DecidetoCrawl(
                 stock,
