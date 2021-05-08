@@ -24,8 +24,8 @@ and so on.....
 
 ## Installing Locally
 ```
-git clone https://github.com/jouellnyc/stocks_web
-cd stocks_web 
+git clone https://github.com/jouellnyc/DockerStocksWeb
+cd DockerStocksWeb
 docker-compose -f docker-compose.local.yaml  up -d
 ```
 

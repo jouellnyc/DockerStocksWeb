@@ -12,10 +12,9 @@ def sa(how_to_sort):
     return sorted(
         [
             (x["Stock"], x["DateCrawled"], x["Crawled_By"])
-                for x in mg.dbh.find({"Crawled_By": {"$exists": True}})
+                for x in mg.dbh.find({ "Crawled_By": {"$exists": True}, "Error" : {"$exists": False } })
         ], key=how_to_sort,
     )
-
 
 def by_date(stock):
     return stock[1]

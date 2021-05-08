@@ -393,7 +393,7 @@ if __name__ == "__main__":
         except ValueError as e:
 
             if "Thank you" in str(e.args):
-                print("Error: Hit Api limit -- ", end="")
+                print("Error: Hit Api limit")
                 sys.exit(1)
             elif "no return was given" in str(e.args):
                 msg = "No Data Returned from Api"
