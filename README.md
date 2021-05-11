@@ -227,8 +227,8 @@ Nginx will listen on the local hosts port 80.
 Flask and Mongodb will be on the same bridged docker network reachable by docker names.
 
 ## Requirements
-Git/Docker/Docker-compose/Optionally a MongoDB hosted at Mongo
-https://www.alphavantage.co/ -- Free Api key
+- Git/Docker/Docker-compose/MongoDB(Optionally at Mongo)
+- https://www.alphavantage.co/ -- Free Api key
 
 
 This project defaults to a local MongoDB -- up and running after 'git clone'.
