@@ -238,5 +238,4 @@ To use AWS:
 - If using https://github.com/jouellnyc/AWS/tree/master/boto3/blue_green_deploy, modify the variable 'user_data_file' in 'prod_vpc_lb_builder.py' to point to  user_data.http.AWS.sh
 
 To fully deploy automatically:
-- You'll need to setup AWS Secret Manager entries as well. See user_data.http.AWS.sh.
-
+- You'll need to setup AWS Secret Manager entries as well. See user_data.http.AWS.sh and getSecret.py.
