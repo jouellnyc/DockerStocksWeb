@@ -215,11 +215,11 @@ Stocks  0.000GB
 admin   0.000GB
 config  0.000GB
 local   0.000GB
-
+```
 Point your browser to http://$YOUR_IP and search for GOOG or 
+
 http://$YOUR_IP/search/?stock=GOOG
 
-```
 
 ## Architecture
 Nginx will listen on the local hosts port 80.
