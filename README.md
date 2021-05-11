@@ -236,6 +236,7 @@ This project defaults to a local MongoDB -- up and running after 'git clone'.
 To use AWS:
 - You'd need a custom MongoDB entry specific to your account  -- (See https://www.mongodb.com/python) 
 - If using https://github.com/jouellnyc/AWS/tree/master/boto3/blue_green_deploy, modify the variable 'user_data_file' in 'prod_vpc_lb_builder.py' to point to  user_data.http.AWS.sh
-- To Fully Deploy Automatically you'll need to setup AWS Secret Manager entries as well. See
-user_data.http.AWS.sh.
+
+To fully deploy automatically:
+- You'll need to setup AWS Secret Manager entries as well. See user_data.http.AWS.sh.
 
