@@ -49,7 +49,6 @@ class FlywheelError(Exception):
 
 def mk_pretty(num):
     """ Pretty print Growth Rate """
-    # return "%.2f" % (num * 100) + "%"
     return "%.2f" % (num * 100)
 
 
@@ -94,7 +93,6 @@ def stock_is_crawled_recently(stock_data, old_enough=None):
     difference = datetime.datetime.utcnow() - date_crawled
     # duration_in_s = difference.total_seconds()
     # hours = divmod(duration_in_s, 3600)[0]
-
     if difference.days > old_enough:
         # if hours > old_enough:
         return False
@@ -126,7 +124,9 @@ def DecidetoCrawl(stock, force_new_all=None, force_retry_errors=None):
     """ if force_new_all is True, crawl the doc """
     """ otherwise check it's crawl date         """
 
-    debug = False
+    debug = True
+
+    print("Deciding to Crawl or Not...")
 
     try:
         _, stock_data = get_stock_data(stock)
@@ -138,7 +138,6 @@ def DecidetoCrawl(stock, force_new_all=None, force_retry_errors=None):
     if debug:
         print("data:\n", stock_data)
 
-    print("Deciding to Crawl or Not...")
 
     if force_new_all:
         print(f"Crawling and Indexing {stock} - due to force_new_all ")
@@ -176,6 +175,7 @@ def CrawlStock(stock):
     df = income_data[["fiscalDateEnding", "totalRevenue", "netIncome"]]
 
     print("df:\n", df, "\n") if debug else None
+
 
     if (
         (df["totalRevenue"].iloc[0] == "0")
@@ -249,7 +249,8 @@ def CrawlStock(stock):
 
     """ Pull out Each value and millify() """
     revenue_ttm = float(overview_data["RevenueTTM"].values[0])
-    market_cap = overview_data["MarketCapitalization"].values[0]
+    
+    market_cap = overview_data["MarketCapitalization"].values[0] 
     PETTM = int(float(overview_data["TrailingPE"].values[0]))
     price2sales = float(overview_data["PriceToSalesRatioTTM"].values[0])
     price2book = float(overview_data["PriceToBookRatio"].values[0])
@@ -274,7 +275,7 @@ def CrawlStock(stock):
 
     mongo_doc["Currency"] = currency
     mongo_doc["TrailingPE"] = float(PETTM)
-    mongo_doc["PriceToSalesTTM"] = float(millify(price2sales, precision=2))
+    mongo_doc["PriceToSalesTTM"] = millify(price2sales, precision=2)
     mongo_doc["PriceToBookRatio"] = float(millify(price2book, precision=2))
     mongo_doc["DateCrawled"] = datetime.datetime.utcnow()
     mongo_doc["Success"] = "Yes"
@@ -287,7 +288,6 @@ def CrawlStock(stock):
 
     """ And now we are ready to send the Data to Mongo """
     print(f"OK, Sending data to Mongo for {stock}\n")
-    # print(mg.insert_one_document({"Stock": stock}, mongo_doc))
     print(mg.update_one_document({"Stock": stock}, {"$set": mongo_doc}))
     # Remember: ValueError: update only works with $ operators
     raise GoodCrawl
@@ -297,9 +297,10 @@ if __name__ == "__main__":
 
     # Multiple crawlers will step on each other if set
     pause = 35
-    debug = False
+    debug = True
     force_new_all = False
-    force_retry_errors = False
+    force_retry_errors = True
+    
     my_crawlid = gen_crawlid()
 
     parser = argparse.ArgumentParser()
@@ -367,7 +368,7 @@ if __name__ == "__main__":
             continue
 
         except GoodCrawl:
-            print(f"OK, Updating {stock} as the lastest stock\n")
+            print(f"OK - Updating {stock} as the lastest stock\n")
             print(mg.update_latest_stock(stock))
             sleepit(pause)
             continue
@@ -376,7 +377,7 @@ if __name__ == "__main__":
             msg = "Zero Revenue"
             mg.update_as_error(stock, msg)
             print(msg) if debug else None
-            print(f"OK, Updating {stock} as the lastest stock\n")
+            print(f"Updating {stock} as the lastest stock\n")
             print(mg.update_latest_stock(stock))
             sleepit(pause)
             continue
@@ -385,7 +386,7 @@ if __name__ == "__main__":
             msg = "Likely a Data Issue"
             mg.update_as_error(stock, f"{msg} -- {e}")
             print(msg)
-            print(f"OK, Updating {stock} as the lastest stock\n")
+            print(f"Updating {stock} as the lastest stock\n")
             print(mg.update_latest_stock(stock))
             sleepit(pause)
             continue
@@ -398,7 +399,7 @@ if __name__ == "__main__":
             elif "no return was given" in str(e.args):
                 msg = "No Data Returned from Api"
                 mg.update_as_error(stock, msg)
-                print(f"OK, Updating {stock} as the lastest stock\n")
+                print(f"Updating {stock} as the lastest stock\n")
                 mg.update_latest_stock(stock)
                 print(msg)
                 sleepit(pause)
@@ -406,7 +407,7 @@ if __name__ == "__main__":
             else:
                 msg = "Unhandled Value Error"
                 mg.update_as_error(stock, f"{msg} -- {e}")
-                print(f"OK, Updating {stock} as the lastest stock\n")
+                print(f"Updating {stock} as the lastest stock\n")
                 mg.update_latest_stock(stock)
                 print("Full TB: ", traceback.format_exc())
                 sleepit(pause)
