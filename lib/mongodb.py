@@ -42,7 +42,7 @@ class MongoCli:
         database_name = self.database_name
 
         try:
-            client = MongoClient("mongodb+srv://stocku:pO1UvmV0wEsuUwm0@stockcluster.poxqf.mongodb.net/test?retryWrites=true&w=majority", serverSelectionTimeoutMS=2000)
+            client = MONGOCLIENTLINE
             client.server_info()
             database_handle = client[database_name]
             collection_handle = database_handle[collection_name]
@@ -81,6 +81,13 @@ class MongoCli:
         """ Pull down the last stock that got crawled """
         return self.dbh.find_one({"Stock": "last_good"}, {"Name": 1, "_id": 0})["Name"]
 
+    def delete_one_stock(self, stock):
+        """ Delete One Stock """
+        result = self.dbh.delete_one({"Stock": stock})
+        if result.acknowledged and result.deleted_count == 1:
+            return True
+        return False
+                
     def update_latest_stock(self, stock):
         """ Update DB with the last stock that got crawled """
         return self.dbh.update_one(
@@ -102,49 +109,22 @@ class MongoCli:
         return all_stocks[latest_stock_index:]
 
     def update_one_document(self, mongo_filter, mongo_doc):
-        """
-        Update only one document in MongoDB, create it if it does not exist.
-        
-        Parameters
-        ----------
-        mongo_filter
-            - hash to specify mongo restriction
-        mongo_doc
-            - key : value pairs making up the document
-        """
+        """ Update Fields on a doc, create if it does not exist. """
         new_result = self.dbh.update_one(mongo_filter, mongo_doc, upsert=True)
         return new_result
 
     def insert_one_document(self, mongo_filter, mongo_doc):
-        """ Insert one document - do not create it if it does not exist.
-
-        Parameters
-        ----------
-        mongo_filter
-            - hash to specify mongo restriction
-        mongo_doc
-            - key : value pairs making up the document
-        
-        """
+        """ Insert one document - do not create it if it does not exist. """
         new_result = self.dbh.insert_one(mongo_filter, mongo_doc)
         return new_result.inserted_id
 
+    def replace_one_document(self, mongo_filter, mongo_doc):
+        """ Replace one document in MongoDB entirely """
+        new_result = self.dbh.replace_one(mongo_filter, mongo_doc, upsert=True)
+        return new_result
+    
     def drop_db(self):
-        """  Drop all documents (testing/etc.)
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        new_result
-
-        Exceptions
-        ----------
-        Failure/Connection
-        """
-
+        """  Drop all documents (testing/etc.) """
         new_result = self.dbh.drop()
         return new_result
     
