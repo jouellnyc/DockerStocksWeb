@@ -150,7 +150,7 @@ def DecidetoCrawl(stock, force_new_all=None, force_retry_errors=None):
         try:
             print("Force_retry_errors is False...")
             print("Checking for Errors...")
-            if stock_data["Error"]:
+            if stock_data["Error"] is None:
                 print("Passing: force_retry_errors is False and stock has errors")
                 raise PassOnErrorStock
         except KeyError:
@@ -222,6 +222,7 @@ def CrawlStock(stock):
 
     """ Setup our mongo doc as a hash to prepare to send to Mongo """
     mongo_doc = {}
+    mongo_doc["Error"] = None 
     mongo_doc["Years"] = {}
 
     """ millify() and mk_pretty() the data and re-arrange df """
@@ -250,7 +251,16 @@ def CrawlStock(stock):
     """ Pull out Each value and millify() """
     revenue_ttm = float(overview_data["RevenueTTM"].values[0])
     
-    market_cap = overview_data["MarketCapitalization"].values[0] 
+    
+    market_cap = overview_data["MarketCapitalization"].values[0]
+    #market_cap is a string 'None', not the python None.
+    if market_cap.startswith('None'):
+        mongo_doc["Market_Cap"] = 'NA'
+    else:    
+        mongo_doc["Market_Cap"] = millify(market_cap, precision=2)
+        mongo_doc["Market_Cap_Denom"] = mongo_doc["Market_Cap"][-1]
+        mongo_doc["Market_Cap"] = float(mongo_doc["Market_Cap"][:-1])
+        
     PETTM = int(float(overview_data["TrailingPE"].values[0]))
     price2sales = float(overview_data["PriceToSalesRatioTTM"].values[0])
     price2book = float(overview_data["PriceToBookRatio"].values[0])
@@ -268,11 +278,7 @@ def CrawlStock(stock):
     else:
         mongo_doc["RevTTM_Denom"] = "NA"
         mongo_doc["RevTTM"] = revenue_ttm
-
-    mongo_doc["Market_Cap"] = millify(market_cap, precision=2)
-    mongo_doc["Market_Cap_Denom"] = mongo_doc["Market_Cap"][-1]
-    mongo_doc["Market_Cap"] = float(mongo_doc["Market_Cap"][:-1])
-
+   
     mongo_doc["Currency"] = currency
     mongo_doc["TrailingPE"] = float(PETTM)
     mongo_doc["PriceToSalesTTM"] = millify(price2sales, precision=2)
