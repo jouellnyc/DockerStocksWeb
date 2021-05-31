@@ -116,8 +116,8 @@ class MongoCli:
         return new_result
     
     def insert_one_document(self, mongo_doc):
-        """ Insert one document - do not create it if it does not exist. """
-        """ Will CREATE A DUP DOC WITH THE SAME STOCK SYMBOL!            """
+        """ Insert one document:                                         """
+        """ Will create a DUP DOC with the same stock symbol if exists!  """
         new_result = self.dbh.insert_one(mongo_doc)
         return new_result.inserted_id
 
