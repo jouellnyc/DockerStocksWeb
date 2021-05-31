@@ -294,8 +294,7 @@ def CrawlStock(stock):
 
     """ And now we are ready to send the Data to Mongo """
     print(f"OK, Sending data to Mongo for {stock}\n")
-    print(mg.update_one_document({"Stock": stock}, {"$set": mongo_doc}))
-    # Remember: ValueError: update only works with $ operators
+    print(mg.replace_one_document( {"Stock": stock}, mongo_doc )) 
     raise GoodCrawl
 
 
