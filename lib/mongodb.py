@@ -44,6 +44,9 @@ class MongoCli:
 
         try:
             client = MONGOCLIENTLINE
+                "mongodb+srv://stocku:pO1UvmV0wEsuUwm0@stockcluster.poxqf.mongodb.net/test?retryWrites=true&w=majority",
+                serverSelectionTimeoutMS=2000,
+            )
             client.server_info()
             database_handle = client[database_name]
             collection_handle = database_handle[collection_name]
@@ -65,8 +68,10 @@ class MongoCli:
         stocks = sorted(
             [
                 (x["Stock"], x["DateCrawled"])
-                for x in self.dbh.find({"DateCrawled": {"$exists": True}})
+
+                    for x in self.dbh.find({"DateCrawled": {"$exists": True}})
             ],
+
             key=lambda one_date: one_date[1],
         )
         return [one_stock[0] for one_stock in stocks]
@@ -109,12 +114,11 @@ class MongoCli:
         """ Replace existing Data with a blank if no Data Return from API """
         return self.dbh.replace_one({"Stock": stock}, {"Stock": stock, "Error": msg})
 
-
     def update_one_document(self, mongo_filter, mongo_doc):
         """ Update a fields on a doc, create if it does not exist. """
-        new_result = self.dbh.update_one(mongo_filter, {"$set" : mongo_doc}, upsert=True) 
+        new_result = self.dbh.update_one(mongo_filter, {"$set": mongo_doc}, upsert=True)
         return new_result
-    
+
     def insert_one_document(self, mongo_doc):
         """ Insert one document:                                         """
         """ Will create a DUP DOC with the same stock symbol if exists!  """
