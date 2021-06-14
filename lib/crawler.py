@@ -222,8 +222,10 @@ def CrawlStock(stock):
 
     """ Setup our mongo doc as a hash to prepare to send to Mongo """
     mongo_doc = {}
+    mongo_doc["Stock"] = stock
     mongo_doc["Error"] = None 
     mongo_doc["Years"] = {}
+    
 
     """ millify() and mk_pretty() the data and re-arrange df """
     for year in df.to_dict("records"):
