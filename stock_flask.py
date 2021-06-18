@@ -72,6 +72,8 @@ def get_data():
             stock_data = mongocli.lookup_stock(stock)
             if len(stock_data) < 2:
                 return render_template("dne_stock.html", stock=stock)
+            if stock_data['Error']:
+                return render_template("dne_stock.html", stock=stock)
         except ValueError as e:
             app.logger.error(str(e))
             return render_template("dne_stock.html", stock=stock)
