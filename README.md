@@ -216,9 +216,9 @@ admin   0.000GB
 config  0.000GB
 local   0.000GB
 ```
-Point your browser to http://$YOUR_IP and search for GOOG or 
+Point your browser to http://$YOUR_IP and search for OKTA or 
 
-http://$YOUR_IP/search/?stock=GOOG
+http://$YOUR_IP/search/?stock=OKTA
 
 
 ## Architecture
@@ -239,3 +239,6 @@ To use AWS:
 
 To fully deploy automatically:
 - You'll need to setup AWS Secret Manager entries as well. See user_data.http.AWS.sh and getSecret.py.
+
+## Warnings
+This project is mean to be a part of a DevOps/Python learning project and is unsecured by default.
