@@ -43,10 +43,10 @@ cd /stocks/lib
 vi ./crawler.py
 ```
 
-Start crawling -- (Example with debug=True):
+Start testing a crawling -- (Example with debug=True):
 ```
 
-nobody@85e2ddd5a534:/stocks/lib$ ./crawler.py OKTA
+nobody@85e2ddd5a534:/stocks/lib$ ./crawler.py -s  OKTA
 Connecting to Alpha Vantage for OKTA
 df:
        fiscalDateEnding totalRevenue   netIncome
