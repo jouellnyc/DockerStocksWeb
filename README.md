@@ -242,3 +242,4 @@ To fully deploy automatically:
 
 ## Warnings
 This project is mean to be a part of a DevOps/Python learning project and is unsecured by default.
+
