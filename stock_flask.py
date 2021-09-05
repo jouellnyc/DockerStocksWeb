@@ -61,7 +61,7 @@ def get_data():
         app.logger.error(f"Invalid data: querystring: {querystring} : invalid")
         return render_template("notastock.html", stock=stock)
     except Exception as e:
-        msg = f"Bug: querystring:{querystring}, Error: {str(e)}"
+        msg = f'Bug: querystring:{querystring}, Error: {e}'
         app.logger.exception(msg)
         flask.abort(500)
     else:
