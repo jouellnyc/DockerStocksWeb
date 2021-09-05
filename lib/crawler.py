@@ -93,10 +93,7 @@ def stock_is_crawled_recently(stock_data, old_enough=None):
     difference = datetime.datetime.utcnow() - date_crawled
     # duration_in_s = difference.total_seconds()
     # hours = divmod(duration_in_s, 3600)[0]
-    if difference.days > old_enough:
-        # if hours > old_enough:
-        return False
-    return True
+    return difference.days <= old_enough
 
 
 def GetNextStockBatch(count=0, max=5, pause=60):
@@ -221,12 +218,7 @@ def CrawlStock(stock):
         print("\n")
 
     """ Setup our mongo doc as a hash to prepare to send to Mongo """
-    mongo_doc = {}
-    mongo_doc["Stock"] = stock
-    mongo_doc["Error"] = None 
-    mongo_doc["Years"] = {}
-    
-
+    mongo_doc = {'Stock': stock, 'Error': None, 'Years': {}}
     """ millify() and mk_pretty() the data and re-arrange df """
     for year in df.to_dict("records"):
 
@@ -252,8 +244,8 @@ def CrawlStock(stock):
 
     """ Pull out Each value and millify() """
     revenue_ttm = float(overview_data["RevenueTTM"].values[0])
-    
-    
+
+
     market_cap = overview_data["MarketCapitalization"].values[0]
     #market_cap is a string 'None', not the python None.
     if market_cap.startswith('None'):
@@ -262,7 +254,7 @@ def CrawlStock(stock):
         mongo_doc["Market_Cap"] = millify(market_cap, precision=2)
         mongo_doc["Market_Cap_Denom"] = mongo_doc["Market_Cap"][-1]
         mongo_doc["Market_Cap"] = float(mongo_doc["Market_Cap"][:-1])
-        
+
     PETTM = int(float(overview_data["TrailingPE"].values[0]))
     price2sales = float(overview_data["PriceToSalesRatioTTM"].values[0])
     price2book = float(overview_data["PriceToBookRatio"].values[0])
@@ -280,7 +272,7 @@ def CrawlStock(stock):
     else:
         mongo_doc["RevTTM_Denom"] = "NA"
         mongo_doc["RevTTM"] = revenue_ttm
-   
+
     mongo_doc["Currency"] = currency
     mongo_doc["TrailingPE"] = float(PETTM)
     mongo_doc["PriceToSalesTTM"] = millify(price2sales, precision=2)
@@ -296,7 +288,7 @@ def CrawlStock(stock):
 
     """ And now we are ready to send the Data to Mongo """
     print(f"OK, Sending data to Mongo for {stock}\n")
-    print(mg.replace_one_document( {"Stock": stock}, mongo_doc )) 
+    print(mg.replace_one_document( {"Stock": stock}, mongo_doc ))
     raise GoodCrawl
 
 
@@ -307,7 +299,7 @@ if __name__ == "__main__":
     debug = True
     force_new_all = False
     force_retry_errors = True
-    
+
     my_crawlid = gen_crawlid()
 
     parser = argparse.ArgumentParser()
@@ -344,9 +336,7 @@ if __name__ == "__main__":
 
         elif namespace.stock:
 
-            all_stocks = []
-            all_stocks.append(namespace.stock)
-
+            all_stocks = [namespace.stock]
     except PyMongoError as e:
         print("Mongodb issue: ", e)
         sys.exit(1)
@@ -357,7 +347,7 @@ if __name__ == "__main__":
     print(all_stocks)
     for stock in all_stocks:
         try:
-            
+
             print(f"==== Trying {stock} - {count}")
             DecidetoCrawl(
                 stock,

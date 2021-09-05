@@ -46,8 +46,7 @@ class MongoCli:
             client = MongoClient( "mongodb+srv://stocku:pO1UvmV0wEsuUwm0@stockcluster.poxqf.mongodb.net/test?retryWrites=true&w=majority", serverSelectionTimeoutMS=2000,)
             client.server_info()
             database_handle = client[database_name]
-            collection_handle = database_handle[collection_name]
-            return collection_handle
+            return database_handle[collection_name]
         except Exception:
             raise
 
@@ -76,19 +75,16 @@ class MongoCli:
     def dump_recent_stocks(self):
         """ Return all stocks split *after* the last crawled stock """
         all_stocks = self.dump_all_stocks()
-        all_stocks_dict = {}
-        for i, stock in enumerate(all_stocks, 1):
-            all_stocks_dict[stock] = int(i)
+        all_stocks_dict = {stock: int(i) for i, stock in enumerate(all_stocks, 1)}
         latest_stock = self.get_latest_stock()
         latest_stock_index = all_stocks_dict[latest_stock]
         return all_stocks[latest_stock_index:]
 
     def dump_all_stocks(self):
         """ Dump All Stocks (All should have a CD), sorted Alphabetically """
-        stocks = sorted(
+        return sorted(
             [x["Stock"] for x in self.dbh.find({"Stock": {"$exists": True}})]
         )
-        return stocks
 
     def get_latest_stock(self):
         """ Pull down the last stock that got crawled """
@@ -97,9 +93,7 @@ class MongoCli:
     def delete_one_stock(self, stock):
         """ Delete One Stock """
         result = self.dbh.delete_one({"Stock": stock})
-        if result.acknowledged and result.deleted_count == 1:
-            return True
-        return False
+        return bool(result.acknowledged and result.deleted_count == 1)
 
     def update_latest_stock(self, stock):
         """ Update DB with the last stock that got crawled """
@@ -113,8 +107,7 @@ class MongoCli:
 
     def update_one_document(self, mongo_filter, mongo_doc):
         """ Update a fields on a doc, create if it does not exist. """
-        new_result = self.dbh.update_one(mongo_filter, {"$set": mongo_doc}, upsert=True)
-        return new_result
+        return self.dbh.update_one(mongo_filter, {"$set": mongo_doc}, upsert=True)
 
     def insert_one_document(self, mongo_doc):
         """ Insert one document:                                         """
@@ -124,10 +117,8 @@ class MongoCli:
 
     def replace_one_document(self, mongo_filter, mongo_doc):
         """ Replace one document in MongoDB entirely/%100 """
-        new_result = self.dbh.replace_one(mongo_filter, mongo_doc, upsert=True)
-        return new_result
+        return self.dbh.replace_one(mongo_filter, mongo_doc, upsert=True)
 
     def drop_db(self):
         """  Drop all documents (testing/etc.) """
-        new_result = self.dbh.drop()
-        return new_result
+        return self.dbh.drop()
