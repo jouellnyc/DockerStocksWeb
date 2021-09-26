@@ -208,13 +208,22 @@ OK, Sending data to Mongo for OKTA
 
 The DB 'Stocks' will be auto created in the local Mongo Container
 ```
-./non-app/master.enter.sh mongodb 
-
+./non-app/master.enter.sh mongodb
+mongodb@6fd40bdb8b08:/$ mongo
+MongoDB shell version v3.6.8
+connecting to: mongodb://127.0.0.1:27017
+Implicit session: session { "id" : UUID("755643dd-801e-4d72-bfd0-30c7728f6fd9") }
+MongoDB server version: 3.6.8
+Server has startup warnings: 
+2021-09-26T15:14:41.888+0000 I CONTROL  [initandlisten] 
+2021-09-26T15:14:41.888+0000 I CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
+2021-09-26T15:14:41.888+0000 I CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
+2021-09-26T15:14:41.888+0000 I CONTROL  [initandlisten] 
 > show dbs
-Stocks  0.000GB
 admin   0.000GB
 config  0.000GB
 local   0.000GB
+
 ```
 Point your browser to http://$YOUR_IP and search for OKTA or 
 
