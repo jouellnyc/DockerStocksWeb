@@ -275,7 +275,7 @@ def CrawlStock(stock):
 
     mongo_doc["Currency"] = currency
     mongo_doc["TrailingPE"] = float(PETTM)
-    mongo_doc["PriceToSalesTTM"] = millify(price2sales, precision=2)
+    mongo_doc["PriceToSalesTTM"] = float(millify(price2sales, precision=2))
     mongo_doc["PriceToBookRatio"] = float(millify(price2book, precision=2))
     mongo_doc["DateCrawled"] = datetime.datetime.utcnow()
     mongo_doc["Success"] = "Yes"
