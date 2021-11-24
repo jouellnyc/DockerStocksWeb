@@ -25,7 +25,7 @@ COPY external/gunicorn/gunicorn.conf.py /$WORKDIR/external/gunicorn/
 COPY lib/             /$WORKDIR/lib/
 
 RUN chown -R nobody:  /$WORKDIR/
-COPY Docker/flask-docker-entrypoint.AWS.hosted.DB.sh /usr/sbin/flask-docker-entrypoint.sh
+COPY Docker/flask-docker-entrypoint.sh /usr/sbin/flask-docker-entrypoint.sh
 RUN chmod 755 /usr/sbin/flask-docker-entrypoint.sh 
 RUN rm /usr/bin/python3 && ln -s /usr/local/bin/python3 /usr/bin/python3
 
