@@ -3,7 +3,7 @@ services:
   app:
       build:
         context: .
-        dockerfile: Docker/Dockerfile.flask
+        dockerfile: Docker/Dockerfile.flask.local
       networks:
         - stocksnetwork
       cap_drop:
