@@ -3,8 +3,7 @@ services:
   app:
       build:
         context: .
-        #Yes; it's the same file name
-        dockerfile: Docker/Dockerfile.flask.AWS.hosted.DB
+        dockerfile: Docker/Dockerfile.flask
       networks:
         - stocksnetwork
       cap_drop:

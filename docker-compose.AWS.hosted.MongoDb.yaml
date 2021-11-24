@@ -3,7 +3,7 @@ services:
   app:
       build:
         context: .
-        dockerfile: Docker/Dockerfile.flask.AWS.hosted.DB
+        dockerfile: Docker/Dockerfile.flask
       networks:
         - stocksnetwork
       logging:
