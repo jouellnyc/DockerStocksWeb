@@ -13,17 +13,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
     - name: Build the Docker image
       uses: actions/checkout@v2
       run: docker build . --file Docker/Dockerfile.nginx --tag docker-stocks-web-nginx:$(date +%s)
     - name: Tag the Docker image
       uses: actions/checkout@v2
       run: docker tag docker-stocks-web-nginx:$(date +%s)  631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest
-    - name: Publish Image to ECR
-      run: docker push 631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest
+    - name: Push to ECR
+      id: jouell-stocks 
+      uses: jwalton/gh-ecr-push@v1
+      with: access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        region: us-east-1
+        local-image: my-image:v1
+        image: my-image:v1, my-image:latest
