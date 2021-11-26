@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - run: docker build . -f Docker/Dockerfile.nginx --tag docker-stocks-web-nginx:$(date +%s)
+    - run: docker build .  --tag docker-stocks-web-nginx:$(date +%s)
     - name: Push to ECR
       id: jouell-stocks 
       uses: jwalton/gh-ecr-push@v1
