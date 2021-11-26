@@ -15,4 +15,5 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
-      run: docker build . --file Docker/Dockerfile.flask.local --tag docker-stock-web:$(date +%s)
+      run: docker build . --file Docker/Dockerfile.flask.local --tag docker-stocks-web-flask:$(date +%s)
+      run: docker build . --file Docker/Dockerfile.nginx --tag docker-stocks-web-nginx:$(date +%s)
