@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - run: docker build . --file ../Docker/Dockerfile.nginx --tag docker-stocks-web-nginx:$(date +%s)
+    - run: docker build . --file Docker/Dockerfile.nginx --tag docker-stocks-web-nginx:$(date +%s)
     - name: Push 
       id: jouell-stocks 
       uses: actions/checkout@v2

@@ -1,4 +1,4 @@
-name: Flask Docker Image Build CI
+name: Flask Docker Image Builder CI
 
 on:
   push:
