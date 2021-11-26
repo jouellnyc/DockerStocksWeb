@@ -16,3 +16,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build the Docker image
       run: docker build . --file Docker/Dockerfile.nginx --tag docker-stocks-web-nginx:$(date +%s)
+    - tag:
+      run: docker tag docker-stocks-web:latest 631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest
+    - publish:
+      run: docker push 631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest
