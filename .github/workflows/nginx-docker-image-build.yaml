@@ -1,4 +1,4 @@
-name: Docker Image Build CI
+name: Nginx - Docker Image Build CI
 
 on:
   push:
