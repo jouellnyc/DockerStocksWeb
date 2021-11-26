@@ -1,0 +1,10 @@
+name: 'Build'
+description: 'Docker StocksWeb Docker Builder'
+inputs:
+  none:
+outputs:
+  none:
+runs:
+  using: 'docker'
+  image: 'Docker/Dockerfile.flask.local'
+  args:
