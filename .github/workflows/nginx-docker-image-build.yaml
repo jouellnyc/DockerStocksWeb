@@ -20,3 +20,6 @@ jobs:
       run: docker tag docker-stocks-web:latest 631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest
     - publish:
       run: docker push 631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest
+      with:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
