@@ -13,14 +13,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Build the Docker image
-      run: docker build . --file Docker/Dockerfile.nginx --tag docker-stocks-web-nginx:$(date +%s)
-    - tag:
-      run: docker tag docker-stocks-web:latest 631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest
-    - publish:
-    - uses: say8425/aws-secrets-manager-actions@v2
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
       with:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - name: Build the Docker image
+      uses: actions/checkout@v2
+      run: docker build . --file Docker/Dockerfile.nginx --tag docker-stocks-web-nginx:$(date +%s)
+    - name: Tag the Docker image
+      uses: actions/checkout@v2
+      run: docker tag docker-stocks-web-nginx:$(date +%s)  631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest
+    - name: Publish Image to ECR
       run: docker push 631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest
