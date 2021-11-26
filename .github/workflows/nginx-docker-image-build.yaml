@@ -13,13 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - run: docker build .  --tag docker-stocks-web-nginx:$(date +%s)
-    - name: Push to ECR
-      id: jouell-stocks 
-      uses: jwalton/gh-ecr-push@v1
-      with: 
-        access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        region: us-east-1
-        local-image: my-image:v1
-        image: docker-stocks-web-nginx:$(date +%s) 
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      run: docker build . --file Docker/Dockerfile.nginx --tag docker-stocks-web-nginx:$(date +%s)
