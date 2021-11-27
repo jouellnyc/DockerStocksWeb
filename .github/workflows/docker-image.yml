@@ -30,7 +30,7 @@ jobs:
 
     - name: Build, tag, and push image to Amazon ECR
       env:
-        ECR_REGISTRY: ${{ steps.jouell-steps.outputs.registry }}
+        ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
         ECR_REPOSITORY: docker-stocks-web 
         IMAGE_TAG: latest 
       run: |
