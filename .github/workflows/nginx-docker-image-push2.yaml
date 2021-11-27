@@ -28,7 +28,7 @@ jobs:
         ECR_REPOSITORY: docker-stocks-web  
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --file Docker/Dockerfile.nginx
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . -f Docker/Dockerfile.nginx
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
     - name: Log out of Amazon ECR
