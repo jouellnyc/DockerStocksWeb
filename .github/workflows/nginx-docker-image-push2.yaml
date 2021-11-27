@@ -1,10 +1,10 @@
+name: Docker Image CI Build and Push to AWS ECR
+
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-
-name: Stocks Web CI and Publish
 
 jobs:
   deploy:
