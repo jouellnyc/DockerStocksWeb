@@ -1,4 +1,5 @@
-
+# https://towardsaws.com/build-push-docker-image-to-aws-ecr-using-github-actions-8396888a8f9e
+#
 name: Docker Nginx Image CI
 
 on:
@@ -14,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Build the Docker image
+    - name: Checkout the Docker image
       uses: actions/checkout@v2
 
     - name: Configure AWS credentials
