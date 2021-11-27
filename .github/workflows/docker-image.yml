@@ -16,7 +16,6 @@ jobs:
     steps:
     - name: Build the Docker image
       uses: actions/checkout@v2
-      run: docker build . --file Docker/Dockerfile.nginx --tag my-image-name:$(date +%s)
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -25,3 +24,15 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
+    - name: Login to Amazon ECR
+      id: jouell-stocks
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.jouell-steps.outputs.registry }}
+        ECR_REPOSITORY: docker-stocks-web 
+        IMAGE_TAG: latest 
+      run: |
+        docker build . --file Docker/Dockerfile.nginx -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
