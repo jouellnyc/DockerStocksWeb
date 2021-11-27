@@ -6,10 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
-runs-on: ubuntu-latest
 
 jobs:
   build:
+    runs-on: ubuntu-latest
     steps:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
