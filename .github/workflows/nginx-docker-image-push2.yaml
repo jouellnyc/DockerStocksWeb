@@ -2,9 +2,9 @@ name: Docker Image CI Build and Push to AWS ECR
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   deploy:
