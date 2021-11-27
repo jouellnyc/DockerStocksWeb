@@ -1,3 +1,4 @@
+
 name: Docker Nginx Image CI
 
 on:
@@ -16,3 +17,4 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build the Docker image
       run: docker build . --file Docker/Dockerfile.nginx --tag my-image-name:$(date +%s)
+
