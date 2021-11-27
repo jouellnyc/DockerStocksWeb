@@ -23,18 +23,12 @@ jobs:
         aws-region: us-east-1
 
     - name: Login to Amazon ECR
-      id: login-ecr
+      id: jouell-stocks
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build, tag, and push the image to Amazon ECR
       id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-        IMAGE_TAG: 1.0
       run: |
-        docker build . --file Docker/Dockerfile.nginx --tag docker-stocks-web-nginx:$(date +%s)
+        docker build . --file Docker/Dockerfile.nginx --tag test/aws:latest
         echo "Pushing image to ECR..."
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-        echo ${{ secrets.AWS_ACCESS_KEY_ID }}
+        docker push test/aws:latest 
