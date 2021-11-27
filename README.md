@@ -1,3 +1,4 @@
+![Last Build Workflow](https://github.com/jouellnyc/DockerStocksWeb/actions/workflows/docker-image.yml/badge.svg)
 
 # Historical Stock Data (With Growth Rates) 
 ![Stocks](non-app/stock_peek.gif)
