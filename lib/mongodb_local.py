@@ -122,3 +122,5 @@ class MongoCli:
     def drop_db(self):
         """  Drop all documents (testing/etc.) """
         return self.dbh.drop()
+
+
