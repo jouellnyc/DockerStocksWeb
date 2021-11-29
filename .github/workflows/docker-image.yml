@@ -3,7 +3,7 @@ name: Docker Nginx Image CI
 
 on:
   push:
-    branches: [ develop2 ]
+    branches: [ develop ]
   pull_request:
     branches: [ develop ]
 
