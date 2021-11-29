@@ -3,9 +3,9 @@ name: Docker Nginx Image CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ develop ]
 
 jobs:
   build_docker_image:
