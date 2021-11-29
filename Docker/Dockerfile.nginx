@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM debian:buster-slim
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
