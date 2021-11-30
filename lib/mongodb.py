@@ -42,7 +42,7 @@ class MongoCli:
         database_name = self.database_name
 
         try:
-            client = MONGOCLIENTLINE
+            client = MongoClient("mongodb+srv://stocku:wwQcb33Sg8S3GQ07@stockcluster.poxqf.mongodb.net/test?retryWrites=true&w=majority", serverSelectionTimeoutMS=2000)
             client.server_info()
             database_handle = client[database_name]
             return database_handle[collection_name]
