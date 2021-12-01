@@ -34,5 +34,5 @@ jobs:
       run: |
         #docker build  --file Docker/Dockerfile.nginx -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker-compose -f docker-compose.local.yaml  build
-        #docker ps
+        docker ps
 
