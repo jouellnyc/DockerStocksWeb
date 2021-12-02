@@ -22,7 +22,6 @@ COPY static/               /$WORKDIR/static/
 COPY non-app/              /$WORKDIR/non-app/
 COPY templates/            /$WORKDIR/templates/
 COPY lib/                  /$WORKDIR/lib/
-COPY external/getSecret.py /$WORKDIR/lib/
 COPY external/gunicorn/gunicorn.conf.py /$WORKDIR/external/gunicorn/
 
 RUN chown -R nobody:  /$WORKDIR/
