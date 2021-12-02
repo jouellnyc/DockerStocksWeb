@@ -11,8 +11,6 @@ import sys
 import json
 import urllib.parse
 
-sys.path.insert(0, "../../AWS/python/")
-
 from getSecret import get_secret
 from pymongo import MongoClient
 
