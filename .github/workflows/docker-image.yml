@@ -15,11 +15,12 @@ jobs:
     - name: Checkout the Docker image
       uses: actions/checkout@v2
 
-   - uses: actions/checkout@master
-     with:
-       name: jouellnyc/AWS
-       ref: refs/heads/release
-       path: '/tmp/AWS/'
+    - name: Checkout AWS Repo
+      uses: actions/checkout@master
+      with:
+        name: jouellnyc/AWS
+        ref: refs/heads/release
+        path: '/tmp/AWS/'
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
