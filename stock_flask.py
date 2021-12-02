@@ -28,6 +28,9 @@ from pymongo.errors import OperationFailure
 
 from lib import mongodb
 
+# AWS Globals
+AWS_REGION = "us-east-1"
+AWS_SECRET = "Prod-Stocks"
 
 app = Flask(__name__)
 
@@ -67,8 +70,7 @@ def get_data():
     else:
         stock = str(stock).upper()
         try:
-            # Master Dictionary with all the Data
-            mongocli = mongodb.MongoCli()
+            mongocli = mongodb.MongoCli(AWS_REGION,AWS_SECRET)
             stock_data = mongocli.lookup_stock(stock)
             if len(stock_data) < 2:
                 return render_template("dne_stock.html", stock=stock)
@@ -97,7 +99,6 @@ def get_data():
             return render_template(
                 "stock_data.html", stock_data=stock_data, stock=stock,
             )
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
