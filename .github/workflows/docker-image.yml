@@ -20,7 +20,7 @@ jobs:
       with:
         name: jouellnyc/AWS
         ref: refs/heads/release
-        path: '/tmp/AWS/'
+        path: '../AWS/'
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
