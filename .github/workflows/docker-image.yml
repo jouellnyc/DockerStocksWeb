@@ -19,7 +19,6 @@ jobs:
       uses: actions/checkout@master
       with:
         name: jouellnyc/AWS
-        ref: refs/heads/release
         path: $GITHUB_WORKSPACE/AWS/
 
     - name: Configure AWS credentials
