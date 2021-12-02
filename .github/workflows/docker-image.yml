@@ -20,7 +20,7 @@ jobs:
       with:
         name: jouellnyc/AWS
         ref: refs/heads/release
-        path: '../AWS/'
+        path: $GITHUB_WORKSPACE/AWS/
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -40,7 +40,6 @@ jobs:
         IMAGE_TAG: latest 
       run: |
         #docker build  --file Docker/Dockerfile.nginx -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        echo $GITHUB_WORKSPACE
         docker-compose -f docker-compose.local.yaml  build
         docker-compose -f docker-compose.local.yaml  up -d
         docker ps
