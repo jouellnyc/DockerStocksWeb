@@ -31,6 +31,13 @@ read -r  MONGOUSERNAME MONGOPASSWORD MONGOHOST <  <(/usr/bin/python3 ./getSecret
 cd $GIT_DIR
 git clone $GIT_STOCKS 
 cd DockerStocksWeb
+
+##
+cd /tmp
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+/usr/local/bin/aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 631686326988.dkr.ecr.us-east-1.amazonaws.com
 docker pull 631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest
 DOCKER_COMPOSE_FILE="docker-compose.AWS.hosted.MongoDb.yaml"
 source $GIT_DIR/AWS/aws-cli/shared_vars.txt
