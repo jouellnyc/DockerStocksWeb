@@ -43,7 +43,4 @@ docker image tag $IMAGE dockerstocksweb_web:latest
 source data/AWS.vars.txt
 DOCKER_COMPOSE_FILE="docker-compose.AWS.hosted.MongoDb.yaml"
 docker-compose -f $DOCKER_COMPOSE_FILE up -d
-<<<<<<< HEAD
 ### End
-=======
->>>>>>> ae153bc8a7683e7d864912bf9059f145c3ace1ac
