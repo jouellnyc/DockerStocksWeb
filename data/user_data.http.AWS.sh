@@ -31,17 +31,14 @@ read -r  MONGOUSERNAME MONGOPASSWORD MONGOHOST <  <(/usr/bin/python3 ./getSecret
 cd $GIT_DIR
 git clone $GIT_STOCKS 
 cd DockerStocksWeb
-sleep 2
 
-MONGOFILE="lib/mongodb.py"
-sed -i -r  's#MONGOCLIENTLINE#client = MongoClient("mongodb+srv://MONGOUSERNAME:MONGOPASSWORD@MONGOHOST/test?retryWrites=true\&w=majority", serverSelectionTimeoutMS=2000)#' $MONGOFILE
-sed -i s"/MONGOUSERNAME/${MONGOUSERNAME}/" $MONGOFILE
-sed -i s"/MONGOPASSWORD/${MONGOPASSWORD}/" $MONGOFILE 
-sed -i         s"/MONGOHOST/${MONGOHOST}/" $MONGOFILE 
-unset MONGOPASSWORD 
-unset MONGOHOST
-unset MONGOUSERNAME
-
+##
+cd /tmp
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+/usr/local/bin/aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 631686326988.dkr.ecr.us-east-1.amazonaws.com
+docker pull 631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest
 DOCKER_COMPOSE_FILE="docker-compose.AWS.hosted.MongoDb.yaml"
 source $GIT_DIR/AWS/aws-cli/shared_vars.txt
 docker-compose -f $DOCKER_COMPOSE_FILE up -d

@@ -17,12 +17,12 @@ RUN pip3 install -r /$WORKDIR/requirements.txt
 RUN mkdir /$WORKDIR/non-app/ &&  mkdir /$WORKDIR/static/ && mkdir /$WORKDIR/templates/ && mkdir /$WORKDIR/lib/
 RUN mkdir -p /$WORKDIR/external/gunicorn/
 
-COPY static/          /$WORKDIR/static/
-COPY non-app/         /$WORKDIR/non-app/
-COPY templates/       /$WORKDIR/templates/
-COPY stock_flask.py   /$WORKDIR/
+COPY stock_flask.py        /$WORKDIR/
+COPY static/               /$WORKDIR/static/
+COPY non-app/              /$WORKDIR/non-app/
+COPY templates/            /$WORKDIR/templates/
+COPY lib/                  /$WORKDIR/lib/
 COPY external/gunicorn/gunicorn.conf.py /$WORKDIR/external/gunicorn/
-COPY lib/             /$WORKDIR/lib/
 
 RUN chown -R nobody:  /$WORKDIR/
 COPY Docker/flask-docker-entrypoint.sh /usr/sbin/flask-docker-entrypoint.sh

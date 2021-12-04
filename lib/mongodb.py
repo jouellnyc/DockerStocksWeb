@@ -1,26 +1,39 @@
 #!/usr/bin/env python3
 
 """ mongodb.py - interface into MongoDB
-
 - This script requires the pymongo module.
 
 - This file is intended as a loadable module only.
 
 """
 
-from pymongo import MongoClient
+import sys
+import json
+import urllib.parse
 
+from getSecret import get_secret
+from pymongo import MongoClient
 
 class StockDoesNotExist(Exception):
     pass
 
-
 class MongoCli:
-    def __init__(self):
-
-        self.database_name = "stocks"
-        self.collection_name = "data"
+    def __init__(self, aws_secret, aws_region):
+        self.aws_secret    = aws_secret 
+        self.aws_region    = aws_region
+        self.mysecret      = self.GetSecrets()
+        self.collection    = urllib.parse.quote_plus(self.mysecret["collection"])
+        self.database      = urllib.parse.quote_plus(self.mysecret["database"])
+        self.mongousername = urllib.parse.quote_plus(self.mysecret["mongousername"])
+        self.mongopassword = urllib.parse.quote_plus(self.mysecret["mongopassword"])
+        self.mongohost     = urllib.parse.quote_plus(self.mysecret["mongohost"])
         self.dbh = self.ConnectToMongo()
+
+    def GetSecrets(self):
+        try:
+            return json.loads(get_secret(self.aws_secret, self.aws_region))
+        except Exception:
+            raise
 
     def ConnectToMongo(self):
         """
@@ -38,14 +51,12 @@ class MongoCli:
             collection_handle :  pymongo connect object
         """
 
-        collection_name = self.collection_name
-        database_name = self.database_name
-
         try:
-            client = MONGOCLIENTLINE
+            url = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
+            client = MongoClient(url)
             client.server_info()
-            database_handle = client[database_name]
-            return database_handle[collection_name]
+            database_handle = client[self.database]
+            return database_handle[self.collection]
         except Exception:
             raise
 
@@ -63,10 +74,8 @@ class MongoCli:
         stocks = sorted(
             [
                 (x["Stock"], x["DateCrawled"])
-
-                    for x in self.dbh.find({"DateCrawled": {"$exists": True}})
+                for x in self.dbh.find({"DateCrawled": {"$exists": True}})
             ],
-
             key=lambda one_date: one_date[1],
         )
         return [one_stock[0] for one_stock in stocks]
@@ -81,9 +90,7 @@ class MongoCli:
 
     def dump_all_stocks(self):
         """ Dump All Stocks (All should have a CD), sorted Alphabetically """
-        return sorted(
-            [x["Stock"] for x in self.dbh.find({"Stock": {"$exists": True}})]
-        )
+        return sorted([x["Stock"] for x in self.dbh.find({"Stock": {"$exists": True}})])
 
     def get_latest_stock(self):
         """ Pull down the last stock that got crawled """
