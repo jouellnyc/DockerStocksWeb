@@ -36,7 +36,9 @@ cd $GIT_DIR
 git clone $REPO
 cd $REPO 
 
-docker pull 631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest
+IMAGE="631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest"
+docker pull $IMAGE 
+docker image tag $IMAGE dockerstocksweb_web:latest
 
 DOCKER_COMPOSE_FILE="docker-compose.AWS.hosted.MongoDb.yaml"
 source $GIT_DIR/AWS/aws-cli/shared_vars.txt
