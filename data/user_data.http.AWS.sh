@@ -44,4 +44,3 @@ source data/AWS.vars.txt
 DOCKER_COMPOSE_FILE="docker-compose.AWS.hosted.MongoDb.yaml"
 docker-compose -f $DOCKER_COMPOSE_FILE up -d
 
-
