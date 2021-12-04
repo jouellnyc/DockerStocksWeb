@@ -40,6 +40,8 @@ IMAGE="631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest"
 docker pull $IMAGE 
 docker image tag $IMAGE dockerstocksweb_web:latest
 
-source $GIT_DIR/AWS/aws-cli/shared_vars.txt
+source data/AWS.vars.txt
 DOCKER_COMPOSE_FILE="docker-compose.AWS.hosted.MongoDb.yaml"
 docker-compose -f $DOCKER_COMPOSE_FILE up -d
+
+
