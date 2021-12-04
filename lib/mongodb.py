@@ -11,7 +11,7 @@ import sys
 import json
 import urllib.parse
 
-from getSecret import get_secret
+from lib.getSecret import get_secret
 from pymongo import MongoClient
 
 class StockDoesNotExist(Exception):
