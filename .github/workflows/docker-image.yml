@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout the Docker image
+    - name: Checkout the GitHub Repo
       uses: actions/checkout@v2
 
     - name: Configure AWS credentials
