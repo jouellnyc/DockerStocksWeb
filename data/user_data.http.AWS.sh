@@ -34,7 +34,7 @@ GIT_DIR="/gitrepos/"
 mkdir -p $GIT_DIR
 cd $GIT_DIR
 git clone $REPO
-cd $REPO 
+cd DockerStocksWeb 
 
 IMAGE="631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest"
 docker pull $IMAGE 
