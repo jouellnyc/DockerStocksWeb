@@ -29,10 +29,11 @@ jobs:
     - name: Build and tag image 
       env:
         ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
-        ECR_REPOSITORY: docker-stocks-web 
+        ECR_REPOSITORY: docker-stocks-web-dev
         IMAGE_TAG: latest 
       run: |
-        docker-compose -f docker-compose.local.yaml build
+        docker-compose -f docker-compose.local.yaml build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker-compose -f docker-compose.local.yaml up -d 
         docker ps
         docker images
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
