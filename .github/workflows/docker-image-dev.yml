@@ -26,9 +26,10 @@ jobs:
       id: jouell-stocks
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build and tag image 
+    - name: Caching
       uses: satackey/action-docker-layer-caching@v0.0.11
 
+    - name: Build and tag image 
       env:
         ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
         ECR_REPOSITORY: docker-stocks-web-dev
