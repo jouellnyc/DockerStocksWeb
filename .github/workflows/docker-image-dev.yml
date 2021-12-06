@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: docker ps
+      run: docker ps
+
     - name: Checkout the GitHub Repo
       uses: actions/checkout@v2
 
