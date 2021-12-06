@@ -2,8 +2,6 @@
 name: Dev Docker Nginx Image CI
 
 on:
-  push:
-    branches: [ develop ]
   pull_request:
     branches: [ develop ]
 
@@ -38,4 +36,3 @@ jobs:
         docker ps
         docker images
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
