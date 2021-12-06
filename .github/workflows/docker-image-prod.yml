@@ -1,4 +1,3 @@
-# https://towardsaws.com/build-push-docker-image-to-aws-ecr-using-github-actions-8396888a8f9e
 name: Prod Docker Nginx Image CI
 
 on:
