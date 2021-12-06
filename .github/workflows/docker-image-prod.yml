@@ -1,4 +1,3 @@
-# https://towardsaws.com/build-push-docker-image-to-aws-ecr-using-github-actions-8396888a8f9e
 name: Prod Docker Nginx Image CI
 
 on:
@@ -6,26 +5,35 @@ on:
     branches: [ main ]
 
 jobs:
+
   build_image_and_push_to_ecr:
+
     runs-on: ubuntu-latest
 
     steps:
 
-    - name: Configure AWS credentials
+    - name: Checkout the Repo
+      uses: actions/checkout@v2
+
+    - name: Configure credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    - name: Login to Amazon ECR
+    - name: Login to Repository 
       id: jouell-stocks
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Push to AWS ECR 
+    - name: Build, tag, and push image to ECR
       env:
         ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
         ECR_REPOSITORY: docker-stocks-web
         IMAGE_TAG: latest 
       run: |
+        docker-compose -f docker-compose.local.yaml up -d 
+        docker tag dockerstocksweb_web:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker ps
+        docker images
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
