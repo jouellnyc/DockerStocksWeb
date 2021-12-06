@@ -1,0 +1,27 @@
+# https://towardsaws.com/build-push-docker-image-to-aws-ecr-using-github-actions-8396888a8f9e
+name: Dev Docker Nginx Image CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_image_and_push_to_ecr:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Login to Amazon ECR
+      id: jouell-stocks
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Push to AWS ECR 
+      env:
+        ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
+        ECR_REPOSITORY: docker-stocks-web
+        IMAGE_TAG: latest 
+      run: |
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
