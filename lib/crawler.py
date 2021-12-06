@@ -315,7 +315,7 @@ if __name__ == "__main__":
     try:
 
         """ Connect to Mongo... or not """
-        mg = MongoCli()
+        mg = MongoCli("Prod-Stocks","us-east-1")
 
         """ mode == all  -- Crawl from the first alphabetically    """
         """ mode == date -- Crawl the oldest stocks first          """

@@ -8,7 +8,7 @@ on:
     branches: [ develop ]
 
 jobs:
-  build_docker_image:
+  build_image_and_push_to_ecr:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,10 +29,11 @@ jobs:
     - name: Build and tag image 
       env:
         ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
-        ECR_REPOSITORY: docker-stocks-web 
+        ECR_REPOSITORY: docker-stocks-web-dev
         IMAGE_TAG: latest 
       run: |
-        docker-compose -f docker-compose.local.yaml build
         docker-compose -f docker-compose.local.yaml up -d 
+        docker tag dockerstocksweb_web:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker ps
         docker images
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
