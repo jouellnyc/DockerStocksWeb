@@ -12,10 +12,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: docker ps
-      run: |
-        docker ps
-        docker images
 
     - name: Checkout the GitHub Repo
       uses: actions/checkout@v2
@@ -30,9 +26,6 @@ jobs:
     - name: Login to Amazon ECR
       id: jouell-stocks
       uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Caching
-      uses: satackey/action-docker-layer-caching@v0.0.11
 
     - name: Build and tag image 
       env:
