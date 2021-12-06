@@ -13,7 +13,9 @@ jobs:
 
     steps:
     - name: docker ps
-      run: docker ps
+      run: |
+        docker ps
+        docker images
 
     - name: Checkout the GitHub Repo
       uses: actions/checkout@v2
