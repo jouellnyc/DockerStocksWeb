@@ -33,7 +33,6 @@ jobs:
         ECR_REPOSITORY: docker-stocks-web-dev
         IMAGE_TAG: latest 
       run: |
-        docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker-compose -f docker-compose.local.yaml up -d 
         docker tag dockerstocksweb_web:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker ps
