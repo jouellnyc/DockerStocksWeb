@@ -36,13 +36,13 @@ cd $GIT_DIR
 git clone $REPO
 cd DockerStocksWeb
 
-IMAGE="631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest"
-docker pull $IMAGE
-docker image tag $IMAGE dockerstocksweb_web:latest
+#IMAGE="631686326988.dkr.ecr.us-east-1.amazonaws.com/docker-stocks-web:latest"
+#docker pull $IMAGE
+#docker image tag $IMAGE dockerstocksweb_web:latest
 
-IMAGE="631686326988.dkr.ecr.us-east-1.amazonaws.com/dockerstocksweb_app:latest"
-docker pull $IMAGE
-docker image tag $IMAGE dockerstocksweb_app:latest
+#IMAGE="631686326988.dkr.ecr.us-east-1.amazonaws.com/dockerstocksweb_app:latest"
+#docker pull $IMAGE
+#docker image tag $IMAGE dockerstocksweb_app:latest
 
 source data/AWS.vars.txt
 DOCKER_COMPOSE_FILE="docker-compose.AWS.hosted.MongoDb.yaml"
