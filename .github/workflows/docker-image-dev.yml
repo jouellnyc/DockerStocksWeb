@@ -7,6 +7,8 @@ on:
   push:
     branches:
       - develop
+         paths-ignore:
+      - '**/**.md'
 
 jobs:
   build_image_and_push_to_ecr:
