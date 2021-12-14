@@ -30,7 +30,7 @@ jobs:
     - name: Build and tag Web image 
       env:
         ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
-        ECR_REPOSITORY: docker-stocks-web
+        ECR_REPOSITORY: docker_stocks_web_dev
         IMAGE_TAG: latest 
       run: |
         docker pull      $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -40,7 +40,7 @@ jobs:
     - name: Build and tag App image 
       env:
         ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
-        ECR_REPOSITORY: docker_stocks_app 
+        ECR_REPOSITORY: docker_stocks_app_dev 
         IMAGE_TAG: latest 
       run: |
         docker pull      $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
