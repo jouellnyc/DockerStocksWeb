@@ -1,6 +1,6 @@
-FROM python:3.7
+FROM python:3.9-slim-bullseye
 
-RUN apt-get update  -y && \ 
+RUN apt-get update  -y && \
     apt-get install -y --no-install-recommends vim \
     curl \
     net-tools \
@@ -9,7 +9,7 @@ RUN apt-get update  -y && \
     net-tools  &&  pip install --upgrade pip
 
 ENV WORKDIR /stocks/
-RUN mkdir /$WORKDIR/ 
+RUN mkdir /$WORKDIR/
 
 COPY requirements.txt /$WORKDIR/
 RUN pip3 install -r /$WORKDIR/requirements.txt
@@ -28,8 +28,7 @@ COPY external/gunicorn/gunicorn.conf.py /$WORKDIR/external/gunicorn/
 
 RUN chown -R nobody:  /$WORKDIR/
 COPY Docker/flask-docker-entrypoint.sh /usr/sbin/flask-docker-entrypoint.sh
-RUN chmod 755 /usr/sbin/flask-docker-entrypoint.sh 
-RUN rm /usr/bin/python3 && ln -s /usr/local/bin/python3 /usr/bin/python3
+RUN chmod 755 /usr/sbin/flask-docker-entrypoint.sh
 
 USER nobody
 ENTRYPOINT ["/usr/sbin/flask-docker-entrypoint.sh"]

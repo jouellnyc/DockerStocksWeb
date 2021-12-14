@@ -1,2 +1,5 @@
 https://medium.com/@betz.mark/ten-tips-for-debugging-docker-containers-cde4da841a1d
 https://vsupalov.com/debug-docker-container/
+https://githubmemory.com/repo/docker-slim/docker-slim/issues/97
+https://phoenixnap.com/kb/docker-run-override-entrypoint
+https://pythonspeed.com/docker/#base-image-and-dependencies
