@@ -24,15 +24,23 @@ jobs:
       id: jouell-stocks
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build and tag image 
+    - name: Build and tag Web image 
       env:
         ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
-        ECR_REPOSITORY: docker-stocks-web-dev
+        ECR_REPOSITORY: docker-stocks-web
         IMAGE_TAG: latest 
       run: |
+        docker pull      $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker image tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG docker_stocks_web:latest 
+
+    - name: Build and tag App image 
+      env:
+        ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
+        ECR_REPOSITORY: docker_stocks_app 
+        IMAGE_TAG: latest 
+      run: |
+        docker pull      $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker image tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG docker_stocks_app:latest 
         docker-compose -f docker-compose.AWS.hosted.MongoDb.yaml up -d 
-        docker tag dockerstocksweb_web:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker ps
         docker images
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
