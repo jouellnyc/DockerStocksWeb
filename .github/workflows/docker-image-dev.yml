@@ -45,6 +45,7 @@ jobs:
       run: |
         docker pull      $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker image tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG docker_stocks_app:latest 
+        docker-compose -f docker-compose.AWS.hosted.MongoDb.no.cloudwatch.yaml build 
         docker-compose -f docker-compose.AWS.hosted.MongoDb.no.cloudwatch.yaml up -d 
         docker ps
         docker images
