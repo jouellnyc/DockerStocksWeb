@@ -1,6 +1,3 @@
-# https://towardsaws.com/build-push-docker-image-to-aws-ecr-using-github-actions-8396888a8f9e
-# https://github.community/t/trigger-workflow-only-on-pull-request-merge/17359
-
 name: Dev Docker Nginx Image CI
 
 on:
