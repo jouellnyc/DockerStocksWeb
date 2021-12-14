@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-REPO="https://github.com/jouellnyc/DockerStocksWeb.git"
+source data/AWS.vars.txt
 
 ### Update Software and utils
 yum update -y
@@ -24,29 +24,30 @@ curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compos
 chmod +x /usr/local/bin/docker-compose
 ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
-### Start Build 
+### Start Docker and AWSlogsd
 service docker start
 chkconfig docker on
+
 service awslogsd start
 chkconfig awslogsd on
 
+### Start Build 
 GIT_DIR="/gitrepos/"
 mkdir -p $GIT_DIR
 cd $GIT_DIR
-git clone $REPO
+
+#*Vars
+git clone $GITHUB_REPO
 cd DockerStocksWeb
 
-REPO="631686326988.dkr.ecr.us-east-1.amazonaws.com"
+#*Vars
+docker pull       $AWS_ECR_REPO/$SHORT_WEB_IMAGE
+docker image tag  $AWS_ECR_REPO/$SHORT_WEB_IMAGE $SHORT_WEB_IMAGE
 
-SHORT_IMAGE="docker_stocks_web:latest"
-docker pull       $REPO/$SHORT_IMAGE
-docker image tag  $REPO/$SHORT_IMAGE $SHORT_IMAGE
+#*Vars
+docker pull       $AWS_ECR_REPO/$SHORT_APP_IMAGE
+docker image tag  $AWS_ECR_REPO/$SHORT_APP_IMAGE $SHORT_APP_IMAGE
 
-SHORT_IMAGE="docker_stocks_app:latest"
-docker pull       $REPO/$SHORT_IMAGE
-docker image tag  $REPO/$SHORT_IMAGE $SHORT_IMAGE
-
-source data/AWS.vars.txt
 DOCKER_COMPOSE_FILE="docker-compose.AWS.hosted.MongoDb.yaml"
 docker-compose -f $DOCKER_COMPOSE_FILE up -d
 

@@ -1,3 +1,12 @@
 #AVAIL ZONES
 export AWS_REGION="us-east-1"
 export AWS_DEFAULT_REGION="us-east-1"
+
+AWS_ECR_REPO="631686326988.dkr.ecr.us-east-1.amazonaws.com"
+
+#Docker Builds
+export SHORT_WEB_IMAGE="docker_stocks_web:latest"
+export SHORT_APP_IMAGE="docker_stocks_app:latest"
+
+#GitHub
+export GITHUB_REPO="https://github.com/jouellnyc/DockerStocksWeb.git"
