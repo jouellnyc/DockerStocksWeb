@@ -1,18 +1,12 @@
 FROM python:3.9-slim-bullseye
 
-RUN apt-get update  -y && \ 
-    apt-get install -y --no-install-recommends vim \
-    curl \
-    net-tools \
-    less \
-    telnet \
-    net-tools  &&  pip install --upgrade pip
+RUN apt-get update  -y  && rm -rf /var/lib/apt/lists/*
 
 ENV WORKDIR /stocks/
 RUN mkdir /$WORKDIR/ 
 
 COPY requirements.txt /$WORKDIR/
-RUN pip3 install -r /$WORKDIR/requirements.txt
+RUN pip3 install -r /$WORKDIR/requirements.txt && rm -rf  /root/.cache
 
 RUN mkdir /$WORKDIR/non-app/ &&  mkdir /$WORKDIR/static/ && mkdir /$WORKDIR/templates/ && mkdir /$WORKDIR/lib/
 RUN mkdir -p /$WORKDIR/external/gunicorn/
