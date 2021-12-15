@@ -10,3 +10,4 @@ export SHORT_APP_IMAGE="docker_stocks_app:latest"
 
 #GitHub
 export GITHUB_REPO="https://github.com/jouellnyc/DockerStocksWeb.git"
+
