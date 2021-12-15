@@ -1,6 +1,5 @@
 #!/bin/bash -x
 
-source data/AWS.vars.txt
 
 ### Update Software and utils
 yum update -y
@@ -32,6 +31,7 @@ service awslogsd start
 chkconfig awslogsd on
 
 ### Start Build 
+GITHUB_REPO="https://github.com/jouellnyc/DockerStocksWeb.git"
 GIT_DIR="/gitrepos/"
 mkdir -p $GIT_DIR
 cd $GIT_DIR
@@ -39,6 +39,7 @@ cd $GIT_DIR
 #*Vars
 git clone $GITHUB_REPO
 cd DockerStocksWeb
+source data/AWS.vars.txt
 
 #*Vars
 docker pull       $AWS_ECR_REPO/$SHORT_WEB_IMAGE
