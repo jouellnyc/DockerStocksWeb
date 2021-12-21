@@ -9,6 +9,6 @@ with open(file,'r') as fh:
                  ID=line.split('=')[1].replace(" ", "")
 
 with open('../aws_env','w') as fh:
-    fh.write(f"AWS_ACCESS_KEY_ID={ID}")
-    fh.write(f"AWS_SECRET_ACCESS_KEY={KEY}")
-    fh.write(f"AWS_DEFAULT_REGION=us-east-1")
+    fh.write(f"export AWS_ACCESS_KEY_ID={ID}")
+    fh.write(f"export AWS_SECRET_ACCESS_KEY={KEY}")
+    fh.write(f"export AWS_DEFAULT_REGION=us-east-1")

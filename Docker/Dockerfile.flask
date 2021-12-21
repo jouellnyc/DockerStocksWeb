@@ -1,6 +1,7 @@
 FROM python:3.9-slim-bullseye
 
-RUN apt-get update  -y  && rm -rf /var/lib/apt/lists/*
+COPY install-packages.sh .
+RUN ./install-packages.sh
 
 ENV WORKDIR /stocks
 ENV USER nobody
@@ -10,31 +11,18 @@ RUN usermod -d $WORKDIR -s /bin/bash $USER
 
 COPY requirements.txt /$WORKDIR/
 
-RUN apt-get update  -y && \
-    apt-get install -y --no-install-recommends vim \
-    curl \
-    net-tools \
-    less \
-    telnet \
-    unzip \
-    sudo \
-    net-tools  &&  pip install --upgrade pip
-
-RUN  cd /tmp &&  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" &&  unzip awscliv2.zip && sudo ./aws/install
-
-RUN pip3 install -r /$WORKDIR/requirements.txt && rm -rf  /root/.cache
-
+RUN pip install --upgrade pip && pip3 install -r /$WORKDIR/requirements.txt && rm -rf  /root/.cache
 RUN mkdir /$WORKDIR/non-app/ &&  mkdir /$WORKDIR/static/ && mkdir /$WORKDIR/templates/ && mkdir /$WORKDIR/lib/
 RUN mkdir -p /$WORKDIR/external/gunicorn/
 
-COPY stock_flask.py        /$WORKDIR/
-COPY static/               /$WORKDIR/static/
-COPY non-app/              /$WORKDIR/non-app/
-COPY templates/            /$WORKDIR/templates/
-COPY lib/                  /$WORKDIR/lib/
+COPY static/                     /$WORKDIR/static/
+COPY application/stock_flask.py  /$WORKDIR/
+COPY non-app/                    /$WORKDIR/non-app/
+COPY templates/                  /$WORKDIR/templates/
+COPY lib/                        /$WORKDIR/lib/
 COPY external/gunicorn/gunicorn.conf.py /$WORKDIR/external/gunicorn/
 
-RUN chown -R nobody:  /$WORKDIR/
+RUN chown -R nobody:             /$WORKDIR/
 COPY Docker/flask-docker-entrypoint.sh /usr/sbin/flask-docker-entrypoint.sh
 RUN chmod 755 /usr/sbin/flask-docker-entrypoint.sh 
 RUN ln -s /usr/local/bin/python3.9 /usr/bin/python3

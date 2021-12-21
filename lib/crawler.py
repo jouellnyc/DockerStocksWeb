@@ -14,7 +14,7 @@ from pymongo.errors import PyMongoError
 from millify import millify
 import pandas as pd
 
-from mongodb_local import MongoCli, StockDoesNotExist
+from mongodb import MongoCli, StockDoesNotExist
 from requestwrap import err_web
 from requests.exceptions import HTTPError
 
