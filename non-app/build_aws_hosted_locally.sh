@@ -1,6 +1,7 @@
 #!/bin/bash
 
 docker-compose  -f docker-compose.AWS.hosted.MongoDb.no.cloudwatch.yaml build
+docker-compose  -f docker-compose.AWS.hosted.MongoDb.no.cloudwatch.yaml up -d
 echo == Docker Images
 docker images
 REPO="631686326988.dkr.ecr.us-east-1.amazonaws.com"
