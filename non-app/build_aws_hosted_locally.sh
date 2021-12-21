@@ -1,6 +1,5 @@
 #!/bin/bash
 
-source data/AWS.vars.txt
 docker-compose  -f docker-compose.AWS.hosted.MongoDb.no.cloudwatch.yaml build
 echo == Docker Images
 docker images

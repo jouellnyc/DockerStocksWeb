@@ -11,7 +11,10 @@ import sys
 import json
 import urllib.parse
 
-from lib.getSecret import get_secret
+try:
+    from lib.getSecret import get_secret
+except ModuleNotFoundError:
+    from getSecret import get_secret
 from pymongo import MongoClient
 
 class StockDoesNotExist(Exception):
