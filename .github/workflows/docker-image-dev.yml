@@ -49,6 +49,8 @@ jobs:
         #
         docker-compose -f docker-compose.AWS.hosted.MongoDb.no.cloudwatch.yaml build 
         docker-compose -f docker-compose.AWS.hosted.MongoDb.no.cloudwatch.yaml up -d 
+        #
         docker ps
         docker images
+        #
         docker push $ECR_REGISTRY/$PROD_APP_REPO:$IMAGE_TAG 
