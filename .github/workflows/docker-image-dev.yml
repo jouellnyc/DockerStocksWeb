@@ -30,22 +30,25 @@ jobs:
     - name: Build and tag Web image 
       env:
         ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
-        ECR_REPOSITORY: docker_stocks_web_dev
+        DEV_WEB_REPO: docker_stocks_web_dev
+        PRD_WEB_REPO: docker_stocks_web
         IMAGE_TAG: latest 
       run: |
-        docker pull      $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker image tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG docker_stocks_web:latest 
-
+        docker pull      $ECR_REGISTRY/$DEV_WEB_REPO:$IMAGE_TAG
+        docker image tag $ECR_REGISTRY/$DEV_WEB_REPO:$IMAGE_TAG docker_stocks_web_dev:latest 
 
     - name: Build and tag App image 
       env:
         ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
-        ECR_REPOSITORY: docker_stocks_app_dev 
+        DEV_APP_REPO: docker_stocks_app_dev 
+        PRD_APP_REPO: docker_stocks
         IMAGE_TAG: latest 
       run: |
-        docker pull      $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker image tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG docker_stocks_app:latest 
+        docker pull      $ECR_REGISTRY/$DEV_APP_REPO:$IMAGE_TAG
+        docker image tag $ECR_REGISTRY/$DEV_APP_REPO:$IMAGE_TAG docker_stocks_app_dev:latest 
+        #
         docker-compose -f docker-compose.AWS.hosted.MongoDb.no.cloudwatch.yaml build 
         docker-compose -f docker-compose.AWS.hosted.MongoDb.no.cloudwatch.yaml up -d 
         docker ps
         docker images
+        docker push $ECR_REGISTRY/$PROD_APP_REPO:$IMAGE_TAG 
