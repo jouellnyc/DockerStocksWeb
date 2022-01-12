@@ -31,7 +31,7 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
         DEV_WEB_REPO: docker_stocks_web_dev
-        PRD_WEB_REPO: docker_stocks_web
+        PROD_WEB_REPO: docker_stocks_web
         IMAGE_TAG: latest 
       run: |
         docker pull      $ECR_REGISTRY/$DEV_WEB_REPO:$IMAGE_TAG
