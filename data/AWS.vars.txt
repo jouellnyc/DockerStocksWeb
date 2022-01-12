@@ -7,7 +7,8 @@ AWS_ECR_REPO="631686326988.dkr.ecr.us-east-1.amazonaws.com"
 #Docker Builds
 export SHORT_WEB_IMAGE="docker_stocks_web:latest"
 export SHORT_APP_IMAGE="docker_stocks_app:latest"
+export SHORT_WEB_IMAGE_DEV="docker_stocks_web_dev:latest"
+export SHORT_APP_IMAGE_DEV="docker_stocks_app_dev:latest"
 
 #GitHub
 export GITHUB_REPO="https://github.com/jouellnyc/DockerStocksWeb.git"
-
