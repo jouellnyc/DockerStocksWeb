@@ -41,26 +41,26 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.jouell-stocks.outputs.registry }}
         DEV_APP_REPO: docker_stocks_app_dev 
-        PRD_APP_REPO: docker_stocks
+        PROD_APP_REPO: docker_stocks
         IMAGE_TAG: latest 
       run: |
-        echo docker pull
+        echo '***' Docker pull
         docker pull      $ECR_REGISTRY/$DEV_APP_REPO:$IMAGE_TAG
         #
-        echo docker tag 
+        echo '***' Docker tag 
         docker image tag $ECR_REGISTRY/$DEV_APP_REPO:$IMAGE_TAG docker_stocks_app_dev:latest 
         #
-        echo Docker Compose Build
+        echo '***' Docker Compose Build
         docker-compose -f docker-compose.AWS.hosted.MongoDb.no.cloudwatch.yaml build 
         #
-        echo Docker Compose Up 
+        echo '***' Docker Compose Up 
         docker-compose -f docker-compose.AWS.hosted.MongoDb.no.cloudwatch.yaml up -d 
         #
-        echo Docker PS 
+        echo '***' Docker PS 
         docker ps
         #
-        echo Docker images
+        echo '***' Docker images
         docker images
         #
-        echo Docker push 
+        echo '***' Docker push 
         docker push $ECR_REGISTRY/$PROD_APP_REPO:$IMAGE_TAG 
