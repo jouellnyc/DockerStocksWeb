@@ -1,5 +1,3 @@
-![Last Build Workflow](https://github.com/jouellnyc/DockerStocksWeb/actions/workflows/docker-image.yml/badge.svg)
-
 # Historical Stock Data (With Growth Rates) 
 ![Stocks](non-app/stock_peek.gif)
 
@@ -251,5 +249,6 @@ To fully deploy automatically:
 - You'll need to setup AWS Secret Manager entries as well. See user_data.http.AWS.sh and getSecret.py.
 
 ## Warnings
-This project is mean to be a part of a DevOps/Python learning project and is unsecured by default.
+- This project is mean to be a part of a DevOps/Python learning project and is unsecured by default.
+- Images built from this report are likely to be large and cumbersome with Container Orchestration.
 
