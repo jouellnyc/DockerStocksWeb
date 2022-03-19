@@ -1,0 +1,5 @@
+Infra:
+  port: 27017
+  mongohost: docker_stocks_db_1
+  database: stocks
+  collection: data
