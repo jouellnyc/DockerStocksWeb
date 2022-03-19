@@ -9,36 +9,54 @@
 
 import sys
 import json
+import yaml
 import urllib.parse
 
+### Allow for local, same directory testing and usage
+
 try:
-    from lib.getSecret import get_secret
+    from lib.aws_secrets import get_aws_secrets
 except ModuleNotFoundError:
-    from getSecret import get_secret
+    from aws_secrets import get_aws_secrets
+
+try:
+    from lib.load_mongo_config import get_local_mongodb_config
+except ModuleNotFoundError:
+    from load_mongo_config import get_local_mongodb_config 
+
 from pymongo import MongoClient
+
 
 class StockDoesNotExist(Exception):
     pass
 
-class MongoCli:
-    def __init__(self, aws_secret, aws_region):
-        self.aws_secret    = aws_secret 
-        self.aws_region    = aws_region
-        self.mysecret      = self.GetSecrets()
-        self.collection    = urllib.parse.quote_plus(self.mysecret["collection"])
-        self.database      = urllib.parse.quote_plus(self.mysecret["database"])
-        self.mongousername = urllib.parse.quote_plus(self.mysecret["mongousername"])
-        self.mongopassword = urllib.parse.quote_plus(self.mysecret["mongopassword"])
-        self.mongohost     = urllib.parse.quote_plus(self.mysecret["mongohost"])
-        self.dbh = self.ConnectToMongo()
 
-    def GetSecrets(self):
+class MongoCli:
+    def __init__(self, mode=None):
+        if mode == 'AWS':
+            self.mysecret      = self.GetSecrets()
+            self.database      = urllib.parse.quote_plus(self.mysecret["database"])
+            self.collection    = urllib.parse.quote_plus(self.mysecret["collection"])
+            self.mongohost     = urllib.parse.quote_plus(self.mysecret["mongohost"])
+            self.mongousername = urllib.parse.quote_plus(self.mysecret["mongousername"])
+            self.mongopassword = urllib.parse.quote_plus(self.mysecret["mongopassword"])
+            self.client_connect_string = f"mongodb+srv://{self.mongousername}\
+            :{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
+        else:
+            self.database      = get_local_mongodb_config()['Infra']['database']
+            self.collection    = get_local_mongodb_config()['Infra']['collection']
+            self.mongohost     = get_local_mongodb_config()['Infra']['mongohost']
+            self.port          = get_local_mongodb_config()['Infra']['port']
+            self.client_connect_string = (self.mongohost, self.port)
+        self.dbh = self.connect_to_mongo()
+
+    def get_aws_secrets(self):
         try:
             return json.loads(get_secret(self.aws_secret, self.aws_region))
         except Exception:
             raise
 
-    def ConnectToMongo(self):
+    def connect_to_mongo(self):
         """
         Return a database_handle to the caller
 
@@ -55,8 +73,9 @@ class MongoCli:
         """
 
         try:
-            url = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
-            client = MongoClient(url)
+            client = MongoClient(self.mongohost, self.port)
+            #client = MongoClient('docker_stocks_db_1', 27017)
+            #client = MongoClient('172.25.0.2', 27017)
             client.server_info()
             database_handle = client[self.database]
             return database_handle[self.collection]
@@ -131,4 +150,3 @@ class MongoCli:
     def drop_db(self):
         """  Drop all documents (testing/etc.) """
         return self.dbh.drop()
-

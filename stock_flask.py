@@ -28,7 +28,6 @@ from pymongo.errors import OperationFailure
 
 from lib import mongodb
 
-
 app = Flask(__name__)
 
 # Logging A la:

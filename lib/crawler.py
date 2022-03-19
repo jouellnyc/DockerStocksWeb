@@ -25,6 +25,7 @@ pd.options.mode.chained_assignment = None
 api_key = "XXXXXXXXXXX"
 format = "pandas"
 alpha = FundamentalData(key=api_key, output_format=format, indexing_type="integer")
+NA ='NA'
 
 
 class NotOldEnough(Exception):
@@ -42,6 +43,8 @@ class GoodCrawl(Exception):
 class ZeroRevenue(Exception):
     pass
 
+class BadRevenueData(Exception):
+    pass
 
 class FlywheelError(Exception):
     pass
@@ -222,6 +225,9 @@ def CrawlStock(stock):
     """ millify() and mk_pretty() the data and re-arrange df """
     for year in df.to_dict("records"):
 
+        if year["totalRevenue"] < 1:
+            raise BadRevenueData
+
         mongo_doc["Years"][year["Years_From"]] = {
             "Date": year["fiscalDateEnding"],
             "Revenue": float(millify(year["totalRevenue"], precision=2)[:-1]),
@@ -259,14 +265,24 @@ def CrawlStock(stock):
     try:
         PETTM = int(float(overview_data["TrailingPE"].values[0]))
     except ValueError:
-        PETTM = NA
-    price2sales = float(overview_data["PriceToSalesRatioTTM"].values[0])
-    price2book = float(overview_data["PriceToBookRatio"].values[0])
-    book_value = overview_data["BookValue"].values[0]
-    if book_value.startswith("None"):
-        mongo_doc["BookValue"] = 0.0
-    else:
-        mongo_doc["BookValue"] = float(book_value)
+        PETTM = NA 
+
+    try:
+        price2sales = float(overview_data["PriceToSalesRatioTTM"].values[0])
+    except ValueError:
+        price2sales = NA
+
+    try:
+        price2book = float(overview_data["PriceToBookRatio"].values[0])
+    except ValueError:
+        price2book = NA
+
+    try:
+        book_value = float(overview_data["BookValue"].values[0])
+    except ValueError:
+        book_value = NA
+    mongo_doc["BookValue"] = book_value 
+
 
     """ Add each as a key:value pair ... """
     if revenue_ttm > 0:
@@ -279,8 +295,17 @@ def CrawlStock(stock):
 
     mongo_doc["Currency"] = currency
     mongo_doc["TrailingPE"] = PETTM
-    mongo_doc["PriceToSalesTTM"] = millify(price2sales, precision=2)
-    mongo_doc["PriceToBookRatio"] = float(millify(price2book, precision=2))
+
+    try:
+        mongo_doc["PriceToSalesTTM"] = millify(price2sales, precision=2)
+    except ValueError:
+        mongo_doc["PriceToSalesTTM"] = NA
+
+    try:
+        mongo_doc["PriceToBookRatio"] = float(millify(price2book, precision=2))
+    except ValueError:
+        mongo_doc["PriceToBookRatio"] = NA
+
     mongo_doc["DateCrawled"] = datetime.datetime.utcnow()
     mongo_doc["Success"] = "Yes"
     mongo_doc["Crawled_By"] = my_crawlid
@@ -319,7 +344,7 @@ if __name__ == "__main__":
     try:
 
         """ Connect to Mongo... or not """
-        mg = MongoCli("Prod-Stocks","us-east-1")
+        mg = MongoCli()
 
         """ mode == all  -- Crawl from the first alphabetically    """
         """ mode == date -- Crawl the oldest stocks first          """
