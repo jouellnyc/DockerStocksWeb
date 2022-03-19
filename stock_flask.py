@@ -2,7 +2,7 @@
 
 """
 
-app.py - Main Flask application file
+Main Flask application file
 
 - This script is the WSGI form parser/validator.
 
