@@ -30,10 +30,14 @@ from lib import mongodb
 from lib.mongodb import StockDoesNotExist
 
 app = Flask(__name__)
-# Logging A la:
-# https://trstringer.com/logging-flask-gunicorn-the-manageable-way/
-# https://stackoverflow.com/questions/27687867/is-there-a-way-to-log-python-print-statements-in-gunicorn
 
+"""
+
+ Logging A la:
+ https://trstringer.com/logging-flask-gunicorn-the-manageable-way/
+ https://stackoverflow.com/questions/27687867/is-there-a-way-to-log-python-print-statements-in-gunicorn
+
+"""
 if __name__ != "__main__":
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
