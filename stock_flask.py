@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 """
+
 app.py - Main Flask application file
 
 - This script is the WSGI form parser/validator.
@@ -8,7 +9,7 @@ app.py - Main Flask application file
 - This script requires Flask to be installed.
 
 - It expects to be passed:
-    - stock # from nginx html form
+    - stock name from nginx html form
 
 - It sends all returnables to return flask's render_template
 
@@ -21,15 +22,14 @@ import flask
 from flask import Flask
 from flask import request
 from flask import render_template
-
 from pymongo.errors import ConnectionFailure
 from pymongo.errors import ServerSelectionTimeoutError
 from pymongo.errors import OperationFailure
 
 from lib import mongodb
+from lib.mongodb import StockDoesNotExist
 
 app = Flask(__name__)
-
 # Logging A la:
 # https://trstringer.com/logging-flask-gunicorn-the-manageable-way/
 # https://stackoverflow.com/questions/27687867/is-there-a-way-to-log-python-print-statements-in-gunicorn
@@ -38,7 +38,6 @@ if __name__ != "__main__":
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
-
 
 @app.route("/search/", methods=["POST", "GET"])
 def get_data():
@@ -64,15 +63,17 @@ def get_data():
         app.logger.exception(msg)
         flask.abort(500)
     else:
-        stock = str(stock).upper()
         try:
-            # Master Dictionary with all the Data
+            stock = str(stock).upper()
             mongocli = mongodb.MongoCli()
             stock_data = mongocli.lookup_stock(stock)
             if len(stock_data) < 2:
                 return render_template("dne_stock.html", stock=stock)
             if stock_data['Error']:
                 return render_template("dne_stock.html", stock=stock)
+        except mongodb.StockDoesNotExist as e:
+            app.logger.error(str(e))
+            return render_template("dne_stock.html", stock=stock)
         except ValueError as e:
             app.logger.error(str(e))
             return render_template("dne_stock.html", stock=stock)
