@@ -34,7 +34,7 @@ class StockDoesNotExist(Exception):
 class MongoCli:
     def __init__(self, mode=None):
         if mode == 'AWS':
-            self.mysecret      = self.GetSecrets()
+            self.mysecret      = self.get_aws_secrets()
             self.database      = urllib.parse.quote_plus(self.mysecret["database"])
             self.collection    = urllib.parse.quote_plus(self.mysecret["collection"])
             self.mongohost     = urllib.parse.quote_plus(self.mysecret["mongohost"])
