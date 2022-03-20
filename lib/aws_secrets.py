@@ -3,7 +3,10 @@
 import boto3
 import base64
 import json
+
 from botocore.exceptions import ClientError
+
+from load_mongo_config import get_aws_mongodb_config 
 
 
 def get_aws_secrets(secret_name, region_name):
@@ -51,7 +54,9 @@ def get_aws_secrets(secret_name, region_name):
 
 
 if __name__ == "__main__":
-    mysecret = json.loads(get_aws_secrets("Prod-Stocks", "us-east-1"))
+    region        = get_aws_mongodb_config()[1]['region']
+    secret        = get_aws_mongodb_config()[0]['secret']
+    mysecret      = json.loads(get_aws_secrets(secret, region)
     mongousername = mysecret["mongousername"]
     mongopassword = mysecret["mongopassword"]
     mongohost = mysecret["mongohost"]
