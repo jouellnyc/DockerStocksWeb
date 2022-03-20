@@ -69,7 +69,7 @@ def get_data():
     else:
         try:
             stock = str(stock).upper()
-            mongocli = mongodb.MongoCli()
+            mongocli = mongodb.MongoCli('AWS')
             stock_data = mongocli.lookup_stock(stock)
             if len(stock_data) < 2:
                 return render_template("dne_stock.html", stock=stock)
