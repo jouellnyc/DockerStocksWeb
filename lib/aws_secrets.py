@@ -6,7 +6,10 @@ import json
 
 from botocore.exceptions import ClientError
 
-from load_mongo_config import get_aws_mongodb_config 
+try:
+    from load_mongo_config import get_aws_mongodb_config
+except ModuleNotFoundError:
+    from lib.load_mongo_config import get_aws_mongodb_config
 
 
 def get_aws_secrets(secret_name, region_name):
@@ -56,9 +59,8 @@ def get_aws_secrets(secret_name, region_name):
 if __name__ == "__main__":
     region        = get_aws_mongodb_config()[1]['region']
     secret        = get_aws_mongodb_config()[0]['secret']
-    mysecret      = json.loads(get_aws_secrets(secret, region)
+    mysecret      = json.loads(get_aws_secrets(secret, region))
     mongousername = mysecret["mongousername"]
     mongopassword = mysecret["mongopassword"]
     mongohost = mysecret["mongohost"]
     print(mongousername, mongopassword, mongohost)
-
