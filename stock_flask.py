@@ -57,7 +57,7 @@ def get_data():
         querystring = request.args
         app.logger.debug(f"querystring: {querystring}")
         stock = querystring.get("stock")
-        if len(str(stock)) < 1:
+        if not str(stock):
             raise ValueError
     except (TypeError, ValueError):
         app.logger.error(f"Invalid data: querystring: {querystring} : invalid")
@@ -82,18 +82,15 @@ def get_data():
             app.logger.error(str(e))
             return render_template("dne_stock.html", stock=stock)
         except OperationFailure as e:
-            msg = "PROD FAILURE! "
-            msg += str(e)
+            msg = "PROD FAILURE! " + str(e)
             app.logger.error(msg)
             return render_template("dne_stock.html", stock=stock)
         except ConnectionFailure as e:
-            msg = "Connect FAILURE! "
-            msg += str(e)
+            msg = "Connect FAILURE! " + str(e)
             app.logger.error(msg)
             return render_template("dne_stock.html", stock=stock)
         except ServerSelectionTimeoutError as e:
-            msg = "Server FAILURE! "
-            msg += str(e)
+            msg = "Server FAILURE! " + str(e)
             app.logger.error(msg)
             return render_template("dne_stock.html", stock=stock)
         else:
