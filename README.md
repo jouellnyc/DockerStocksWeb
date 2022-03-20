@@ -242,7 +242,8 @@ Flask and Mongodb will be on the same bridged docker network reachable by docker
 This project defaults to a local MongoDB -- up and running after 'git clone'.
 
 To use AWS:
-- You'd need a custom MongoDB entry specific to your account  -- (See https://www.mongodb.com/python) 
+- Change Mode to 'AWS' in mongo_infra_prod_config.yaml
+- You'd need a custom Mongo Atlas entry specific to your account  -- (See https://www.mongodb.com/python) 
 - If using https://github.com/jouellnyc/AWS/tree/master/boto3/blue_green_deploy, modify the variable 'user_data_file' in 'prod_vpc_lb_builder.py' to point to  user_data.http.AWS.sh
 
 To fully deploy automatically:
