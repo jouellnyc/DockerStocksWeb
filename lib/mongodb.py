@@ -46,7 +46,7 @@ class MongoCli:
             self.collection    = get_local_mongodb_config()['Infra']['collection']
             self.mongohost     = get_local_mongodb_config()['Infra']['mongohost']
             self.port          = get_local_mongodb_config()['Infra']['port']
-            self.client_connect_string = (self.mongohost, self.port)
+            self.client_connect_string = (f"mongodb://{self.mongohost}:{self.port}")
         self.dbh = self.connect_to_mongo()
 
     def connect_to_mongo(self):
@@ -66,11 +66,7 @@ class MongoCli:
         """
 
         try:
-            print(self.client_connect_string)
             client = MongoClient(self.client_connect_string)
-            ###client = MongoClient(self.mongohost, self.port)
-            #client = MongoClient('docker_stocks_db_1', 27017)
-            #client = MongoClient('172.25.0.2', 27017)
             client.server_info()
             database_handle = client[self.database]
             return database_handle[self.collection]
@@ -145,4 +141,3 @@ class MongoCli:
     def drop_db(self):
         """  Drop all documents (testing/etc.) """
         return self.dbh.drop()
-
