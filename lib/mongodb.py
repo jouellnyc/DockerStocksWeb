@@ -20,9 +20,10 @@ except ModuleNotFoundError:
     from     aws_secrets import get_aws_secrets
 
 try:
-    from lib.load_mongo_config import using_aws, get_local_mongodb_config
+    from lib.load_mongo_config import using_aws, get_local_mongodb_config, get_aws_mongodb_config
 except ModuleNotFoundError:
-    from     load_mongo_config import using_aws, get_local_mongodb_config
+    from     load_mongo_config import using_aws, get_local_mongodb_config, get_aws_mongodb_config
+
 
 from pymongo import MongoClient
 
