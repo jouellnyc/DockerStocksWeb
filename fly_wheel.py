@@ -36,9 +36,9 @@ if __name__ != "__main__":
 def get_data():
         
     global all_stocks
-    
+
     while all_stocks:
-        stock = [ all_stocks.pop() for x in range(batch_size ) ]
+        stock = [all_stocks.pop() for _ in range(batch_size )]
         return jsonify(NextBatch=stock)
         
 if __name__ == "__main__":
