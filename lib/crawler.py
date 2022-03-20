@@ -256,7 +256,7 @@ def CrawlStock(stock):
     #market_cap is a string 'None', not the python None.
     if market_cap.startswith('None'):
         mongo_doc["Market_Cap"] = 'NA'
-    else:    
+    else:
         mongo_doc["Market_Cap"] = millify(market_cap, precision=2)
         mongo_doc["Market_Cap_Denom"] = mongo_doc["Market_Cap"][-1]
         mongo_doc["Market_Cap"] = float(mongo_doc["Market_Cap"][:-1])
@@ -265,7 +265,7 @@ def CrawlStock(stock):
     try:
         PETTM = int(float(overview_data["TrailingPE"].values[0]))
     except ValueError:
-        PETTM = NA 
+        PETTM = NA
 
     try:
         price2sales = float(overview_data["PriceToSalesRatioTTM"].values[0])
@@ -281,7 +281,7 @@ def CrawlStock(stock):
         book_value = float(overview_data["BookValue"].values[0])
     except ValueError:
         book_value = NA
-    mongo_doc["BookValue"] = book_value 
+    mongo_doc["BookValue"] = book_value
 
 
     """ Add each as a key:value pair ... """
@@ -344,7 +344,7 @@ if __name__ == "__main__":
     try:
 
         """ Connect to Mongo... or not """
-        mg = MongoCli()
+        mg = MongoCli('AWS')
 
         """ mode == all  -- Crawl from the first alphabetically    """
         """ mode == date -- Crawl the oldest stocks first          """

@@ -22,7 +22,7 @@ except ModuleNotFoundError:
 try:
     from lib.load_mongo_config import get_local_mongodb_config
 except ModuleNotFoundError:
-    from load_mongo_config import get_local_mongodb_config 
+    from load_mongo_config import get_local_mongodb_config
 
 from pymongo import MongoClient
 
@@ -34,14 +34,13 @@ class StockDoesNotExist(Exception):
 class MongoCli:
     def __init__(self, mode=None):
         if mode == 'AWS':
-            self.mysecret      = self.get_aws_secrets()
+            self.mysecret      = json.loads(get_aws_secrets("Prod-Stocks", "us-east-1"))
             self.database      = urllib.parse.quote_plus(self.mysecret["database"])
             self.collection    = urllib.parse.quote_plus(self.mysecret["collection"])
             self.mongohost     = urllib.parse.quote_plus(self.mysecret["mongohost"])
             self.mongousername = urllib.parse.quote_plus(self.mysecret["mongousername"])
             self.mongopassword = urllib.parse.quote_plus(self.mysecret["mongopassword"])
-            self.client_connect_string = f"mongodb+srv://{self.mongousername}\
-            :{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
+            self.client_connect_string = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
         else:
             self.database      = get_local_mongodb_config()['Infra']['database']
             self.collection    = get_local_mongodb_config()['Infra']['collection']
@@ -49,12 +48,6 @@ class MongoCli:
             self.port          = get_local_mongodb_config()['Infra']['port']
             self.client_connect_string = (self.mongohost, self.port)
         self.dbh = self.connect_to_mongo()
-
-    def get_aws_secrets(self):
-        try:
-            return json.loads(get_secret(self.aws_secret, self.aws_region))
-        except Exception:
-            raise
 
     def connect_to_mongo(self):
         """
@@ -73,7 +66,9 @@ class MongoCli:
         """
 
         try:
-            client = MongoClient(self.mongohost, self.port)
+            print(self.client_connect_string)
+            client = MongoClient(self.client_connect_string)
+            ###client = MongoClient(self.mongohost, self.port)
             #client = MongoClient('docker_stocks_db_1', 27017)
             #client = MongoClient('172.25.0.2', 27017)
             client.server_info()
@@ -150,3 +145,4 @@ class MongoCli:
     def drop_db(self):
         """  Drop all documents (testing/etc.) """
         return self.dbh.drop()
+

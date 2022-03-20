@@ -51,7 +51,7 @@ def get_aws_secrets(secret_name, region_name):
 
 
 if __name__ == "__main__":
-    mysecret = json.loads(get_secret("Prod-Stocks", "us-east-1"))
+    mysecret = json.loads(get_aws_secrets("Prod-Stocks", "us-east-1"))
     mongousername = mysecret["mongousername"]
     mongopassword = mysecret["mongopassword"]
     mongohost = mysecret["mongohost"]
