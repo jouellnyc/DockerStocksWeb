@@ -11,9 +11,7 @@ def get_mongodb_config():
             return yaml.safe_load(file)
 
 def using_aws():
-    if get_mongodb_config()['Mode'] == 'AWS':
-        return True
-    return False
+    return get_mongodb_config()['Mode'] == 'AWS'
 
 def get_local_mongodb_config():
     return get_mongodb_config()['LocalInfra']
