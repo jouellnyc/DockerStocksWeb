@@ -374,6 +374,8 @@ if __name__ == "__main__":
 
     count = 1
     print(all_stocks)
+
+    date = datetime.datetime.utcnow()
     for stock in all_stocks:
         try:
 
@@ -400,7 +402,7 @@ if __name__ == "__main__":
             continue
 
         except ZeroRevenue:
-            msg = "Zero Revenue"
+            msg = f"Zero Revenue - {date} - "
             mg.update_as_error(stock, msg)
             print(msg) if debug else None
             print(f"Updating {stock} as the lastest stock\n")
@@ -409,7 +411,7 @@ if __name__ == "__main__":
             continue
 
         except KeyError as e:
-            msg = "Likely a Data Issue"
+            msg = f"Likely a Data Issue - {date} -"
             mg.update_as_error(stock, f"{msg} -- {e}")
             print(msg)
             print(f"Updating {stock} as the lastest stock\n")
@@ -431,7 +433,7 @@ if __name__ == "__main__":
                 sleepit(pause)
                 continue
             else:
-                msg = "Unhandled Value Error"
+                msg = f"Unhandled Value Error - {date} -"
                 mg.update_as_error(stock, f"{msg} -- {e}")
                 print(f"Updating {stock} as the lastest stock\n")
                 mg.update_latest_stock(stock)
