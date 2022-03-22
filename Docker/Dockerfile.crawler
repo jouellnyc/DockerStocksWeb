@@ -24,6 +24,8 @@ RUN mkdir /$WORKDIR/non-app/   && \
 
 COPY non-app/  /$WORKDIR/non-app/
 COPY lib/      /$WORKDIR/lib/
+COPY mongo_infra_prod_config.yaml     /$WORKDIR/
+
 
 COPY Docker/$MY_ENTRY  /usr/sbin/$MY_ENTRY
 
