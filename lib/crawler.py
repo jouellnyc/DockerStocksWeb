@@ -43,6 +43,9 @@ class GoodCrawl(Exception):
 class ZeroRevenue(Exception):
     pass
 
+class ZeroNetIncome(Exception):
+    pass
+
 class BadRevenueData(Exception):
     pass
 
@@ -185,6 +188,15 @@ def CrawlStock(stock):
     ):
         raise ZeroRevenue
 
+    if (
+        (df["netIncome"].iloc[0] == "0")
+        or (df["netIncome"].iloc[0] == 0)
+        or (df["netIncome"].iloc[-1] == "0")
+        or (df["netIncome"].iloc[-1] == 0)
+    ):
+        raise ZeroNetIncome
+
+
     """  Set data to numbers from strings """
     df[["totalRevenue", "netIncome"]] = df[["totalRevenue", "netIncome"]].apply(
         pd.to_numeric
@@ -222,6 +234,7 @@ def CrawlStock(stock):
 
     """ Setup our mongo doc as a hash to prepare to send to Mongo """
     mongo_doc = {'Stock': stock, 'Error': None, 'Years': {}}
+
     """ millify() and mk_pretty() the data and re-arrange df """
     for year in df.to_dict("records"):
 
@@ -403,6 +416,15 @@ if __name__ == "__main__":
 
         except ZeroRevenue:
             msg = f"Zero Revenue - {date} - "
+            mg.update_as_error(stock, msg)
+            print(msg) if debug else None
+            print(f"Updating {stock} as the lastest stock\n")
+            print(mg.update_latest_stock(stock))
+            sleepit(pause)
+            continue
+
+        except ZeroNetIncome:
+            msg = f"Zero NetIncome - {date} - "
             mg.update_as_error(stock, msg)
             print(msg) if debug else None
             print(f"Updating {stock} as the lastest stock\n")
