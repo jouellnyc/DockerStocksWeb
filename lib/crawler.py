@@ -49,6 +49,9 @@ class ZeroNetIncome(Exception):
 class BadRevenueData(Exception):
     pass
 
+class BadIncomeData(Exception):
+    pass
+
 class FlywheelError(Exception):
     pass
 
@@ -171,8 +174,15 @@ def CrawlStock(stock):
     print(f"Connecting to Alpha Vantage for {stock}")
     """ Pull Down Income Data from Alpha Vantage """
     income_data, stock_name = alpha.get_income_statement_annual(stock)
-    income_data.replace("None", 0, inplace=True)
-    currency = income_data["reportedCurrency"].values[0]
+    if len(income_data) < 2:
+        raise BadIncomeData
+    else:
+        income_data.replace("None", 0, inplace=True)
+
+    try:
+        currency = income_data["reportedCurrency"].values[0]
+    except KeyError:
+        currency = NA
 
     """ Setup our panda dataframe """
     df = income_data[["fiscalDateEnding", "totalRevenue", "netIncome"]]
@@ -432,6 +442,15 @@ if __name__ == "__main__":
             sleepit(pause)
             continue
 
+        except BadIncomeData:
+            msg = f"Bad  NetIncome - {date} - "
+            mg.update_as_error(stock, msg)
+            print(msg) if debug else None
+            print(f"Updating {stock} as the lastest stock\n")
+            print(mg.update_latest_stock(stock))
+            sleepit(pause)
+            continue
+
         except KeyError as e:
             msg = f"Likely a Data Issue - {date} -"
             mg.update_as_error(stock, f"{msg} -- {e}")
@@ -473,5 +492,7 @@ if __name__ == "__main__":
             print(traceback.format_exc())
             sleepit(pause)
             continue
+
         finally:
             count += 1
+
