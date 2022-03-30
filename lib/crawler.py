@@ -22,10 +22,10 @@ from requests.exceptions import HTTPError
 pd.options.mode.chained_assignment = None
 
 
-api_key = "XXXXXXXXXXX"
 format = "pandas"
 alpha = FundamentalData(key=api_key, output_format=format, indexing_type="integer")
 NA ='NA'
+api_key ="XXXXXXXXXXX"
 
 
 class NotOldEnough(Exception):
@@ -383,6 +383,7 @@ if __name__ == "__main__":
                 all_stocks = mg.dump_all_stocks_sorted_by_date()
             elif namespace.mode == "flywheel":
                 all_stocks = GetNextStockBatch()
+                api_key = my_crawlid.upper()
             elif namespace.mode == "last":
                 all_stocks = mg.dump_recent_stocks()
 
