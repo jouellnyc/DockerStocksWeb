@@ -112,7 +112,7 @@ def GetNextStockBatch(count=0, max=5, pause=60):
 
     try:
 
-        stock_json = err_web("http://0:9001/stocks/").json()
+        stock_json = err_web("http://54.235.28.102:9001/stocks/").json()
         stocks = stock_json["NextBatch"]
 
     except HTTPError:
