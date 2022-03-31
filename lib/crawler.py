@@ -22,14 +22,6 @@ from requests.exceptions import HTTPError
 pd.options.mode.chained_assignment = None
 
 
-format = "pandas"
-api_key ="None"
-my_crawlid = gen_crawlid()
-api_key = api_key or  my_crawlid.upper()
-alpha = FundamentalData(key=api_key, output_format=format, indexing_type="integer")
-NA ='NA'
-
-
 class NotOldEnough(Exception):
     pass
 
@@ -347,6 +339,13 @@ def CrawlStock(stock):
 
 
 if __name__ == "__main__":
+
+    format = "pandas"
+    api_key ="None"
+    my_crawlid = gen_crawlid()
+    api_key = api_key or  my_crawlid.upper()
+    alpha = FundamentalData(key=api_key, output_format=format, indexing_type="integer")
+    NA ='NA'
 
     # Multiple crawlers will step on each other if set
     pause = 35
