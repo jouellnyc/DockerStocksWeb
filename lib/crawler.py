@@ -105,8 +105,8 @@ def GetNextStockBatch(count=0, max=5, pause=60):
     """ before raising a FlywheelError              """
 
     try:
-
-        stock_json = err_web("http://54.87.52.33:9001/stocks/").json()
+        #TBD: Can we please stop this hard code and put it in a yaml?
+        stock_json = err_web("http://flywheel.justgrowthrates.com:9001/stocks/").json()
         stocks = stock_json["NextBatch"]
 
     except HTTPError:
