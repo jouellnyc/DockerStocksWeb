@@ -8,7 +8,7 @@ yum -y install python3
 pip3 install boto3
 yum -y install awslogs
 yum -y install telnet 
-yum -y install pyyaml
+yum -y install jq 
 
 amazon-linux-extras install docker
 
