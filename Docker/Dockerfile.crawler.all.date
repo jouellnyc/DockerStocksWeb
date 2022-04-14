@@ -27,7 +27,7 @@ COPY lib/      /$WORKDIR/lib/
 COPY mongo_infra_prod_config.yaml     /$WORKDIR/
 
 
-COPY data/$MY_ENTRY  /usr/sbin/$MY_ENTRY
+COPY Docker/$MY_ENTRY  /usr/sbin/$MY_ENTRY
 
 RUN chown -R nobody:  /$WORKDIR/  &&     \
     chmod 755 /usr/sbin/$MY_ENTRY &&     \
