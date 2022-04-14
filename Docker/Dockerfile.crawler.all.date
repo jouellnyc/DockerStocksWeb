@@ -1,7 +1,7 @@
 FROM python:3.7
 
 ARG WORKDIR=/stocks/
-ARG MY_ENTRY=crawler.entry.one_by_date.sh
+ARG MY_ENTRY=crawler_entry_one_by_date.sh
 
 ARG MY_PY3=/usr/bin/python3
 
