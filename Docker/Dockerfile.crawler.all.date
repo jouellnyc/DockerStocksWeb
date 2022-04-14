@@ -1,7 +1,7 @@
 FROM python:3.7
 
 ARG WORKDIR=/stocks/
-ARG MY_ENTRY=user_data.crawler.all.date.AWS.sh
+ARG MY_ENTRY=crawler.entry.one_by_date.sh
 
 ARG MY_PY3=/usr/bin/python3
 
@@ -28,7 +28,7 @@ COPY lib/      /$WORKDIR/lib/
 COPY mongo_infra_prod_config.yaml     /$WORKDIR/
 
 
-COPY data/$MY_ENTRY  /usr/sbin/$MY_ENTRY
+COPY Docker/$MY_ENTRY  /usr/sbin/$MY_ENTRY
 
 RUN chown -R nobody:  /$WORKDIR/  &&     \
     chmod 755 /usr/sbin/$MY_ENTRY &&     \
