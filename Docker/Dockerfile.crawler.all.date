@@ -35,4 +35,4 @@ RUN chown -R nobody:  /$WORKDIR/  &&     \
     ln -s /usr/local/bin/python3 $MY_PY3
 
 USER nobody
-ENTRYPOINT /usr/sbin/crawler.entry.sh
+ENTRYPOINT /usr/sbin/$MY_ENTRY
