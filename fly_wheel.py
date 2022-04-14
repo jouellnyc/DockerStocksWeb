@@ -15,10 +15,11 @@ import logging
 from flask import Flask, jsonify
 
 from lib import mongodb
-sys.path.insert(0, 'lib')
+
+sys.path.insert(0, "lib")
 
 app = Flask(__name__)
-mg = mongodb.MongoCli()    
+mg = mongodb.MongoCli()
 all_stocks = mg.dump_all_stocks_sorted_by_date()
 batch_size = 50
 
@@ -31,15 +32,16 @@ if __name__ != "__main__":
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
-    
+
 @app.route("/stocks/", methods=["POST", "GET"])
 def get_data():
-        
+
     global all_stocks
 
     while all_stocks:
-        stock = [all_stocks.pop() for _ in range(batch_size )]
+        stock = [all_stocks.pop() for _ in range(batch_size)]
         return jsonify(NextBatch=stock)
-        
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=9001)

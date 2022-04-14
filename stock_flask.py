@@ -43,6 +43,7 @@ if __name__ != "__main__":
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
+
 @app.route("/search/", methods=["POST", "GET"])
 def get_data():
     """
@@ -63,7 +64,7 @@ def get_data():
         app.logger.error(f"Invalid data: querystring: {querystring} : invalid")
         return render_template("notastock.html", stock=stock)
     except Exception as e:
-        msg = f'Bug: querystring:{querystring}, Error: {e}'
+        msg = f"Bug: querystring:{querystring}, Error: {e}"
         app.logger.exception(msg)
         flask.abort(500)
     else:
@@ -73,7 +74,7 @@ def get_data():
             stock_data = mongocli.lookup_stock(stock)
             if len(stock_data) < 2:
                 return render_template("dne_stock.html", stock=stock)
-            if stock_data['Error']:
+            if stock_data["Error"]:
                 return render_template("dne_stock.html", stock=stock)
         except mongodb.StockDoesNotExist as e:
             app.logger.error(str(e))
