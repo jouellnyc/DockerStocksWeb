@@ -38,4 +38,4 @@ RUN chown -R nobody:  /$WORKDIR/  &&     \
 
 USER nobody
 #ENTRYPOINT /usr/sbin/$MY_ENTRY
-#ENTRYPOINT /tmp/$MY_ENTRY
+ENTRYPOINT /tmp/$MY_ENTRY
