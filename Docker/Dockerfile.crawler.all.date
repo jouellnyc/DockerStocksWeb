@@ -28,7 +28,8 @@ COPY lib/      /$WORKDIR/lib/
 COPY mongo_infra_prod_config.yaml     /$WORKDIR/
 
 
-COPY Docker/$MY_ENTRY  /usr/sbin/$MY_ENTRY
+#COPY Docker/$MY_ENTRY  /usr/sbin/$MY_ENTRY
+COPY Docker/$MY_ENTRY  /tmp/$MY_ENTRY
 
 RUN chown -R nobody:  /$WORKDIR/  &&     \
     chmod 755 /usr/sbin/$MY_ENTRY &&     \
@@ -36,4 +37,5 @@ RUN chown -R nobody:  /$WORKDIR/  &&     \
     ln -s /usr/local/bin/python3 $MY_PY3
 
 USER nobody
-ENTRYPOINT /usr/sbin/$MY_ENTRY
+#ENTRYPOINT /usr/sbin/$MY_ENTRY
+#ENTRYPOINT /tmp/$MY_ENTRY
