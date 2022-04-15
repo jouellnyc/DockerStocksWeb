@@ -1,9 +1,6 @@
 FROM python:3.7
 
 ARG WORKDIR=/stocks/
-ARG MY_CRAWL=crawler_entry_one_by_date.sh
-ARG MY_ENTRY=/tmp/"${MY_CRAWL}"
-
 ARG MY_PY3=/usr/bin/python3
 
 RUN apt-get update  -y && \
@@ -14,9 +11,9 @@ RUN apt-get update  -y && \
     telnet \
     net-tools  &&  pip install --upgrade pip
 
-RUN mkdir /$WORKDIR/
+RUN  mkdir /$WORKDIR/
 COPY requirements.txt /$WORKDIR/
-RUN pip3 install -r /$WORKDIR/requirements.txt
+RUN  pip3 install -r /$WORKDIR/requirements.txt
 
 RUN mkdir /$WORKDIR/non-app/   && \
     mkdir /$WORKDIR/static/    && \
@@ -28,12 +25,12 @@ COPY non-app/  /$WORKDIR/non-app/
 COPY lib/      /$WORKDIR/lib/
 COPY mongo_infra_prod_config.yaml     /$WORKDIR/
 
-COPY Docker/crawler_entry_one_by_date.sh $MY_ENTRY
+COPY Docker/crawler_entry_one_by_date.sh /tmp 
 
-RUN chown -R nobody:  /$WORKDIR/  &&     \
-    chmod 755 $MY_ENTRY           &&     \
-    rm $MY_PY3                    &&     \
+RUN chown -R nobody:  /$WORKDIR/                 &&     \
+    chmod 755 /tmp/crawler_entry_one_by_date.sh  &&     \
+    rm $MY_PY3                                   &&     \
     ln -s /usr/local/bin/python3 $MY_PY3
 
 USER nobody
-ENTRYPOINT $MY_ENTRY
+ENTRYPOINT /tmp/crawler_entry_one_by_date.sh
