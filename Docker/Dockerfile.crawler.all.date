@@ -1,7 +1,8 @@
 FROM python:3.7
 
 ARG WORKDIR=/stocks/
-ARG MY_ENTRY=crawler_entry_one_by_date.sh
+ARG MY_CRAWL=crawler_entry_one_by_date.sh
+ARG MY_ENTRY=/tmp/"${MY_CRAWL}"
 
 ARG MY_PY3=/usr/bin/python3
 
@@ -27,15 +28,12 @@ COPY non-app/  /$WORKDIR/non-app/
 COPY lib/      /$WORKDIR/lib/
 COPY mongo_infra_prod_config.yaml     /$WORKDIR/
 
-
-#COPY Docker/$MY_ENTRY  /usr/sbin/$MY_ENTRY
-COPY Docker/$MY_ENTRY  /tmp/$MY_ENTRY
+COPY Docker/crawler_entry_one_by_date.sh $MY_ENTRY
 
 RUN chown -R nobody:  /$WORKDIR/  &&     \
-    chmod 755 /usr/sbin/$MY_ENTRY &&     \
+    chmod 755 $MY_ENTRY           &&     \
     rm $MY_PY3                    &&     \
     ln -s /usr/local/bin/python3 $MY_PY3
 
 USER nobody
-#ENTRYPOINT /usr/sbin/$MY_ENTRY
-ENTRYPOINT /tmp/$MY_ENTRY
+ENTRYPOINT $MY_ENTRY

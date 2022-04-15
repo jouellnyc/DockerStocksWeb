@@ -28,6 +28,16 @@ services:
         - stocksnetwork 
       cap_drop:
         - ALL 
+  crawler:
+      build:
+        context: .
+        dockerfile: Docker/Dockerfile.crawler.all.date
+      networks:
+        - stocksnetwork
+      cap_drop:
+        - ALL
+
+
 
 networks:
   stocksnetwork:
