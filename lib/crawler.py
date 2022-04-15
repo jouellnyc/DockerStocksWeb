@@ -464,7 +464,7 @@ if __name__ == "__main__":
 
             if "Thank you" in str(e.args):
                 print("Error: Hit Api limit")
-                sys.exit(1)
+                time.sleep(7200)
             elif "no return was given" in str(e.args):
                 msg = "No Data Returned from Api"
                 mg.update_as_error(stock, msg)
