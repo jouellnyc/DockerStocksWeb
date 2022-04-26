@@ -49,7 +49,7 @@ docker image tag  $AWS_ECR_REPO/$SHORT_WEB_IMAGE $SHORT_WEB_IMAGE
 docker pull       $AWS_ECR_REPO/$SHORT_APP_IMAGE
 docker image tag  $AWS_ECR_REPO/$SHORT_APP_IMAGE $SHORT_APP_IMAGE
 
-DOCKER_COMPOSE_FILE="docker-compose.AWS.flywheel.yaml"
+DOCKER_COMPOSE_FILE="docker-compose.AWS.crawler.flywheel.yaml"
 docker-compose -f $DOCKER_COMPOSE_FILE up -d
 
 ./update_mongo_ip_allow_list.sh
