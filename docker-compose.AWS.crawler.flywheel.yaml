@@ -1,6 +1,7 @@
 version: "3"
 services:
   crawler:
+      image: docker_stocks_app:latest
       build:
         context: .
         dockerfile: Docker/Dockerfile.crawler.flywheel
