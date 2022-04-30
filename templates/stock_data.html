@@ -86,6 +86,7 @@
 
 
 
+
 <table width="%100">
 
   <tr>
@@ -107,11 +108,16 @@ function goBack() {
 }
 </script>
 
+<P>
 
 <small>
+
 Data provided on this site is for education purposes only.
 No offer or guarantee of any financial outcome is being made of any kind.
 By using this site you agree to using the data as-is with no warranty of any kind.
+<P>
+Crawled: {{ stock_data['DateCrawled'].strftime("%d-%b-%Y-%H:%M:%S" + ' utc') }}
+
 </small>
 
 </body>
