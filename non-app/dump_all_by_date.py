@@ -14,7 +14,7 @@ def sa(how_to_sort):
     return sorted(
 
         [
-            (x["Stock"], x['Crawled_By'], x['Error'], x['DateCrawled'], x['Success']) for x in mg.dbh.find({ "Crawled_By": {"$exists": True}})
+            (x["Stock"], x['DateCrawled'], x['Crawled_By'], x['Error'], x['Success']) for x in mg.dbh.find({ "Crawled_By": {"$exists": True}})
         ], key=how_to_sort,
     )
 
