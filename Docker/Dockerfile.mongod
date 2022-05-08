@@ -1,10 +1,12 @@
-FROM ubuntu
-RUN apt-get update && apt-get install -y gnupg2 && \
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10 && \
-    echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' > tee /etc/apt/sources.list.d/mongodb.list && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends mongodb telnet vim net-tools
-
+FROM ubuntu:20.04
+RUN apt-get update -y        && \ 
+    apt-get install gnupg -y && \ 
+    apt-get install wget -y  && \ 
+    wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | apt-key add - && \
+    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" \ 
+    | tee /etc/apt/sources.list.d/mongodb-org-5.0.list && \
+    apt-get update -y        && \ 
+    apt-get install -y mongodb-org
 RUN mkdir -p /data/db 
 RUN chown -R mongodb:mongodb /data/db
 USER mongodb
