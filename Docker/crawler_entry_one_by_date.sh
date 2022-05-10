@@ -1,4 +1,4 @@
 #!/bin/bash
 WORKDIR="stocks"
 cd /$WORKDIR/lib
-./crawler.py -m all 
+./crawler.py -m date 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 """
 
 Main Flask application file
@@ -16,12 +17,16 @@ Main Flask application file
 """
 
 
+import json
 import logging
 
 import flask
+from flask import g
 from flask import Flask
 from flask import request
+from flask import redirect
 from flask import render_template
+from flask_oidc import OpenIDConnect
 from pymongo.errors import ConnectionFailure
 from pymongo.errors import ServerSelectionTimeoutError
 from pymongo.errors import OperationFailure
@@ -29,21 +34,60 @@ from pymongo.errors import OperationFailure
 from lib import mongodb
 from lib.mongodb import StockDoesNotExist
 
+
+logging.basicConfig(level=logging.DEBUG)
+
 app = Flask(__name__)
+app.config.update({
+    'SECRET_KEY': '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',
+    'TESTING': True,
+    'DEBUG': True,
+    'OIDC_CLIENT_SECRETS': 'client_secrets.json',
+    'OIDC_ID_TOKEN_COOKIE_SECURE': False,
+    'OIDC_REQUIRE_VERIFIED_EMAIL': False,
+    'OIDC_USER_INFO_ENABLED': True,
+    'OIDC_SCOPES' : ['openid', 'email', 'profile']
 
-"""
+})
 
- Logging A la:
- https://trstringer.com/logging-flask-gunicorn-the-manageable-way/
- https://stackoverflow.com/questions/27687867/is-there-a-way-to-log-python-print-statements-in-gunicorn
-
-"""
 if __name__ != "__main__":
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
+oidc = OpenIDConnect(app)
 
+@app.route('/')
+def hello_world():
+    if oidc.user_loggedin:
+        email=oidc.user_getfield('email')
+        email=oidc.user_getfield('given_name')
+        print("email:",email)
+        #return ('Hello, %s, <a href="/private">See private</a> '
+        #        '<a href="/logout">Log out</a>') % \
+        #    oidc.user_getfield('email')
+        return render_template("welcome.html",email=email)
+    else:
+        return render_template("welcome_not_logged.html")
+
+@app.route('/login_oauth')
+@oidc.require_login
+def hello_me():
+    info = oidc.user_getinfo(['email', 'openid_id'])
+    print(info)
+    return redirect("/", code=302)
+    #return ('Hello, %s (%s)! <a href="/">Return</a>' %
+    #        (info.get('email'), info.get('openid_id')))
+
+
+@app.route('/logout')
+def logout():
+    oidc.logout()
+    return redirect("/", code=302)
+    #return redirect("/http://www.example.com", code=302)
+    #return 'You have been logged out! <a href="/">Return</a>'
+
+@oidc.require_login
 @app.route("/search/", methods=["POST", "GET"])
 def get_data():
     """
@@ -101,5 +145,5 @@ def get_data():
             )
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+if __name__ == '__main__':
+    app.run(ssl_context='adhoc')
