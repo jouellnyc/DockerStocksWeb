@@ -51,8 +51,10 @@ docker pull       $AWS_ECR_REPO/$SHORT_APP_IMAGE
 docker image tag  $AWS_ECR_REPO/$SHORT_APP_IMAGE $SHORT_APP_IMAGE
 
 DOCKER_COMPOSE_FILE="docker-compose.AWS.hosted.MongoDb.bespoke.yaml"
-docker-compose -f $DOCKER_COMPOSE_FILE up -d
+cd lib; ./get_client_secrets_json.py && cd ..; ./update_mongo_ip_allow_list.sh && docker-compose -f $DOCKER_COMPOSE_FILE up -d
 
-./update_mongo_ip_allow_list.sh
 
 ### End
+
+
+
