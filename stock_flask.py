@@ -39,7 +39,6 @@ logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 app.config.update({
-    'SECRET_KEY': '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',
     'TESTING': True,
     'DEBUG': True,
     'OIDC_CLIENT_SECRETS': 'client_secrets.json',
