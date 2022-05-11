@@ -53,5 +53,5 @@ curl --user "${PUBLIC_KEY}:${PRIVATE_KEY}" --digest \
      --data '
        [{
           "ipAddress" : "77.54.32.11"
-       }]'
+       }]' | grep -iv $MY_IP  && exit 1
 
