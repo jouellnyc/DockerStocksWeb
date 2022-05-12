@@ -9,3 +9,4 @@ bak/
 aws_env
 *.pem
 *inp*
+client_secrets*
