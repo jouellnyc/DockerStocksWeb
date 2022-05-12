@@ -38,6 +38,7 @@ from lib.mongodb import StockDoesNotExist
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
+app.secret_key = 'super secret key ZZ ZZ'
 app.config.update({
     'TESTING': True,
     'DEBUG': True,

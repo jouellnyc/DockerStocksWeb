@@ -2,7 +2,7 @@
 
 #Mode is 'AWS' or 'Local'
 
-Mode: AWS 
+Mode: Local 
 
 AWS:
 - secret: "Prod-Stocks"

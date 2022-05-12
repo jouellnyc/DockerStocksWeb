@@ -1,16 +1,15 @@
 #!/bin/bash -x
 
-set -e 
 
 ### Update Software and utils
 yum update -y
-yum -y install git 
-yum -y install python3 
+yum -y install git
+yum -y install python3
 pip3 install boto3
-pip3 install pyyaml 
+pip3 install pyyaml
 yum -y install awslogs
-yum -y install telnet 
-yum -y install jq 
+yum -y install telnet
+yum -y install jq
 
 amazon-linux-extras install docker
 
@@ -33,7 +32,7 @@ chkconfig docker on
 service awslogsd start
 chkconfig awslogsd on
 
-### Start Build 
+### Start Build
 GITHUB_REPO="https://github.com/jouellnyc/DockerStocksWeb.git"
 GIT_DIR="/gitrepos/"
 mkdir -p $GIT_DIR
@@ -45,21 +44,15 @@ cd DockerStocksWeb
 source data/AWS.vars.txt
 
 #*Vars
-docker pull       $AWS_ECR_REPO/$SHORT_WEB_IMAGE
-docker image tag  $AWS_ECR_REPO/$SHORT_WEB_IMAGE $SHORT_WEB_IMAGE
+#docker pull       $AWS_ECR_REPO/$SHORT_WEB_IMAGE
+#docker image tag  $AWS_ECR_REPO/$SHORT_WEB_IMAGE $SHORT_WEB_IMAGE
 
 #*Vars
-docker pull       $AWS_ECR_REPO/$SHORT_APP_IMAGE
-docker image tag  $AWS_ECR_REPO/$SHORT_APP_IMAGE $SHORT_APP_IMAGE
+#docker pull       $AWS_ECR_REPO/$SHORT_APP_IMAGE
+#docker image tag  $AWS_ECR_REPO/$SHORT_APP_IMAGE $SHORT_APP_IMAGE
 
 DOCKER_COMPOSE_FILE="docker-compose.AWS.hosted.MongoDb.bespoke.yaml"
-cd lib 
-./get_client_secrets_json.py 
-mv client_secrets.json ..
-cd ..
-./update_mongo_ip_allow_list.sh && docker-compose -f $DOCKER_COMPOSE_FILE up -d
+cd lib; ./get_client_secrets_json.py && cd ..; ./update_mongo_ip_allow_list.sh && docker-compose -f $DOCKER_COMPOSE_FILE up -d
+
 
 ### End
-
-
-
