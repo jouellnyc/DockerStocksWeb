@@ -10,3 +10,4 @@ aws_env
 *.pem
 *inp*
 client_secrets*
+mongo_infra_prod_config.yaml
