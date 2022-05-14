@@ -23,6 +23,7 @@ import logging
 import flask
 from flask import g
 from flask import Flask
+from flask import session
 from flask import request
 from flask import redirect
 from flask import render_template
@@ -50,6 +51,7 @@ app.config.update({
 
 })
 
+
 if __name__ != "__main__":
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
@@ -57,12 +59,25 @@ if __name__ != "__main__":
 
 oidc = OpenIDConnect(app)
 
+@app.before_request
+def before_request_func():
+    if 'user' in session:
+        if not g.oidc_id_token and 'oidc_id_token' in session:
+            g.oidc_id_token = session["oidc_id_token"]
+    else:
+        session['oidc_id_token'] = g.oidc_id_token
+
 @app.route('/')
 def hello_world():
     if oidc.user_loggedin:
         email=oidc.user_getfield('email')
         email=oidc.user_getfield('given_name')
         print("email:",email)
+        print('oidc-',dir(oidc))
+        print('g-',dir(g.oidc_id_token))
+        print('g--',dir(g))
+        print('g---',g.oidc_id_token)
+        print('app-',dir(app))
         #return ('Hello, %s, <a href="/private">See private</a> '
         #        '<a href="/logout">Log out</a>') % \
         #    oidc.user_getfield('email')
