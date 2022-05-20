@@ -15,7 +15,7 @@ services:
       depends_on:
         - app
       ports:
-        - "80:8080"
+        - "127.0.0.1:80:8080"
       networks:
         - stocksnetwork 
       cap_drop:
