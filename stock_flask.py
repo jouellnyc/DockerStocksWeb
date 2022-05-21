@@ -70,16 +70,6 @@ def before_request_func():
 def hello_world():
     if oidc.user_loggedin:
         email=oidc.user_getfield('email')
-        email=oidc.user_getfield('given_name')
-        print("email:",email)
-        print('oidc-',dir(oidc))
-        print('g-',dir(g.oidc_id_token))
-        print('g--',dir(g))
-        print('g---',g.oidc_id_token)
-        print('app-',dir(app))
-        #return ('Hello, %s, <a href="/private">See private</a> '
-        #        '<a href="/logout">Log out</a>') % \
-        #    oidc.user_getfield('email')
         return render_template("welcome.html",email=email)
     else:
         return render_template("welcome_not_logged.html")
@@ -90,16 +80,12 @@ def hello_me():
     info = oidc.user_getinfo(['email', 'openid_id'])
     print(info)
     return redirect("/", code=302)
-    #return ('Hello, %s (%s)! <a href="/">Return</a>' %
-    #        (info.get('email'), info.get('openid_id')))
 
 
 @app.route('/logout')
 def logout():
     oidc.logout()
     return redirect("/", code=302)
-    #return redirect("/http://www.example.com", code=302)
-    #return 'You have been logged out! <a href="/">Return</a>'
 
 @oidc.require_login
 @app.route("/search/", methods=["POST", "GET"])
