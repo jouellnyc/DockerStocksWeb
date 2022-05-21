@@ -70,7 +70,8 @@ def before_request_func():
 def hello_world():
     if oidc.user_loggedin:
         email=oidc.user_getfield('email')
-        return render_template("welcome.html",email=email)
+        pic_url=oidc.user_getfield('picture')
+        return render_template("welcome.html", email=email, pic_url=pic_url)
     else:
         return render_template("welcome_not_logged.html")
 
@@ -94,10 +95,11 @@ def get_data():
     Return a view to Flask with relevant details
 
     'stock' comes in as a 'str' from the Flash HTML form  and most easily is tested
-    by casting to 'int'. It is  then queried @mongodb and returns HTML
-    Done this way it catches stock='' and if stock is None without explictly checking.
+    by casting to 'int'. It is  then queried @mongodb and returns HTML Done this way it catches stock='' and if stock is None without explictly checking.
     """
-
+    if oidc.user_loggedin:
+        email=oidc.user_getfield('email')
+        pic_url=oidc.user_getfield('picture')
     try:
         querystring = request.args
         app.logger.debug(f"querystring: {querystring}")
@@ -106,7 +108,7 @@ def get_data():
             raise ValueError
     except (TypeError, ValueError):
         app.logger.error(f"Invalid data: querystring: {querystring} : invalid")
-        return render_template("notastock.html", stock=stock)
+        return render_template("notastock.html", stock=stock, pic_url=pic_url, email=email)
     except Exception as e:
         msg = f"Bug: querystring:{querystring}, Error: {e}"
         app.logger.exception(msg)
@@ -117,31 +119,31 @@ def get_data():
             mongocli = mongodb.MongoCli()
             stock_data = mongocli.lookup_stock(stock)
             if len(stock_data) < 2:
-                return render_template("dne_stock.html", stock=stock)
+                return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
             if stock_data["Error"]:
-                return render_template("dne_stock.html", stock=stock)
+                return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
         except mongodb.StockDoesNotExist as e:
             app.logger.error(str(e))
-            return render_template("dne_stock.html", stock=stock)
+            return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
         except ValueError as e:
             app.logger.error(str(e))
-            return render_template("dne_stock.html", stock=stock)
+            return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
         except OperationFailure as e:
             msg = "PROD FAILURE! " + str(e)
             app.logger.error(msg)
-            return render_template("dne_stock.html", stock=stock)
+            return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
         except ConnectionFailure as e:
             msg = "Connect FAILURE! " + str(e)
             app.logger.error(msg)
-            return render_template("dne_stock.html", stock=stock)
+            return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
         except ServerSelectionTimeoutError as e:
             msg = "Server FAILURE! " + str(e)
             app.logger.error(msg)
-            return render_template("dne_stock.html", stock=stock)
+            return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
         else:
             # Each Financial Group will be broken down by the template
             return render_template(
-                "stock_data.html", stock_data=stock_data, stock=stock,
+                "stock_data.html", stock_data=stock_data, stock=stock, email=email, pic_url=pic_url
             )
 
 
