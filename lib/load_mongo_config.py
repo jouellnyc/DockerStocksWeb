@@ -3,12 +3,12 @@
 import yaml
 
 def get_mongodb_config():
-    try:
-        with open('/stocks/mongo_infra_prod_config.yaml', 'r') as file:
-            return yaml.safe_load(file)
-    except FileNotFoundError:
-        with open('../mongo_infra_prod_config.yaml', 'r') as file:
-            return yaml.safe_load(file)
+    for path in ['/stocks/mongo_infra_prod_config.yaml','../mongo_infra_prod_config.yaml','mongo_infra_prod_config.yaml']:
+        try:
+            with open(path,'r') as file:
+                return yaml.safe_load(file)
+        except FileNotFoundError:
+            continue
 
 def using_aws():
     return get_mongodb_config()['Mode'] == 'AWS'

@@ -9,14 +9,12 @@
 
 <table border=0>
      <tr>
-     <td><img src="{{pic_url}}" style="border-radius:50%" width="50%" height="50%"></td>
-     <td><font size=4 face="Comic Sans MS">Hi {{ email }} || </font>                   </td>
+     <td><img src="{{ session['oidc_id_token']['picture'] }}" style="border-radius:50%" width="50%" height="50%"></td>
+     <td><font size=4 face="Comic Sans MS">Hi {{ session['oidc_id_token']['email'] }} || </font>                 </td>
      <td><font size=4 face="Comic Sans MS">Enter a Stock to See it's history ||</font> </td>
      <td><font size=4 face="Comic Sans MS"><a href="/logout">  Logout </a>
      </tr>
 </table>
-
-
 
 
 <table class="comicGreen" style='table-layout:fixed;' border=1>

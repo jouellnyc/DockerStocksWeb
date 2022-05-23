@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 """
 
 Main Flask application file
@@ -50,6 +51,14 @@ app.config.update({
 
 })
 
+######################################################
+app.debug = True
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+from flask_debugtoolbar import DebugToolbarExtension
+toolbar = DebugToolbarExtension(app)
+######################################################
+
+
 if __name__ != "__main__":
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
@@ -60,6 +69,7 @@ oidc = OpenIDConnect(app)
 @app.route('/')
 def hello_world():
     if oidc.user_loggedin:
+        print('g.oidc_id_token',g.oidc_id_token)
         return render_template("welcome.html")
     else:
         return render_template("welcome_not_logged.html")
@@ -96,7 +106,7 @@ def get_data():
             raise ValueError
     except (TypeError, ValueError):
         app.logger.error(f"Invalid data: querystring: {querystring} : invalid")
-        return render_template("dne_stock.html", stock=stock)
+        return render_template("notastock.html", stock=stock)
     except Exception as e:
         msg = f"Bug: querystring:{querystring}, Error: {e}"
         app.logger.exception(msg)
@@ -106,29 +116,28 @@ def get_data():
             stock = str(stock).upper()
             mongocli = mongodb.MongoCli()
             stock_data = mongocli.lookup_stock(stock)
-            g.stock =  stock
             if len(stock_data) < 2:
-                return render_template("dne_stock.html")
+                return render_template("dne_stock.html", stock=stock)
             if stock_data["Error"]:
-                return render_template("dne_stock.html")
+                return render_template("dne_stock.html", stock=stock)
         except mongodb.StockDoesNotExist as e:
             app.logger.error(str(e))
-            return render_template("dne_stock.html")
+            return render_template("dne_stock.html", stock=stock)
         except ValueError as e:
             app.logger.error(str(e))
-            return render_template("dne_stock.html")
+            return render_template("dne_stock.html", stock=stock)
         except OperationFailure as e:
             msg = "PROD FAILURE! " + str(e)
             app.logger.error(msg)
-            return render_template("dne_stock.html")
+            return render_template("dne_stock.html", stock=stock)
         except ConnectionFailure as e:
             msg = "Connect FAILURE! " + str(e)
             app.logger.error(msg)
-            return render_template("dne_stock.html")
+            return render_template("dne_stock.html", stock=stock)
         except ServerSelectionTimeoutError as e:
             msg = "Server FAILURE! " + str(e)
             app.logger.error(msg)
-            return render_template("dne_stock.html")
+            return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
         else:
             # Each Financial Group will be broken down by the template
             return render_template(

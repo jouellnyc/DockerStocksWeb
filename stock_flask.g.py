@@ -128,7 +128,7 @@ def get_data():
         except ServerSelectionTimeoutError as e:
             msg = "Server FAILURE! " + str(e)
             app.logger.error(msg)
-            return render_template("dne_stock.html")
+            return render_template("dne_stock.html", stock=stock)
         else:
             # Each Financial Group will be broken down by the template
             return render_template(

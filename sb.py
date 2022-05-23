@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 """
 
 Main Flask application file
@@ -57,17 +58,47 @@ if __name__ != "__main__":
 
 oidc = OpenIDConnect(app)
 
+@app.before_request
+def before_request_func():
+    if 'user' in session:
+        print('user b4 session values',session.get('values'))
+        if not g.oidc_id_token and 'oidc_id_token' in session:
+            if g.oidc_id_token:
+                print('g.oidc_id_token:',g.oidc_id_token)
+            else:
+                print('no g.oidc_id_token')
+        if session.get('oidc_id_token'):
+            print('session oidc_id_token',session["oidc_id_token"])
+        else:
+            print('no session oidc_id_token')
+            print('b4 session values',session.get('values'))
+            g.oidc_id_token = session["oidc_id_token"]
+    else:
+        print('All session cookies',request.cookies)
+        session['oidc_id_token'] = g.oidc_id_token
+
 @app.route('/')
 def hello_world():
     if oidc.user_loggedin:
-        return render_template("welcome.html")
+        email=oidc.user_getfield('email') or 'There'
+        pic_url=oidc.user_getfield('picture')
+        #print('dir g',dir(g))
+        #print('g.oidc_id_token',g.oidc_id_token)
+        #print('session',session)
+        #print('session get',session.get('oidc_id_token'))
+        print('during session values',session.get('values'))
+        #print('dir session',dir(session))
+        return render_template("welcome.html", email=email, pic_url=pic_url)
     else:
         return render_template("welcome_not_logged.html")
 
 @app.route('/login_oauth')
 @oidc.require_login
 def hello_me():
+    info = oidc.user_getinfo(['email', 'openid_id'])
+    print(info)
     return redirect("/", code=302)
+
 
 @app.route('/logout')
 def logout():
@@ -80,10 +111,8 @@ def get_data():
     """
     Return a view to Flask with relevant details
 
-    'stock' comes in as a 'str' from the Flash HTML form and most easily is tested by casting to 'int'. 
-    It is  then queried @mongodb and returns HTML.
-
-    Done this way it catches stock='' and if stock is None without explictly checking.
+    'stock' comes in as a 'str' from the Flash HTML form  and most easily is tested
+    by casting to 'int'. It is  then queried @mongodb and returns HTML Done this way it catches stock='' and if stock is None without explictly checking.
     """
     if oidc.user_loggedin:
         email=oidc.user_getfield('email')
@@ -96,7 +125,7 @@ def get_data():
             raise ValueError
     except (TypeError, ValueError):
         app.logger.error(f"Invalid data: querystring: {querystring} : invalid")
-        return render_template("dne_stock.html", stock=stock)
+        return render_template("notastock.html", stock=stock, pic_url=pic_url, email=email)
     except Exception as e:
         msg = f"Bug: querystring:{querystring}, Error: {e}"
         app.logger.exception(msg)
@@ -106,29 +135,28 @@ def get_data():
             stock = str(stock).upper()
             mongocli = mongodb.MongoCli()
             stock_data = mongocli.lookup_stock(stock)
-            g.stock =  stock
             if len(stock_data) < 2:
-                return render_template("dne_stock.html")
+                return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
             if stock_data["Error"]:
-                return render_template("dne_stock.html")
+                return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
         except mongodb.StockDoesNotExist as e:
             app.logger.error(str(e))
-            return render_template("dne_stock.html")
+            return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
         except ValueError as e:
             app.logger.error(str(e))
-            return render_template("dne_stock.html")
+            return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
         except OperationFailure as e:
             msg = "PROD FAILURE! " + str(e)
             app.logger.error(msg)
-            return render_template("dne_stock.html")
+            return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
         except ConnectionFailure as e:
             msg = "Connect FAILURE! " + str(e)
             app.logger.error(msg)
-            return render_template("dne_stock.html")
+            return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
         except ServerSelectionTimeoutError as e:
             msg = "Server FAILURE! " + str(e)
             app.logger.error(msg)
-            return render_template("dne_stock.html")
+            return render_template("dne_stock.html", stock=stock, pic_url=pic_url, email=email)
         else:
             # Each Financial Group will be broken down by the template
             return render_template(
@@ -137,4 +165,4 @@ def get_data():
 
 
 if __name__ == '__main__':
-    app.run(ssl_context='adhoc',debug=True)
+    app.run(ssl_context='adhoc')
