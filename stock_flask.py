@@ -10,7 +10,6 @@ Main Flask application file
 
 - It expects to be passed:
     - stock name from nginx html form
-
 - It sends all returnables to return flask's render_template
 
 """
@@ -85,13 +84,12 @@ def get_data():
 
     Done this way it catches stock='' and if stock is None without explictly checking.
     """
-    if oidc.user_loggedin:
-        email=oidc.user_getfield('email')
-        pic_url=oidc.user_getfield('picture')
+    app.logger.info('session' + str(session))
     try:
         querystring = request.args
         app.logger.debug(f"querystring: {querystring}")
         stock = querystring.get("stock")
+        stock = str(stock).upper()
         if not str(stock):
             raise ValueError
     except (TypeError, ValueError):
@@ -100,41 +98,57 @@ def get_data():
     except Exception as e:
         msg = f"Bug: querystring:{querystring}, Error: {e}"
         app.logger.exception(msg)
-        flask.abort(500)
+        return render_template("dne_stock.html", stock='NA')
     else:
-        try:
-            stock = str(stock).upper()
-            mongocli = mongodb.MongoCli()
-            stock_data = mongocli.lookup_stock(stock)
-            g.stock =  stock
-            if len(stock_data) < 2:
-                return render_template("dne_stock.html")
-            if stock_data["Error"]:
-                return render_template("dne_stock.html")
-        except mongodb.StockDoesNotExist as e:
-            app.logger.error(str(e))
-            return render_template("dne_stock.html")
-        except ValueError as e:
-            app.logger.error(str(e))
-            return render_template("dne_stock.html")
-        except OperationFailure as e:
-            msg = "PROD FAILURE! " + str(e)
-            app.logger.error(msg)
-            return render_template("dne_stock.html")
-        except ConnectionFailure as e:
-            msg = "Connect FAILURE! " + str(e)
-            app.logger.error(msg)
-            return render_template("dne_stock.html")
-        except ServerSelectionTimeoutError as e:
-            msg = "Server FAILURE! " + str(e)
-            app.logger.error(msg)
-            return render_template("dne_stock.html")
-        else:
-            # Each Financial Group will be broken down by the template
-            return render_template(
-                "stock_data.html", stock_data=stock_data, stock=stock, email=email, pic_url=pic_url
-            )
+        #Make stock available to the global application context once vetted
+        g.stock =  stock
+        app.logger.debug(f"No Exceptions on query string, moving forward")
 
+    try:
+        mongocli = mongodb.MongoCli()
+    except OperationFailure as e:
+        msg = "PROD FAILURE! " + str(e)
+        app.logger.error(msg)
+        return render_template("dne_stock.html")
+    except ConnectionFailure as e:
+        msg = "Connect FAILURE! " + str(e)
+        app.logger.error(msg)
+        return render_template("dne_stock.html")
+    except ServerSelectionTimeoutError as e:
+        msg = "Server FAILURE! " + str(e)
+        app.logger.error(msg)
+        return render_template("dne_stock.html")
+    except Exception as e:
+        msg = f"Issue connecting to DB: Error: {e}"
+        app.logger.exception(msg)
+        return render_template("dne_stock.html")
+    else:
+        app.logger.debug(f"No Exceptions connection to DB, moving forward")
+
+    try:
+        stock_data = mongocli.lookup_stock(stock)
+        #If the crawler/indexer deemed the stock to have too many errors
+        if stock_data["Error"]:
+            app.logger.debug(f"stock has Errors")
+            return render_template("dne_stock.html")
+        #If there's only one key/value pair like {'Stock': 'LMND'}
+        if len(stock_data) < 2:
+            app.logger.debug(f"invalid len(stockdata)")
+            return render_template("dne_stock.html")
+    except mongodb.StockDoesNotExist as e:
+        app.logger.debug(f"Stock Does Not Exist")
+        return render_template("dne_stock.html")
+    except ValueError as e:
+        app.logger.error("Value Err:",str(e))
+        return render_template("dne_stock.html")
+    except Exception as e:
+        msg = f"Issue connecting to DB: Error: {e}"
+        app.logger.exception(msg)
+        return render_template("dne_stock.html")
+    else:
+        # Each Financial Group will be broken down by the template
+        app.logger.debug(f"No Exceptions with Stock data, returning to user")
+        return render_template("stock_data.html", stock_data=stock_data)
 
 if __name__ == '__main__':
     app.run(ssl_context='adhoc',debug=True)
