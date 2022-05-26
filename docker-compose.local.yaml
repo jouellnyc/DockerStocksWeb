@@ -31,3 +31,4 @@ services:
 networks:
   stocksnetwork:
     driver: bridge
+
