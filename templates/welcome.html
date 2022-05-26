@@ -1,60 +1,35 @@
-<html>
-   <head>
-    <center>
+{% extends "stock_data.html" %}
 
-<title> 
 {% block title %}
- Stock Data
+    <title> Welcome to justgrowthrates.com </title>
 {% endblock %}
-</title>
 
-    </center>
-    </head>
-
-<body>
-
-{% block profile_table %}
-
-
-<table border=0> 
-    <tr>
-    <td><img src="{{pic_url}}" style="border-radius:50%" width="50%" height="50%"></td>
-    <td><font size=4 face="Comic Sans MS">Hi {{ email }} || </font>                   </td>
-    <td><font size=4 face="Comic Sans MS">Enter a Stock to See it's history ||</font> </td>
-    <td><font size=4 face="Comic Sans MS"><a href="/logout">  Logout </a>
-    </tr>
-</table>
-
-
+{% block valid_stock_data %}
+<!--No data -->
 {% endblock %}
 
 
-<table border=0>
-<tr>
-<td><img src=/images/dollar.png style="height:80%;"> </td></td>
-<td>
+{% block content %}
 
-</td>
-</tr>
-</table>
+    <form action="/search/" method="get">
 
+    <br>
+    Stock:
+    <input type="text" name="stock">
 
-{% block form %}
+    <P>
+    <input type="submit" value="Submit">
 
-<form action="/search/" method="get">
-
-<br>
-Stock:
-<input type="text" name="stock">
-
-<P>
-<input type="submit" value="Submit">
-
-<br>
-</form>
+    <br>
+    </form>
 
 {% endblock %}
 
-</body>
-</html>
+{% block  back_button %}
+    <!-- No -->
+{% endblock %}
 
+
+{% block footer %}
+    <!-- No Crawled -->
+{% endblock %}

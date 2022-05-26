@@ -1,8 +1,13 @@
-{% extends "welcome.html" %}
-{% block title %}  Stock {{stock}} not found.{% endblock %}
-{% block form %}  
-Stock {{stock}} not found.
-<form>
-<input type="button" value="Try Again" onclick="history.back()">
-</form>
+{% extends "stock_data.html" %}
+
+{% block valid_stock_data %}
+
+    <table class="comicGreen" style='table-layout:fixed;' border=1>
+    <tr><td>Stock {{g.stock}} not found</td></tr>
+    </table>
+
+{% endblock %}
+
+{% block footer %}
+    <!-- No Crawled -->
 {% endblock %}

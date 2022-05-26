@@ -1,29 +1,58 @@
 <html>
 
     <head>
-        <title> Financial data for  {{stock}}</title>
+
+        <!------------------------------------------------------------>
+        {% block title %}
+            <title> Financial data for  {{g.stock}}</title>
+        {% endblock %}
+        <!------------------------------------------------------------>
+
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
     </head>
 
 <body>
 
+
+<!------------------------------------------------------------>
+{% block welcome_table %}
+<!------------------------------------------------------------>
 <table border=0>
+
      <tr>
-     <td><img src="{{pic_url}}" style="border-radius:50%" width="50%" height="50%"></td>
-     <td><font size=4 face="Comic Sans MS">Hi {{ email }} || </font>                   </td>
-     <td><font size=4 face="Comic Sans MS">Enter a Stock to See it's history ||</font> </td>
-     <td><font size=4 face="Comic Sans MS"><a href="/logout">  Logout </a>
+
+        {% if session['picture_text'] %}
+            <td> {{ session['picture_text'] }} </td>
+            <td><font size=4 face="Comic Sans MS">Hi {{ session['email_text'] }}! || </font> </td>
+            <td><font size=4 face="Comic Sans MS"><a href="/login_oauth">  Login  ||</a></td>
+        {% else %}
+            <td><img src="{{ session['picture'] }}" style="border-radius:50%" width="35%" height="50%"></td>
+            <td><font size=4 face="Comic Sans MS">Hi {{ session['email'] }}! || </font></td>
+            <td><font size=4 face="Comic Sans MS"><a href="/logout"> &nbsp;Logout&nbsp;||</a></td>
+        {% endif %}
+
+            <td><font size=4 face="Comic Sans MS">Enter a Stock to See it's history</font> </td>
+
      </tr>
+
 </table>
 
+<!-- {{ session }} -->
+
+<!------------------------------------------------------------>
+{% endblock %}
+<!------------------------------------------------------------>
 
 
-
+<!------------------------------------------------------------>
+{% block valid_stock_data %}
+<!------------------------------------------------------------>
 <table class="comicGreen" style='table-layout:fixed;' border=1>
 
   <tr>
     <td>
-        {{stock}}
+        {{g.stock}}
     </td>
 
     <td>
@@ -95,10 +124,14 @@
 
 
 </table>
+<!------------------------------------------------------------>
+{% endblock %}
+<!------------------------------------------------------------>
 
 
-
-
+<!------------------------------------------------------------>
+{% block  dollar_banner %}
+<!------------------------------------------------------------>
 <table width="%100">
 
   <tr>
@@ -110,18 +143,37 @@
   </tr>
 
 </table>
+<!------------------------------------------------------------>
+{% endblock %}
+<!------------------------------------------------------------>
+
+{% block content %}
+<!-- Content -->
+{% endblock %}
 
 
-<button onclick="goBack()">Back</button>
+<!------------------------------------------------------------>
+{% block  back_button %}
+<!------------------------------------------------------------>
 
-<script>
-function goBack() {
-  window.history.back();
-}
-</script>
+    <button onclick="goBack()">Back</button>
 
-<P>
+    <script>
+    function goBack() {
+      window.history.back();
+    }
+    </script>
+    <P>
 
+<!------------------------------------------------------------>
+{% endblock %}
+<!------------------------------------------------------------>
+
+
+
+<!------------------------------------------------------------>
+{% block footer %}
+<!------------------------------------------------------------>
 <small>
 
 Data provided on this site is for education purposes only.
@@ -134,3 +186,6 @@ Crawled: {{ stock_data['DateCrawled'].strftime("%d-%b-%Y-%H:%M:%S" + ' utc') }}
 
 </body>
 </html>
+<!------------------------------------------------------------>
+{% endblock %}
+<!------------------------------------------------------------>

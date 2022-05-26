@@ -1,0 +1,32 @@
+FROM python:3.9-slim-bullseye
+
+COPY install-packages.sh .
+RUN ./install-packages.sh
+
+ENV WORKDIR /stocks
+ENV USER nobody
+
+RUN mkdir $WORKDIR && mkdir $WORKDIR/.aws && chown nobody: $WORKDIR/.aws
+RUN usermod -d $WORKDIR -s /bin/bash $USER
+
+COPY requirements.txt /$WORKDIR/
+
+RUN pip install --upgrade pip && pip3 install -r /$WORKDIR/requirements.txt && rm -rf  /root/.cache
+RUN mkdir /$WORKDIR/non-app/ &&  mkdir /$WORKDIR/static/ && mkdir /$WORKDIR/templates/ && mkdir /$WORKDIR/lib/
+RUN mkdir -p /$WORKDIR/external/gunicorn/
+
+COPY static/                                                           /$WORKDIR/static/
+COPY non-app/                                                          /$WORKDIR/non-app/
+COPY templates/                                                        /$WORKDIR/templates/
+COPY lib/                                                              /$WORKDIR/lib/
+COPY client_secrets.json stock_flask.py mongo_infra_prod_config.yaml   /$WORKDIR/
+COPY external/gunicorn/gunicorn.conf.dev.py                            /$WORKDIR/external/gunicorn/
+RUN  chown -R nobody:                                                  /$WORKDIR/
+COPY Docker/flask-docker-entrypoint.dev.sh                             /usr/sbin/flask-docker-entrypoint.dev.sh
+RUN chmod 755                                                          /usr/sbin/flask-docker-entrypoint.dev.sh
+RUN ln -s /usr/local/bin/python3.9                                     /usr/bin/python3
+
+USER $USER
+ENTRYPOINT ["/usr/sbin/flask-docker-entrypoint.dev.sh"]
+
+EXPOSE 8000
