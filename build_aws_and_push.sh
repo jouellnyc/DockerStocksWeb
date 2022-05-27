@@ -13,4 +13,3 @@ for svc in app web; do
     fi
 
 done
-
