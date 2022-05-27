@@ -2,7 +2,7 @@
 
 #Mode is 'AWS' or 'Local'
 
-Mode: Local 
+Mode: AWS 
 
 LocalInfra:
   - port: 27017
