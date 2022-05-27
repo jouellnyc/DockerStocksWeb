@@ -14,4 +14,3 @@ for svc in app web; do
 
 done
 
-
