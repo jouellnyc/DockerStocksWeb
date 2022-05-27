@@ -12,7 +12,7 @@ $DE -it $CONT tail -f /tmp/stocks.error.log
 
 function nginx {
 CONT=$( $DP | grep nginx | awk '{ print $1; }')
-$DE -it $CONT tail -f /var/log/nginx/error.log
+$DE -it $CONT bash
 }
 
 function mongodb {
