@@ -20,13 +20,13 @@ COPY non-app/                                                          /$WORKDIR
 COPY templates/                                                        /$WORKDIR/templates/
 COPY lib/                                                              /$WORKDIR/lib/
 COPY client_secrets.json stock_flask.py mongo_infra_prod_config.yaml   /$WORKDIR/
-COPY external/gunicorn/gunicorn.conf.debug.py                          /$WORKDIR/external/gunicorn/
+COPY external/gunicorn/gunicorn.conf.dev.py                            /$WORKDIR/external/gunicorn/
 RUN  chown -R nobody:                                                  /$WORKDIR/
-COPY Docker/flask-docker-entrypoint.debug.sh                           /usr/sbin/flask-docker-entrypoint.debug.sh
-RUN chmod 755                                                          /usr/sbin/flask-docker-entrypoint.debug.sh
+COPY Docker/flask-docker-entrypoint.dev.sh                             /usr/sbin/flask-docker-entrypoint.dev.sh
+RUN chmod 755                                                          /usr/sbin/flask-docker-entrypoint.dev.sh
 RUN ln -s /usr/local/bin/python3.9                                     /usr/bin/python3
 
 USER $USER
-ENTRYPOINT ["/usr/sbin/flask-docker-entrypoint.debug.sh"]
+ENTRYPOINT ["/usr/sbin/flask-docker-entrypoint.dev.sh"]
 
 EXPOSE 8000
