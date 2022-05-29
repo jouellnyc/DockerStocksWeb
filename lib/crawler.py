@@ -25,14 +25,11 @@ pd.options.mode.chained_assignment = None
 class NotOldEnough(Exception):
     pass
 
-
 class PassOnErrorStock(Exception):
     pass
 
-
 class GoodCrawl(Exception):
     pass
-
 
 class ZeroRevenue(Exception):
     pass
@@ -168,7 +165,7 @@ def CrawlStock(stock):
     print(f"Connecting to Alpha Vantage for {stock}")
     """ Pull Down Income Data from Alpha Vantage """
     income_data, stock_name = alpha.get_income_statement_annual(stock)
-    if len(income_data) < 2:
+    if len(income_data) < 1:
         raise BadIncomeData
     else:
         income_data.replace("None", 0, inplace=True)
