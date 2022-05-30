@@ -58,19 +58,6 @@ if __name__ != "__main__":
 
 oidc = OpenIDConnect(app)
 
-def help():
-    email = oidc.user_getfield('email')
-    if email:
-        session['email'] = email
-    else:
-        session['email'] = 'There'
-    picture = oidc.user_getfield('picture')
-    if picture:
-        session['picture'] = picture 
-    else:
-        session['picture'] = '<Your picture if logged in>' 
-
-
 @app.route('/')
 def index():
     if oidc.user_loggedin:
@@ -87,7 +74,7 @@ def index():
             session['picture'] = picture 
     else:
         session['email_text'] = 'There'
-        session['picture_text'] = '<picture if logged in>' 
+        session['picture_text'] = 'Welcome -' 
     return render_template("welcome.html")
 
 

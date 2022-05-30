@@ -60,15 +60,15 @@
     </td>
 
     <td>
-        Rev TTM: {{ stock_data['RevTTM'] }}
+	     Book Value : {{ stock_data['BookValue'] }} </td>
     </td>
 
     <td>
-      Net INC TTM
+        Price To Book:  {{ stock_data['PriceToBookRatio'] }}
     </td>
 
     <td>
-        ROIC
+        &nbsp;
     </td>
 
   </tr>
@@ -77,46 +77,62 @@
 
   <tr>
 
-
     <td>
-	     BookValue : {{ stock_data['BookValue'] }} </td>
+        &nbsp;
     </td>
 
     <td>
-             PriceToBookRatio :  {{ stock_data['PriceToBookRatio'] }}
+        Revenue TTM: {{ stock_data['RevTTM'] }}
     </td>
 
     <td>
 	    PriceToSalesTTM :  {{ stock_data['PriceToSalesTTM'] }}
     </td>
 
-    <td>
-	    TrailingPE: {{ stock_data['TrailingPE'] }}
+    <td> 
+        TrailingPE: {{ stock_data['TrailingPE'] }}
     </td>
 
+
     <td>
-      Currency : {{ stock_data['Currency'] }}
+        &nbsp;
     </td>
 
   </tr>
 
 
-
   <tr>
-        <td>
-        Revenue  and Net Income
+        <td >
+        Fiscal Year
        </td>
+        <td >
+        Revenue ({{ stock_data['Currency'] }})
+       </td>
+        <td >
+        CAGR
+       </td>
+        <td >
+        Net Income ({{ stock_data['Currency'] }}) 
+       </td>
+       <td >
+       CAGR
+       </td>
+
   </tr>
 
 {% for key,val in stock_data['Years'].items() %}
 
-    <tr>
+     
+    {% set year      = val['Date'].split('-') %}
+    {% set num_years = key|list()             %}
 
-     <td> {{val['Date']}} </td>   
-     <td> Revenue:    {{ val['Revenue']       }} {{ val['RevDenom'] }}  </td>   
-     <td> RevGrowth:  {{ val['RevenueGrowth'] }} % </td>
-     <td> NetIncome:  {{ val['NetIncome']     }} {{ val['NetIncDenom'] }}  </td>   
-     <td> NetIGrowth: {{ val['NetIncGrowth']  }} % </td>
+    <tr>
+     <td> {{ year[0] }} </td>   
+     <td> {{ val['Revenue'] }} {{ val['RevDenom'] }}</td>   
+
+     <td> {{ num_years[0] }} year {{ val['RevenueGrowth'] }} % </td>
+     <td> {{ val['NetIncome'] }} {{ val['NetIncDenom'] }} </td>   
+     <td> {{ num_years[0] }} year {{ val['NetIncGrowth'] }} % </td>
 
    </tr>
 
