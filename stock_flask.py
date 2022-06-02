@@ -47,7 +47,8 @@ app.config.update({
     'OIDC_ID_TOKEN_COOKIE_SECURE': False,
     'OIDC_REQUIRE_VERIFIED_EMAIL': False,
     'OIDC_USER_INFO_ENABLED': True,
-    'OIDC_SCOPES' : ['openid', 'email', 'profile']
+    'OIDC_SCOPES' : ['openid', 'email', 'profile'],
+    'OVERWRITE_REDIRECT_URI' : 'https://www.justgrowthrates.com/oidc_callback'
 
 })
 
