@@ -11,8 +11,7 @@ $DE -it $CONT tail -f /tmp/stocks.error.log
 
 
 function nginx {
-CONT=$( $DP | grep nginx | awk '{ print $1; }')
-$DE -it $CONT bash
+docker logs docker_stocks_web_1 -f
 }
 
 function mongodb {
