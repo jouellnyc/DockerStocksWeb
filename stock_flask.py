@@ -23,11 +23,11 @@ import logging
 import flask
 from flask import g
 from flask import Flask
-from flask import session
 from flask import request
 from flask import redirect
 from flask import render_template
-from flask_oidc import OpenIDConnect
+from flask import session
+from flask import url_for
 from pymongo.errors import ConnectionFailure
 from pymongo.errors import ServerSelectionTimeoutError
 from pymongo.errors import OperationFailure
@@ -35,65 +35,86 @@ from pymongo.errors import OperationFailure
 from lib import mongodb
 from lib.mongodb import StockDoesNotExist
 
+from os import environ as env
+from urllib.parse import quote_plus, urlencode
+from authlib.integrations.flask_client import OAuth
+from dotenv import find_dotenv, load_dotenv
 
-logging.basicConfig(level=logging.DEBUG)
+
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
 
 app = Flask(__name__)
-app.secret_key = 'super secret key ZZ ZZ'
-app.config.update({
-    'TESTING': True,
-    'DEBUG': True,
-    'OIDC_CLIENT_SECRETS': 'client_secrets.json',
-    'OIDC_ID_TOKEN_COOKIE_SECURE': False,
-    'OIDC_REQUIRE_VERIFIED_EMAIL': False,
-    'OIDC_USER_INFO_ENABLED': True,
-    'OIDC_SCOPES' : ['openid', 'email', 'profile'],
-    'OVERWRITE_REDIRECT_URI' : 'https://www.justgrowthrates.com/oidc_callback'
+app.secret_key = env.get("APP_SECRET_KEY")
+app.url_map.strict_slashes = False
 
-})
+logging.basicConfig(level=logging.DEBUG)
 
 if __name__ != "__main__":
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
-oidc = OpenIDConnect(app)
+oauth = OAuth(app)
+oauth.register(
+    "auth0",
+    client_id=env.get("AUTH0_CLIENT_ID"),
+    client_secret=env.get("AUTH0_CLIENT_SECRET"),
+    client_kwargs={
+        "scope": "openid profile email",
+    },
+    server_metadata_url=f'https://{env.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
+)
 
-@app.route('/')
-def index():
-    if oidc.user_loggedin:
-        try:
-            del session['email_text']
-            del session['picture_text']
-        except KeyError:
-            pass
-        email = oidc.user_getfield('email')
-        if email:
-            session['email'] = email
-        picture = oidc.user_getfield('picture')
-        if picture:
-            session['picture'] = picture 
+
+@app.route("/")
+def home():
+    user_data    = session.get('user')
+    if user_data is not None:
+        user_info    = user_data.get('userinfo')
+        email        = user_info.get('email')
+        first_name   = user_info.get('given_name')
+        picture_url  = user_info.get('picture')
+        session['email']       = email
+        session['first_name']  = first_name
+        session['picture_url'] = picture_url
     else:
-        session['email_text'] = 'There'
-        session['picture_text'] = 'Welcome -' 
+        session['picture_text'] = "Welcome - " 
+        session['email_text'] = "There!" 
     return render_template("welcome.html")
 
+@app.route("/callback", methods=["GET", "POST"])
+def callback():
+    token = oauth.auth0.authorize_access_token()
+    session["user"] = token
+    return redirect("/")
 
-@app.route('/login_oauth')
-@oidc.require_login
-def login_oauth():
-    session['info']     = oidc.user_getinfo(['email', 'openid_id'])
-    return redirect("/", code=302)
 
-@app.route('/logout')
+@app.route("/login")
+def login():
+    return oauth.auth0.authorize_redirect(
+        redirect_uri=url_for("callback", _external=True)
+    )
+
+
+@app.route("/logout")
 def logout():
-    oidc.logout()
     session.clear()
-    return redirect("/", code=302)
+    return redirect(
+        "https://"
+        + env.get("AUTH0_DOMAIN")
+        + "/v2/logout?"
+        + urlencode(
+            {
+                "returnTo": url_for("home", _external=True),
+                "client_id": env.get("AUTH0_CLIENT_ID"),
+            },
+            quote_via=quote_plus,
+        )
+    )
 
-
-@oidc.require_login
-@app.route("/search/", methods=["POST", "GET"])
+@app.route("/search")
 def search():
     """
     Return a view to Flask with relevant details
@@ -103,6 +124,9 @@ def search():
     """
     try:
         querystring = request.args
+        print(dir(request))
+        print(request)
+        print('args',request.args)
         app.logger.debug(f"querystring: {querystring}")
         stock = querystring.get("stock")
         if not str(stock):
@@ -147,6 +171,4 @@ def search():
 
 
 if __name__ == '__main__':
-    app.run()
-
-
+    app.run(debug=True)

@@ -22,14 +22,14 @@
 
      <tr>
 
-        {% if session['picture_text'] %}
+        {% if session['picture_url'] %}
+            <td><img src="{{ session['picture_url'] }}" style="border-radius:50%" width="35%" height="50%"></td>
+            <td><font size=4 face="Comic Sans MS">Hi {{ session['email'] }}! || </font></td>
+            <td><font size=4 face="Comic Sans MS"><a href="/logout">Logout&nbsp;||</a></td>
+        {% else %}
             <td> {{ session['picture_text'] }} </td>
             <td><font size=4 face="Comic Sans MS">Hi {{ session['email_text'] }}! || </font> </td>
-            <td><font size=4 face="Comic Sans MS"><a href="/login_oauth"> Login with Google ||</a></td>
-        {% else %}
-            <td><img src="{{ session['picture'] }}" style="border-radius:50%" width="35%" height="50%"></td>
-            <td><font size=4 face="Comic Sans MS">Hi {{ session['email'] }}! || </font></td>
-            <td><font size=4 face="Comic Sans MS"><a href="/logout"> &nbsp;Logout&nbsp;||</a></td>
+            <td><font size=4 face="Comic Sans MS"><a href="/login"> Login with Google ||</a></td>
         {% endif %}
 
             <td><font size=4 face="Comic Sans MS">Enter a Stock to See it's history</font> </td>
