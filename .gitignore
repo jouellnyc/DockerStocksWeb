@@ -9,7 +9,6 @@ bak/
 aws_env
 *.pem
 *inp*
-.env
 client_secrets*
 mongo_infra_prod_config.yaml
 TODO
