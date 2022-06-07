@@ -41,6 +41,8 @@ from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
 
 
+mongocli = mongodb.MongoCli()
+
 ENV_FILE = find_dotenv()
 if ENV_FILE:
     load_dotenv(ENV_FILE)
@@ -72,13 +74,10 @@ oauth.register(
 def home():
     user_data    = session.get('user')
     if user_data is not None:
-        user_info    = user_data.get('userinfo')
-        email        = user_info.get('email')
-        first_name   = user_info.get('given_name')
-        picture_url  = user_info.get('picture')
-        session['email']       = email
-        session['first_name']  = first_name
-        session['picture_url'] = picture_url
+        user_info              = user_data.get('userinfo')
+        session['first_name']  = user_info.get('given_name')
+        session['email']       = user_info.get('email')
+        session['picture_url'] = user_info.get('picture')
     else:
         session['picture_text'] = "Welcome - " 
         session['email_text'] = "There!" 
@@ -124,9 +123,6 @@ def search():
     """
     try:
         querystring = request.args
-        print(dir(request))
-        print(request)
-        print('args',request.args)
         app.logger.debug(f"querystring: {querystring}")
         stock = querystring.get("stock")
         if not str(stock):
@@ -142,7 +138,6 @@ def search():
         try:
             stock = str(stock).upper()
             g.stock = stock
-            mongocli = mongodb.MongoCli()
             stock_data = mongocli.lookup_stock(stock)
             if len(stock_data) < 2:
                 return render_template("dne_stock.html")
