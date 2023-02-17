@@ -30,6 +30,25 @@ services:
           awslogs-group: nginx
       cap_drop:
         - ALL 
+
+  crawler:
+      build:
+        context: .
+        dockerfile: Docker/Dockerfile.crawler.all.date
+      networks:
+        - stocksnetwork
+      logging:
+        driver: awslogs
+        options:
+          awslogs-region: $AWS_REGION
+          awslogs-group: crawler
+      cap_drop:
+        - ALL
+
+networks:
+  stocksnetwork:
+    driver: bridge
+
 networks:
   stocksnetwork:
     driver: bridge

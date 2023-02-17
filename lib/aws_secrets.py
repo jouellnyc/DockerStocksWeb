@@ -61,7 +61,6 @@ if __name__ == "__main__":
     secret        = get_aws_mongodb_config()[0]['secret']
     mysecret      = json.loads(get_aws_secrets(secret, region))
    #Create .env file for Oauth and Docker Compose
-    with open('/stocks/.env','w') as fh:
+    with open('/stocks/.my.env','w') as fh:
         for x in ['AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'AUTH0_DOMAIN', 'APP_SECRET_KEY','COMPOSE_PROJECT_NAME']:
             fh.write(f"{x}={mysecret[x]}\n")
-
