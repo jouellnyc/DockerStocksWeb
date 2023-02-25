@@ -4,11 +4,13 @@ import yaml
 
 class Credentials:
 
-    def __init__(self,init_file=None):
+    def __init__(self, init_file="init.yaml", env_file="../.my.env"):
+        self.init_file = init_file
+        self.env_file  = env_file
         self.init_config_all = self.get_init_config()
-
-    def get_init_config(self, init_file="init.yaml"):
-        with open(init_file,'r') as file:
+            
+    def get_init_config(self):
+        with open(self.init_file,'r') as file:
             return yaml.safe_load(file)
 
     def get_all_credentials(self):
@@ -26,11 +28,13 @@ class Credentials:
     def get_secrets_from_local(self):
         from os import environ as env
         from dotenv import find_dotenv, load_dotenv
-        ENV_FILE = find_dotenv('../.my.env')
+        ENV_FILE = find_dotenv(self.env_file)
         if ENV_FILE:
             load_dotenv(ENV_FILE)
             mysecret = {}
-            for x in ['AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'AUTH0_DOMAIN', 'APP_SECRET_KEY','COMPOSE_PROJECT_NAME']:
+            for x in [ 'AUTH0_CLIENT_ID'    , 'AUTH0_CLIENT_SECRET', 'AUTH0_DOMAIN', 'APP_SECRET_KEY',
+                      'COMPOSE_PROJECT_NAME', 'collection'         , 'mongohost'   , 'mongopassword',
+                      'mongousername'       , 'port'               , 'database' ]:
                 mysecret[x] = env.get(x)
         return mysecret
 
@@ -46,7 +50,7 @@ class Credentials:
 if __name__ == "__main__":
 
     from  pprint import pprint as pp
-    creds = Credentials()
+    creds = Credentials(init_file="../init.yaml")
     print("== All Config  ==")
     pp(creds.init_config_all)
     print("== Mode is Local  ==")

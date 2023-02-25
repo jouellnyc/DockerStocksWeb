@@ -31,25 +31,16 @@ class StockDoesNotExist(Exception):
 
 class MongoCli:
     def __init__(self, mode=None):
-        self.creds =  Credentials()
-
-        if self.creds.mode_is_aws():
-            self.region        = self.creds.init_config_all['AWS']['region'] 
-            self.secret        = self.creds.init_config_all['AWS']['secret']
-            self.mysecret      = json.loads(get_aws_secrets(self.secret, self.region))
-            self.database      = urllib.parse.quote_plus(self.mysecret["database"])
-            self.collection    = urllib.parse.quote_plus(self.mysecret["collection"])
-            self.mongohost     = urllib.parse.quote_plus(self.mysecret["mongohost"])
-            self.mongousername = urllib.parse.quote_plus(self.mysecret["mongousername"])
-            self.mongopassword = urllib.parse.quote_plus(self.mysecret["mongopassword"])
-            self.client_connect_string = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
-        else:
-            mongo_local        = self.creds.get_local_mongodb_config()
-            self.port          = mongo_local['port']
-            self.mongohost     = mongo_local['mongohost']
-            self.database      = mongo_local['database']
-            self.collection    = mongo_local['collection']
-            self.client_connect_string = (f"mongodb://{self.mongohost}:{self.port}")
+        self.creds   = Credentials()
+        self.secrets = self.creds.get_all_credentials()
+        self.port          = urllib.parse.quote_plus(self.secrets["port"])
+        self.database      = urllib.parse.quote_plus(self.secrets["database"])
+        self.collection    = urllib.parse.quote_plus(self.secrets["collection"])
+        self.mongohost     = urllib.parse.quote_plus(self.secrets["mongohost"])
+        self.mongousername = urllib.parse.quote_plus(self.secrets["mongousername"])
+        self.mongopassword = urllib.parse.quote_plus(self.secrets["mongopassword"])
+        #self.client_connect_string = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
+        self.client_connect_string = (f"mongodb://{self.mongohost}:{self.port}")
         self.dbh = self.connect_to_mongo()
 
     def connect_to_mongo(self):
