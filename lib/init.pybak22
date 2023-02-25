@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+
+import yaml
+import pprint
+import aws_secrets
+
+def get_init_config(init_file="init.yaml"):
+    with open(init_file,'r') as file:
+        return yaml.safe_load(file)
+
+def mode_is_aws():
+    return init_config_all['Mode'] == 'AWS'
+
+def mode_is_local():
+    return init_config_all['Mode'] == 'Local'
+
+def get_all_credentials():
+    if mode_is_aws():
+        return get_secrets_from_aws()
+    elif mode_is_local():
+        return get_secrets_from_local()
+
+def get_secrets_from_aws():
+    aws_config    = get_aws_mongodb_config()
+    region        = aws_config['region']
+    secret        = aws_config['secret']
+    return json.loads(get_aws_secrets(secret, region))
+
+def get_secrets_from_local():
+    from os import environ as env
+    from dotenv import find_dotenv, load_dotenv
+    ENV_FILE = find_dotenv('../.my.env')
+    if ENV_FILE:
+        load_dotenv(ENV_FILE)
+        mysecret = {}
+        for x in ['AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'AUTH0_DOMAIN', 'APP_SECRET_KEY','COMPOSE_PROJECT_NAME']:
+            mysecret[x] = env.get(x)
+    return mysecret
+
+def get_local_mongodb_config():
+    #return init_config_all['LocalInfra']
+    return get_init_config() ['LocalInfra']
+
+def get_aws_mongodb_config():
+    #return init_config_all['AWS']
+    return get_init_config() ['AWS']
+
+if __name__ == "__main__":
+
+    init_config_all = get_init_config()
+    print("== infra all config ==")
+    pprint.pprint(init_config_all)
+
+    print("== local mongo config ==")
+    print(get_local_mongodb_config())
+
+    print(init_config_all['LocalInfra']['port'])
+    print(init_config_all['LocalInfra']['database'])
+    print(init_config_all['LocalInfra']['collection'])
+    print(init_config_all['LocalInfra']['mongohost'])
+
+    print("== get_all_credentials ==")
+    print(get_all_credentials())
+    """
+    print(get_aws_mongodb_config()[0]['secret'])
+    print(get_aws_mongodb_config()[1]['region'])
+    """

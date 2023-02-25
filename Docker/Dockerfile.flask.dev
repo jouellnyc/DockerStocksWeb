@@ -18,7 +18,7 @@ RUN mkdir -p /$WORKDIR/external/gunicorn/
 COPY static/                                                           /$WORKDIR/static/
 COPY non-app/                                                          /$WORKDIR/non-app/
 COPY templates/                                                        /$WORKDIR/templates/
-COPY .my.env stock_flask.py mongo_infra_prod_config.yaml               /$WORKDIR/
+COPY .my.env init.yaml stock_flask.py                                  /$WORKDIR/
 COPY external/gunicorn/gunicorn.conf.dev.py                            /$WORKDIR/external/gunicorn/
 COPY Docker/flask-docker-entrypoint.dev.sh                             /usr/sbin/flask-docker-entrypoint.dev.sh
 RUN chmod 755                                                          /usr/sbin/flask-docker-entrypoint.dev.sh

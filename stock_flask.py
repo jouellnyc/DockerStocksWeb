@@ -31,24 +31,18 @@ from flask import url_for
 from pymongo.errors import ConnectionFailure
 from pymongo.errors import ServerSelectionTimeoutError
 from pymongo.errors import OperationFailure
+from urllib.parse import quote_plus, urlencode
+from authlib.integrations.flask_client import OAuth
 
 from lib import mongodb
 from lib.mongodb import StockDoesNotExist
-
-from os import environ as env
-from urllib.parse import quote_plus, urlencode
-from authlib.integrations.flask_client import OAuth
-from dotenv import find_dotenv, load_dotenv
-
+from lib.init import Credentials
 
 mongocli = mongodb.MongoCli()
-
-ENV_FILE = find_dotenv('.my.env')
-if ENV_FILE:
-    load_dotenv(ENV_FILE)
+secrets = Credentials().get_all_credentials()
 
 app = Flask(__name__)
-app.secret_key = env.get("APP_SECRET_KEY")
+app.secret_key = secrets["APP_SECRET_KEY"]
 app.url_map.strict_slashes = False
 
 logging.basicConfig(level=logging.DEBUG)
@@ -61,12 +55,12 @@ if __name__ != "__main__":
 oauth = OAuth(app)
 oauth.register(
     "auth0",
-    client_id=env.get("AUTH0_CLIENT_ID"),
-    client_secret=env.get("AUTH0_CLIENT_SECRET"),
+    client_id     = secrets["AUTH0_CLIENT_ID"],
+    client_secret = secrets["AUTH0_CLIENT_SECRET"],
     client_kwargs={
         "scope": "openid profile email",
     },
-    server_metadata_url=f'https://{env.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
+    server_metadata_url=f'https://{secrets["AUTH0_DOMAIN"]}/.well-known/openid-configuration',
 )
 
 

@@ -34,6 +34,9 @@ class Credentials:
                 mysecret[x] = env.get(x)
         return mysecret
 
+    def get_local_mongodb_config(self):
+        return self.init_config_all['LocalInfra']
+
     def mode_is_aws(self):
         return self.init_config_all['Mode'] == 'AWS'
 

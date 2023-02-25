@@ -20,23 +20,22 @@ except ModuleNotFoundError:
     from     aws_secrets import get_aws_secrets
 
 try:
-    from lib.load_mongo_config import using_aws, get_local_mongodb_config, get_aws_mongodb_config
+    from lib.init import Credentials
 except ModuleNotFoundError:
-    from     load_mongo_config import using_aws, get_local_mongodb_config, get_aws_mongodb_config
-
+    from     init import Credentials
 
 from pymongo import MongoClient
-
 
 class StockDoesNotExist(Exception):
     pass
 
-
 class MongoCli:
     def __init__(self, mode=None):
-        if using_aws():
-            self.region        = get_aws_mongodb_config()[1]['region']
-            self.secret        = get_aws_mongodb_config()[0]['secret']
+        self.creds =  Credentials()
+
+        if self.creds.mode_is_aws():
+            self.region        = self.creds.init_config_all['AWS']['region'] 
+            self.secret        = self.creds.init_config_all['AWS']['secret']
             self.mysecret      = json.loads(get_aws_secrets(self.secret, self.region))
             self.database      = urllib.parse.quote_plus(self.mysecret["database"])
             self.collection    = urllib.parse.quote_plus(self.mysecret["collection"])
@@ -45,10 +44,11 @@ class MongoCli:
             self.mongopassword = urllib.parse.quote_plus(self.mysecret["mongopassword"])
             self.client_connect_string = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
         else:
-            self.port          = get_local_mongodb_config()[0]['port']
-            self.mongohost     = get_local_mongodb_config()[1]['mongohost']
-            self.database      = get_local_mongodb_config()[2]['database']
-            self.collection    = get_local_mongodb_config()[3]['collection']
+            mongo_local        = self.creds.get_local_mongodb_config()
+            self.port          = mongo_local['port']
+            self.mongohost     = mongo_local['mongohost']
+            self.database      = mongo_local['database']
+            self.collection    = mongo_local['collection']
             self.client_connect_string = (f"mongodb://{self.mongohost}:{self.port}")
         self.dbh = self.connect_to_mongo()
 

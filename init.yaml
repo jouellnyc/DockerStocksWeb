@@ -1,0 +1,9 @@
+Mode: Local
+LocalInfra:
+  collection: data
+  database: stocks
+  mongohost: docker_stocks_db_1
+  port: 27017
+AWS:
+  secret: "Prod-Stocks"
+  region: "us-east-1"
