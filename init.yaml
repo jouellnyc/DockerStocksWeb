@@ -1,4 +1,7 @@
-Mode: AWS 
+---
+#Mode is 'AWS' or 'Local'
+
+Mode: Local 
 LocalInfra:
   collection: data
   database: stocks
