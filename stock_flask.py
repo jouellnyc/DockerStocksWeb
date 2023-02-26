@@ -38,6 +38,7 @@ from lib import mongodb
 from lib.mongodb import StockDoesNotExist
 from lib.init import Credentials
 
+#nb:02/25/23 - If the Instance cannot connect to MongoDB, Nginx will return 404 
 mongocli = mongodb.MongoCli()
 secrets = Credentials().get_all_credentials()
 
