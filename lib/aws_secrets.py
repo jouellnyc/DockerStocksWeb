@@ -6,12 +6,6 @@ import json
 
 from botocore.exceptions import ClientError
 
-try:
-    from load_mongo_config import get_aws_mongodb_config
-except ModuleNotFoundError:
-    from lib.load_mongo_config import get_aws_mongodb_config
-
-
 def get_aws_secrets(secret_name, region_name):
 
     # Create a Secrets Manager client
@@ -54,13 +48,3 @@ def get_aws_secrets(secret_name, region_name):
             return base64.b64decode(
                 get_secret_value_response["SecretBinary"]
             )
-
-
-if __name__ == "__main__":
-    region        = get_aws_mongodb_config()[1]['region']
-    secret        = get_aws_mongodb_config()[0]['secret']
-    mysecret      = json.loads(get_aws_secrets(secret, region))
-   #Create .env file for Oauth and Docker Compose
-    with open('/stocks/.my.env','w') as fh:
-        for x in ['AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'AUTH0_DOMAIN', 'APP_SECRET_KEY','COMPOSE_PROJECT_NAME']:
-            fh.write(f"{x}={mysecret[x]}\n")

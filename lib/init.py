@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import json
 import yaml
 
 class Credentials:
@@ -21,7 +20,8 @@ class Credentials:
             return self.get_secrets_from_local()
 
     def get_secrets_from_aws(self):
-        from . aws_secrets import get_aws_secrets 
+        import json
+        from lib.aws_secrets import get_aws_secrets 
         region        = self.init_config_all['AWS']['region']
         secret        = self.init_config_all['AWS']['secret']
         return json.loads(get_aws_secrets(secret, region))
