@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import yaml
+import yaml  
+from aws_secrets import get_aws_secrets 
 
 class Credentials:
 
@@ -21,23 +22,14 @@ class Credentials:
 
     def get_secrets_from_aws(self):
         import json
-        from lib.aws_secrets import get_aws_secrets 
         region        = self.init_config_all['AWS']['region']
         secret        = self.init_config_all['AWS']['secret']
-        return json.loads(get_aws_secrets(secret, region))
-
-    def get_secrets_from_local(self):
-        from os import environ as env
-        from dotenv import find_dotenv, load_dotenv
-        ENV_FILE = find_dotenv(self.env_file)
-        if ENV_FILE:
-            load_dotenv(ENV_FILE)
-            mysecret = {}
-            for x in [ 'AUTH0_CLIENT_ID'    , 'AUTH0_CLIENT_SECRET', 'AUTH0_DOMAIN', 'APP_SECRET_KEY',
-                      'COMPOSE_PROJECT_NAME', 'collection'         , 'mongohost'   , 'mongopassword',
-                      'mongousername'       , 'port'               , 'database' ]:
-                mysecret[x] = env.get(x)
-        return mysecret
+        return  json.loads(get_aws_secrets(secret, region))
+        """
+        with open('/stocks/.my.env','w') as fh:
+            for x in ['AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'AUTH0_DOMAIN', 'APP_SECRET_KEY', 'collection','database', 'mongohost', 'mongousername', 'port']:
+                fh.write(f"{x}={mysecret[x]}\n")
+        """
 
     def get_local_mongodb_config(self):
         return self.init_config_all['LocalInfra']
@@ -50,11 +42,7 @@ class Credentials:
 
 if __name__ == "__main__":
 
-    from  pprint import pprint as pp
+    from pprint import  pprint as pp
+    from aws_secrets import get_aws_secrets 
     creds = Credentials(init_file="../init.yaml")
-    print("== All Config  ==")
-    pp(creds.init_config_all)
-    print("== Mode is Local  ==")
-    pp(creds.mode_is_local())
-    print("== get_all_credentials ==")
     pp(creds.get_all_credentials())
