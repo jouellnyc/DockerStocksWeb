@@ -45,7 +45,7 @@ class Credentials:
 
 
     def get_local_mongodb_config(self):
-        return self.init_config_all['LocalInfra']
+        return self.init_config_all['Local']
 
     def mode_is_aws(self):
         return self.init_config_all['Mode'] == 'AWS'

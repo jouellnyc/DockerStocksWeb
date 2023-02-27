@@ -2,11 +2,13 @@
 #Mode is 'AWS' or 'Local'
 
 Mode: AWS 
-LocalInfra:
+
+Local:
   collection: data
   database: stocks
   mongohost: u2f_db_1
   port: 27017
+
 AWS:
   secret: "Prod-Stocks"
   region: "us-east-1"
