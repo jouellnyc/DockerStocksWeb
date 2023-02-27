@@ -20,12 +20,12 @@ COPY non-app/                                                          /$WORKDIR
 COPY templates/                                                        /$WORKDIR/templates/
 COPY .my.env init.yaml stock_flask.py                                  /$WORKDIR/
 COPY external/gunicorn/gunicorn.conf.dev.py                            /$WORKDIR/external/gunicorn/
-COPY Docker/flask-docker-entrypoint.dev.sh                             /usr/sbin/flask-docker-entrypoint.dev.sh
-RUN chmod 755                                                          /usr/sbin/flask-docker-entrypoint.dev.sh
+COPY Docker/flask-docker-entrypoint.sh                                 /usr/sbin/flask-docker-entrypoint.sh
+RUN chmod 755                                                          /usr/sbin/flask-docker-entrypoint.sh
 RUN ln -s /usr/local/bin/python3.9                                     /usr/bin/python3
 COPY lib/                                                              /$WORKDIR/lib/
 RUN  chown -R nobody:                                                  /$WORKDIR/
 
 USER $USER
-ENTRYPOINT ["/usr/sbin/flask-docker-entrypoint.dev.sh"]
+ENTRYPOINT ["/usr/sbin/flask-docker-entrypoint.sh"]
 EXPOSE 8000
