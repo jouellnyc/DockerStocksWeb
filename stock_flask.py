@@ -38,7 +38,7 @@ from lib import mongodb
 from lib.mongodb import StockDoesNotExist
 from lib.init import Credentials
 
-#nb:02/25/23 - If the Instance cannot connect to MongoDB, Nginx will return 404 
+""" nb:02/25/23 - If the Instance cannot connect to MongoDB, Nginx will return 404  """
 mongocli = mongodb.MongoCli()
 secrets = Credentials().get_all_credentials()
 
@@ -49,9 +49,15 @@ app.url_map.strict_slashes = False
 logging.basicConfig(level=logging.DEBUG)
 
 if __name__ != "__main__":
+    """ if no "AWS" logging in  docker-compose file, access and error logs go 'docker logs' 
+    For local logs use the following in gunicorn.conf.py 
+    errorlog  = '/tmp/stocks.error.log'
+    accesslog = '/tmp/stocks.access.log'
+    """
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
+
 
 oauth = OAuth(app)
 oauth.register(
