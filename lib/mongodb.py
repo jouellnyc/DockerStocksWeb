@@ -32,8 +32,8 @@ class MongoCli:
         self.mongohost     = urllib.parse.quote_plus(self.secrets["mongohost"])
         self.mongousername = urllib.parse.quote_plus(self.secrets["mongousername"])
         self.mongopassword = urllib.parse.quote_plus(self.secrets.get("mongopassword",''))
-        #self.client_connect_string = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
-        self.client_connect_string = (f"mongodb://{self.mongohost}:{self.port}")
+        self.client_connect_string = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
+        #self.client_connect_string = (f"mongodb://{self.mongohost}:{self.port}")
         self.dbh = self.connect_to_mongo()
 
     def connect_to_mongo(self):
