@@ -1,16 +1,16 @@
 #!/bin/bash
 
 
-PROJ="u2f"
+source .env
+source data/AWS.vars.txt
 
 for svc in app web; do 
 
-    docker tag "${PROJ}"_${svc}:latest 631686326988.dkr.ecr.us-east-1.amazonaws.com/docker_stocks_${svc}:latest
-    PUSH="docker push 631686326988.dkr.ecr.us-east-1.amazonaws.com/docker_stocks_${svc}:latest"
+    docker tag "${COMPOSE_PROJECT_NAME}_${svc}:latest" "${AWS_ECR_REP}/${COMPOSE_PROJECT_NAME}_${svc}:latest"
+    PUSH="docker push ${AWS_ECR_REPO}/${COMPOSE_PROJECT_NAME}_${svc}:latest"
     if  ! $PUSH ; then
-        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 631686326988.dkr.ecr.us-east-1.amazonaws.com 
+        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin  "${AWS_ECR_REPO}"
         $PUSH
     fi
 
 done
-
