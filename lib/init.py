@@ -29,15 +29,10 @@ class Credentials:
         region        = self.init_config_all['AWS']['region']
         secret        = self.init_config_all['AWS']['secret']
         return  json.loads(get_aws_secrets(secret, region))
-        """
-        with open('/stocks/.my.env','w') as fh:
-            for x in ['AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'AUTH0_DOMAIN', 'APP_SECRET_KEY', 'collection','database', 'mongohost', 'mongousername', 'port']:
-                fh.write(f"{x}={mysecret[x]}\n")
-        """
 
     def get_secrets_from_local(self):
         secrets={}
-        with open('/stocks/.my.env') as fh:
+        with open(self.env_file) as fh:
             for entry in fh:
                 _lst =  entry.strip().split('=')
                 secrets[_lst[0]] = _lst[1] 
@@ -56,5 +51,6 @@ class Credentials:
 if __name__ == "__main__":
 
     from pprint import  pprint as pp
-    creds = Credentials()
+    creds = Credentials(init_file="../init.yaml", env_file="../.my.env")
+    #breakpoint()
     pp(creds.get_all_credentials())
