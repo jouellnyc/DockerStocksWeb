@@ -1,7 +1,7 @@
 ---
 #Mode is 'AWS' or 'Local'
 
-Mode: AWS 
+Mode: Local 
 
 Local:
   collection: data
