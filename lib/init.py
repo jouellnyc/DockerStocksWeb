@@ -51,6 +51,9 @@ class Credentials:
 if __name__ == "__main__":
 
     from pprint import  pprint as pp
-    creds = Credentials(init_file="../init.yaml", env_file="../.my.env")
-    #breakpoint()
-    pp(creds.get_all_credentials())
+    try:
+        creds = Credentials(init_file="../init.yaml", env_file="../.my.env")
+    except FileNotFoundError:
+        creds = Credentials(init_file="init.yaml", env_file=".my.env")
+    else:
+        pp(creds.get_all_credentials())
