@@ -12,13 +12,6 @@ import json
 import yaml
 import urllib.parse
 
-### Allow for local, same directory testing and usage
-
-try:
-    from lib.aws_secrets import get_aws_secrets
-except ModuleNotFoundError:
-    from     aws_secrets import get_aws_secrets
-
 try:
     from lib.init import Credentials
 except ModuleNotFoundError:
@@ -38,9 +31,9 @@ class MongoCli:
         self.collection    = urllib.parse.quote_plus(self.secrets["collection"])
         self.mongohost     = urllib.parse.quote_plus(self.secrets["mongohost"])
         self.mongousername = urllib.parse.quote_plus(self.secrets["mongousername"])
-        self.mongopassword = urllib.parse.quote_plus(self.secrets["mongopassword"])
-        self.client_connect_string = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
-        #self.client_connect_string = (f"mongodb://{self.mongohost}:{self.port}")
+        self.mongopassword = urllib.parse.quote_plus(self.secrets.get("mongopassword",''))
+        #self.client_connect_string = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
+        self.client_connect_string = (f"mongodb://{self.mongohost}:{self.port}")
         self.dbh = self.connect_to_mongo()
 
     def connect_to_mongo(self):

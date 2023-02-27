@@ -1,0 +1,11 @@
+#AWS is all set except for the flask db connect error / 404
+# I can build aws on my pc, tag and push it to the ecr and the 
+# isntance will run with no problem w/o the credential abstractions
+
+
+Next is to sort of local vs aws docker BUILDs, and the files/what to put in them
+- dev vs prod gunicorn
+- dev vs prod .myenv
+- self.client_connect_string = (f"mongodb://{self.mongohost}:{self.port}")
+  #self.client_connect_string = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
+- integrate .env into build and compose file?

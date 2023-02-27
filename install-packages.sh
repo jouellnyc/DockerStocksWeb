@@ -20,7 +20,7 @@ apt-get -y upgrade
 
 # Install a new package, without unnecessary recommended packages:
 # apt-get -y install --no-install-recommends $BLAH 
-apt-get -y install --no-install-recommends vim  net-tools  procps wget
+apt-get -y install --no-install-recommends vim net-tools procps wget telnet iputils-ping
 
 # Delete cached files we don't need anymore (note that if you're
 # using official Docker images for Debian or Ubuntu, this happens

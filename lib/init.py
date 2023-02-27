@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 
 import yaml  
-from aws_secrets import get_aws_secrets 
+
+try:
+    from lib.aws_secrets import get_aws_secrets 
+except ModuleNotFoundError:
+    from     aws_secrets import get_aws_secrets 
 
 class Credentials:
 
-    def __init__(self, init_file="init.yaml", env_file="../.my.env"):
+    def __init__(self, init_file="/stocks/init.yaml", env_file="/stocks/.my.env"):
         self.init_file = init_file
         self.env_file  = env_file
         self.init_config_all = self.get_init_config()
@@ -31,6 +35,15 @@ class Credentials:
                 fh.write(f"{x}={mysecret[x]}\n")
         """
 
+    def get_secrets_from_local(self):
+        secrets={}
+        with open('/stocks/.my.env') as fh:
+            for entry in fh:
+                _lst =  entry.strip().split('=')
+                secrets[_lst[0]] = _lst[1] 
+        return secrets
+
+
     def get_local_mongodb_config(self):
         return self.init_config_all['LocalInfra']
 
@@ -43,6 +56,5 @@ class Credentials:
 if __name__ == "__main__":
 
     from pprint import  pprint as pp
-    from aws_secrets import get_aws_secrets 
-    creds = Credentials(init_file="../init.yaml")
+    creds = Credentials()
     pp(creds.get_all_credentials())
