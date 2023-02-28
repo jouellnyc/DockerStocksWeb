@@ -33,10 +33,9 @@ class MongoCli:
         self.mongousername = urllib.parse.quote_plus(self.secrets["mongousername"])
         self.mongopassword = urllib.parse.quote_plus(self.secrets.get("mongopassword",''))
         self.dns_srv       = self.secrets.get("DNS_SRV",None)
-        if self.dns_srv:
+        self.client_connect_string     =     f"mongodb://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
+        if self.creds.uses_dns_srv():
             self.client_connect_string = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
-        else:
-            self.client_connect_string =     f"mongodb://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
         self.dbh = self.connect_to_mongo()
 
     def connect_to_mongo(self):

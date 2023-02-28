@@ -41,22 +41,23 @@ class Credentials:
                 secrets[_lst[0]] = _lst[1] 
         return secrets
 
-
-    def get_local_mongodb_config(self):
-        return self.init_config_all[self.local]
-
     def mode_is_aws(self):
         return self.init_config_all[self.mode] == self.aws
 
     def mode_is_local(self):
         return self.init_config_all[self.mode] == self.local
 
+    def uses_dns_srv(self):
+        return self.init_config_all['DNS_SRV'] == True
+
 if __name__ == "__main__":
 
     from pprint import  pprint as pp
+    init_file = "init.yaml"
+    env_file  = ".my.env"
     try:
-        creds = Credentials(init_file="../init.yaml", env_file="../.my.env")
+        creds = Credentials(init_file=f"../{init_file}", env_file=f"../{env_file}")
     except FileNotFoundError:
-        creds = Credentials(init_file="init.yaml", env_file=".my.env")
+        creds = Credentials(init_file=init_file, env_file=env_file)
     else:
         pp(creds.get_all_credentials())
