@@ -3,6 +3,8 @@
 source .env
 source data/AWS.vars.txt
 
+docker-compose  -f  docker-compose.AWS.web.app.Hosted.mongo.yaml build 
+
 for svc in app web; do 
 
     docker tag "${COMPOSE_PROJECT_NAME}_${svc}:latest" "${AWS_ECR_REP}/${COMPOSE_PROJECT_NAME}_${svc}:latest"
@@ -13,12 +15,3 @@ for svc in app web; do
     fi
 
 done
-
-exit
-
-docker-compose  -f docker-compose.local.dev.yaml build 
-docker-compose  -f  docker-compose.AWS.web.app.Hosted.mongo.yaml build 
-docker tag  "${COMPOSE_PROJECT_NAME}":latest "${AWS_ECR_REPO}"/"${COMPOSE_PROJECT_NAME}":latest
-docker tag  "${COMPOSE_PROJECT_NAME}":latest "${AWS_ECR_REPO}"/"${COMPOSE_PROJECT_NAME}":latest
-docker push "${AWS_ECR_REPO}"/"${COMPOSE_PROJECT_NAME}":latest
-docker push "${AWS_ECR_REPO}"/"${COMPOSE_PROJECT_NAME}":latest
