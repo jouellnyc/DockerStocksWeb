@@ -23,7 +23,7 @@ class StockDoesNotExist(Exception):
     pass
 
 class MongoCli:
-    def __init__(self, mode=None):
+    def __init__(self):
         self.creds   = Credentials()
         self.secrets = self.creds.get_all_credentials()
         self.port          = urllib.parse.quote_plus(self.secrets["port"])
@@ -32,8 +32,11 @@ class MongoCli:
         self.mongohost     = urllib.parse.quote_plus(self.secrets["mongohost"])
         self.mongousername = urllib.parse.quote_plus(self.secrets["mongousername"])
         self.mongopassword = urllib.parse.quote_plus(self.secrets.get("mongopassword",''))
-        #self.client_connect_string = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
-        self.client_connect_string = (f"mongodb://{self.mongohost}:{self.port}")
+        self.dns_srv       = self.secrets.get("DNS_SRV",None)
+        if self.dns_srv:
+            self.client_connect_string = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
+        else:
+            self.client_connect_string =     f"mongodb://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
         self.dbh = self.connect_to_mongo()
 
     def connect_to_mongo(self):

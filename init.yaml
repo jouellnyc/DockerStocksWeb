@@ -1,13 +1,15 @@
 ---
+
 #Mode is 'AWS' or 'Local'
 
-Mode: Local 
+MODE: Local 
 
-Local:
-  collection: data
-  database: stocks
-  mongohost: u2f_db_1
-  port: 27017
+# DNS_SRV tells whethter to use mongodb+srv or not
+
+DNS_SRV: False
+
+
+# Inital AWS seeds
 
 AWS:
   secret: "Prod-Stocks"

@@ -13,6 +13,9 @@ class Credentials:
         self.init_file = init_file
         self.env_file  = env_file
         self.init_config_all = self.get_init_config()
+        self.mode  ='MODE'
+        self.local ='Local'
+        self.aws   ='AWS'
             
     def get_init_config(self):
         with open(self.init_file,'r') as file:
@@ -26,8 +29,8 @@ class Credentials:
 
     def get_secrets_from_aws(self):
         import json
-        region        = self.init_config_all['AWS']['region']
-        secret        = self.init_config_all['AWS']['secret']
+        region        = self.init_config_all[self.aws]['region']
+        secret        = self.init_config_all[self.aws]['secret']
         return  json.loads(get_aws_secrets(secret, region))
 
     def get_secrets_from_local(self):
@@ -40,13 +43,13 @@ class Credentials:
 
 
     def get_local_mongodb_config(self):
-        return self.init_config_all['Local']
+        return self.init_config_all[self.local]
 
     def mode_is_aws(self):
-        return self.init_config_all['Mode'] == 'AWS'
+        return self.init_config_all[self.mode] == self.aws
 
     def mode_is_local(self):
-        return self.init_config_all['Mode'] == 'Local'
+        return self.init_config_all[self.mode] == self.local
 
 if __name__ == "__main__":
 
