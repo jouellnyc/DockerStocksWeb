@@ -5,9 +5,7 @@
 
 Next is to sort out:
 
-- self.client_connect_string = (f"mongodb://{self.mongohost}:{self.port}")
-  #self.client_connect_string = f"mongodb+srv://{self.mongousername}:{self.mongopassword}@{self.mongohost}/{self.database}?retryWrites=true&w=majority"
-
-- integrate .env into build and compose file?
-
 - One Docker file / multi stage builds
+- integrate .env    into compose  file?
+- integrate build   into compose  file?
+- integrate content into  compose file?
