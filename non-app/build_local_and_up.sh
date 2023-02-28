@@ -7,6 +7,6 @@ if grep MODE init.yaml | grep AWS; then
 
 else
 
-    docker-compose  -f docker-compose.Local.web.app.db.yaml build && docker-compose  -f docker-compose.Local.web.app.db.yaml up -d
+    docker-compose  -f docker-compose.Local.web.app.db.yaml build && docker-compose  -f docker-compose.Local.web.app.db.yaml up -d && docker ps
 
 fi
