@@ -6,7 +6,7 @@ MODE: Local
 
 # DNS_SRV tells whethter to use mongodb+srv or not
 
-DNS_SRV: False 
+DNS_SRV: False
 
 # Inital AWS seeds
 

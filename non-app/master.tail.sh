@@ -3,25 +3,11 @@
 
 DP="docker ps"
 DE="docker exec"
+DL="docker logs"
 
-function flask {
-CONT=$( $DP | grep flask | awk '{ print $1; }')
-$DE -it $CONT tail -f /tmp/stocks.error.log
-}
-
-
-function nginx {
-docker logs docker_stocks_web_1 -f
-}
-
-function mongodb {
-CONT=$( $DP | grep mongod | awk '{ print $1; }')
-$DE -it $CONT bash
-}
+CONT=$( $DP | grep $1 | awk '{ print $1; }')
+$DL $CONT
 
 case $1 in
-    "flask") flask ;;
-    "nginx") nginx ;;
-    "mongodb") mongodb ;;
     "") echo "Tell me a name"; exit;;
 esac

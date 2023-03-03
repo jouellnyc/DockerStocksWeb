@@ -1,4 +1,3 @@
-#AWS is all set except for the flask db connect error / 404
 # I can build   aws on my pc, tag and push it to the ecr
 # I can build local on my pc, and start it as well
 # Both instance run with no problem w/the credential abstraction 

@@ -1,6 +1,7 @@
 version: "3"
 services:
   app:
+      image: u2f_app_dev
       build:
         context: .
         dockerfile: Docker/Dockerfile.flask.dev
@@ -9,6 +10,7 @@ services:
       cap_drop:
         - ALL
   web:
+      image: u2f_web_dev
       build:
         context: .
         dockerfile: Docker/Dockerfile.nginx
@@ -21,6 +23,7 @@ services:
       cap_drop:
         - ALL
   db:
+      image: u2f_db_dev
       build:
         context: .
         dockerfile: Docker/Dockerfile.mongod
