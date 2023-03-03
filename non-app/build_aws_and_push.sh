@@ -9,6 +9,7 @@ if [[ ! -z $1 ]]; then
 
 else
 
+    cp init.yaml.prod init.yaml
     docker-compose  -f docker-compose.AWS.web.app.Hosted.mongo.yaml build
 
     for svc in app web; do 
