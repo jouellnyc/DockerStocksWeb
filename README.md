@@ -252,4 +252,5 @@ To fully deploy automatically:
 ## Warnings
 - This project is mean to be a part of a DevOps/Python learning project and is unsecured by default.
 - Images built from this report are likely to be large and cumbersome with Container Orchestration.
+- For a while, alphavantage free api keys were not, working, I have not spent time on this project, your mileage may vary.
 
